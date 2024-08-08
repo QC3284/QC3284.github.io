@@ -1,0 +1,174 @@
+
+
+  <!DOCTYPE html>
+  <html lang="en">
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="description" content=嘿，我是QC3284～这是我的博客，用于记录或者搬运一些文章。欢迎访问！ >
+  <meta name="keywords" content=hexo,theme,MiHoYo,blog,QC3284 >
+
+  <head>
+    <title>
+      Openwrt 的README [ QC3284的博客 ]
+    </title>
+  <meta name="generator" content="Hexo 7.3.0"></head>
+
+  <body>
+
+    <link rel="stylesheet" href="/css/header.css">
+<div class="header">
+  <div class="logo">
+    <span class="pull-left">
+      <a id="site-name" href="/">
+        QC3284&#39;s blog
+      </a>
+    </span>
+  </div>
+  <ul class="nav-list">
+    
+      <li>
+        <a href="/">
+          首页
+        </a>
+      </li>
+      
+      <li>
+        <a href="/about">
+          关于
+        </a>
+      </li>
+      
+  </ul>
+</div>
+
+      <!--<link rel="stylesheet" href="/css/top-header.css">
+<div id="top-bar" class="fixed">
+
+  <a class="goto-top" href="#"></a>
+  <ul class="bar-list bar-list-1">
+    
+      <li>
+        <p>
+          <a href="/">
+            <text class="bar-text bar-p1">
+              首页
+            </text>
+            <text class="bar-text bar-p2"></text>
+          </a>
+          <text class="bar-p3">/</text>
+        </p>
+      </li>
+      
+      <li>
+        <p>
+          <a href="/about">
+            <text class="bar-text bar-p1">
+              关于
+            </text>
+            <text class="bar-text bar-p2"></text>
+          </a>
+          <text class="bar-p3">/</text>
+        </p>
+      </li>
+      
+  </ul>
+</div>-->
+
+        <div id="content-outer">
+          <div class="content-inner">
+            <link rel="stylesheet" href="/css/post.css">
+<div class="posts">
+  <a href="/index.html"><i class="fa fa-home
+replay-btn" aria-hidden="true"></i></a>
+  <div class="post-title">
+    <p>
+      Openwrt 的README
+    </p>
+    <hr>
+  </div>
+  <div class="post-content">
+    <p><img src="https://ghproxy.net/https://raw.githubusercontent.com/openwrt/openwrt/main/include/logo.png" alt="OpenWrt logo"></p>
+<p>OpenWrt Project is a Linux operating system targeting embedded devices. Instead<br>of trying to create a single, static firmware, OpenWrt provides a fully<br>writable filesystem with package management. This frees you from the<br>application selection and configuration provided by the vendor and allows you<br>to customize the device through the use of packages to suit any application.<br>For developers, OpenWrt is the framework to build an application without having<br>to build a complete firmware around it; for users this means the ability for<br>full customization, to use the device in ways never envisioned.</p>
+<p>Sunshine!</p>
+<h2 id="Download"><a href="#Download" class="headerlink" title="Download"></a>Download</h2><p>Built firmware images are available for many architectures and come with a<br>package selection to be used as WiFi home router. To quickly find a factory<br>image usable to migrate from a vendor stock firmware to OpenWrt, try the<br><em>Firmware Selector</em>.</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://firmware-selector.openwrt.org/">OpenWrt Firmware Selector</a></li>
+</ul>
+<p>If your device is supported, please follow the <strong>Info</strong> link to see install<br>instructions or consult the support resources listed below.</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p>An advanced user may require additional or specific package. (Toolchain, SDK, …) For everything else than simple firmware download, try the wiki download page:</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://openwrt.org/downloads">OpenWrt Wiki Download</a></li>
+</ul>
+<h2 id="Development"><a href="#Development" class="headerlink" title="Development"></a>Development</h2><p>To build your own firmware you need a GNU&#x2F;Linux, BSD or macOS system (case<br>sensitive filesystem required). Cygwin is unsupported because of the lack of a<br>case sensitive file system.</p>
+<h3 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h3><p>You need the following tools to compile OpenWrt, the package names vary between<br>distributions. A complete list with distribution specific packages is found in<br>the <a target="_blank" rel="noopener" href="https://openwrt.org/docs/guide-developer/build-system/install-buildsystem">Build System Setup</a><br>documentation.</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">binutils bzip2 diff find flex gawk gcc-6+ getopt grep install libc-dev libz-dev</span><br><span class="line">make4.1+ perl python3.7+ rsync subversion unzip which</span><br></pre></td></tr></table></figure>
+
+<h3 id="Quickstart"><a href="#Quickstart" class="headerlink" title="Quickstart"></a>Quickstart</h3><ol>
+<li><p>Run <code>./scripts/feeds update -a</code> to obtain all the latest package definitions<br>defined in feeds.conf &#x2F; feeds.conf.default</p>
+</li>
+<li><p>Run <code>./scripts/feeds install -a</code> to install symlinks for all obtained<br>packages into package&#x2F;feeds&#x2F;</p>
+</li>
+<li><p>Run <code>make menuconfig</code> to select your preferred configuration for the<br>toolchain, target system &amp; firmware packages.</p>
+</li>
+<li><p>Run <code>make</code> to build your firmware. This will download all sources, build the<br>cross-compile toolchain and then cross-compile the GNU&#x2F;Linux kernel &amp; all chosen<br>applications for your target system.</p>
+</li>
+</ol>
+<h3 id="Related-Repositories"><a href="#Related-Repositories" class="headerlink" title="Related Repositories"></a>Related Repositories</h3><p>The main repository uses multiple sub-repositories to manage packages of<br>different categories. All packages are installed via the OpenWrt package<br>manager called <code>opkg</code>. If you’re looking to develop the web interface or port<br>packages to OpenWrt, please find the fitting repository below.</p>
+<ul>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/openwrt/luci">LuCI Web Interface</a>: Modern and modular<br>interface to control the device via a web browser.</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/openwrt/packages">OpenWrt Packages</a>: Community repository<br>of ported packages.</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/openwrt/routing">OpenWrt Routing</a>: Packages specifically<br>focused on (mesh) routing.</p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://github.com/openwrt/video">OpenWrt Video</a>: Packages specifically<br>focused on display servers and clients (Xorg and Wayland).</p>
+</li>
+</ul>
+<h2 id="Support-Information"><a href="#Support-Information" class="headerlink" title="Support Information"></a>Support Information</h2><p>For a list of supported devices see the <a target="_blank" rel="noopener" href="https://openwrt.org/supported_devices">OpenWrt Hardware Database</a></p>
+<h3 id="Documentation"><a href="#Documentation" class="headerlink" title="Documentation"></a>Documentation</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://openwrt.org/docs/guide-quick-start/start">Quick Start Guide</a></li>
+<li><a target="_blank" rel="noopener" href="https://openwrt.org/docs/guide-user/start">User Guide</a></li>
+<li><a target="_blank" rel="noopener" href="https://openwrt.org/docs/guide-developer/start">Developer Documentation</a></li>
+<li><a target="_blank" rel="noopener" href="https://openwrt.org/docs/techref/start">Technical Reference</a></li>
+</ul>
+<h3 id="Support-Community"><a href="#Support-Community" class="headerlink" title="Support Community"></a>Support Community</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://forum.openwrt.org/">Forum</a>: For usage, projects, discussions and hardware advise.</li>
+<li><a target="_blank" rel="noopener" href="https://webchat.oftc.net/#openwrt">Support Chat</a>: Channel <code>#openwrt</code> on <strong>oftc.net</strong>.</li>
+</ul>
+<h3 id="Developer-Community"><a href="#Developer-Community" class="headerlink" title="Developer Community"></a>Developer Community</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://bugs.openwrt.org/">Bug Reports</a>: Report bugs in OpenWrt</li>
+<li><a target="_blank" rel="noopener" href="https://lists.openwrt.org/mailman/listinfo/openwrt-devel">Dev Mailing List</a>: Send patches</li>
+<li><a target="_blank" rel="noopener" href="https://webchat.oftc.net/#openwrt-devel">Dev Chat</a>: Channel <code>#openwrt-devel</code> on <strong>oftc.net</strong>.</li>
+</ul>
+<h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><p>OpenWrt is licensed under GPL-2.0</p>
+
+  </div>
+  
+</div>
+          </div>
+        </div>
+
+        <link rel="stylesheet" href="/css/footer.css">
+<div class="bottom-outer">
+  <div class="copyright">©2021 - 2021 By Tanger</div>
+  <div class="framework-info">
+    <span>Power by</span>
+    <a class="a1" target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>
+    <span class="footer-separator">|</span>
+    <span>Theme by</span>
+    <a class="a2" target="_blank" rel="noopener" href="https://github.com/redhat123456/hexo-theme-MiHoYo">MiHoYo</a>
+  </div>
+</div>
+
+          
+            <!-- scripts list from theme config.yml -->
+            
+              <script src="/js/MiHoYo.js"></script>
+              
+                
+
+  </body>
+
+  </html>
