@@ -13,25 +13,22 @@
     
     <!--- Seo Part-->
     
-    <link rel="canonical" href="https://blog.xcqcoo.us.kg/2024/08/08/如何编译x-wrt/"/>
+    <link rel="canonical" href="https://blog.xcqcoo.us.kg/2024/08/08/自己动手编译-openwrt/"/>
     <meta name="robots" content="index,follow">
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
     
-        <meta name="description" content="文章来源：https:&#x2F;&#x2F;github.com&#x2F;x-wrt&#x2F;x-wrt.github.io&#x2F;tree&#x2F;master&#x2F;docs&#x2F;build  编译教程很多人不知道怎样编译一个自己的固件，这里主要简单介绍大概的编译打包流程，具体的情况还需要大家自己发挥，情况千变万化，大家随机应变。 1 编译准备我们建议使用Ubuntu 系统作为编译环境，这里以Ubuntu 22.04作为例子，其他版本也是可以的。特别">
+        <meta name="description" content="文章来源：https:&#x2F;&#x2F;lgiki.net&#x2F;post&#x2F;compile-openwrt&#x2F;  Intro学校最近升级了校园网设备，终于从年久失修的龟速 100Mbps 升级到了 1Gbps，尽管还是使用锐捷的 ePortal 网页认证，还能通过简单的 Shell 脚本在路由器上自动认证，但新设备却限制了每个用户最多只能同时有两台设备在线，使用路由器会被检测出使用多设备，并被加入黑名单，被断网。 都">
 <meta property="og:type" content="article">
-<meta property="og:title" content="如何编译X-WRT">
-<meta property="og:url" content="https://blog.xcqcoo.us.kg/2024/08/08/%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91X-WRT/index.html">
+<meta property="og:title" content="自己动手编译 OpenWRT">
+<meta property="og:url" content="https://blog.xcqcoo.us.kg/2024/08/08/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E7%BC%96%E8%AF%91-OpenWRT/index.html">
 <meta property="og:site_name" content="QC3284的博客">
-<meta property="og:description" content="文章来源：https:&#x2F;&#x2F;github.com&#x2F;x-wrt&#x2F;x-wrt.github.io&#x2F;tree&#x2F;master&#x2F;docs&#x2F;build  编译教程很多人不知道怎样编译一个自己的固件，这里主要简单介绍大概的编译打包流程，具体的情况还需要大家自己发挥，情况千变万化，大家随机应变。 1 编译准备我们建议使用Ubuntu 系统作为编译环境，这里以Ubuntu 22.04作为例子，其他版本也是可以的。特别">
+<meta property="og:description" content="文章来源：https:&#x2F;&#x2F;lgiki.net&#x2F;post&#x2F;compile-openwrt&#x2F;  Intro学校最近升级了校园网设备，终于从年久失修的龟速 100Mbps 升级到了 1Gbps，尽管还是使用锐捷的 ePortal 网页认证，还能通过简单的 Shell 脚本在路由器上自动认证，但新设备却限制了每个用户最多只能同时有两台设备在线，使用路由器会被检测出使用多设备，并被加入黑名单，被断网。 都">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://ghproxy.net/https://raw.githubusercontent.com/QC3284/x-wrt.github.io/master/docs/build/build-target.png">
-<meta property="og:image" content="https://ghproxy.net/https://raw.githubusercontent.com/QC3284/x-wrt.github.io/master/docs/build//build-m.png">
-<meta property="article:published_time" content="2024-08-08T12:39:53.000Z">
-<meta property="article:modified_time" content="2024-08-08T16:55:55.386Z">
+<meta property="article:published_time" content="2024-08-08T16:57:11.000Z">
+<meta property="article:modified_time" content="2024-08-08T17:13:51.054Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://ghproxy.net/https://raw.githubusercontent.com/QC3284/x-wrt.github.io/master/docs/build/build-target.png">
     
     
     <!--- Icon Part-->
@@ -43,7 +40,7 @@
     
     <title>
         
-            如何编译X-WRT -
+            自己动手编译 OpenWRT -
         
         QC3284&#39;s Blog
     </title>
@@ -395,7 +392,7 @@
         <div class="article-title relative w-full">
             
                 <div class="w-full flex items-center pt-6 justify-start">
-                    <h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">如何编译X-WRT</h1>
+                    <h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">自己动手编译 OpenWRT</h1>
                 </div>
             
             </div>
@@ -416,15 +413,15 @@
                         <div class="article-meta-info">
     <span class="article-date article-meta-item">
         <i class="fa-regular fa-pen-fancy"></i>&nbsp;
-        <span class="desktop">2024-08-08 12:39:53</span>
-        <span class="mobile">2024-08-08 12:39:53</span>
+        <span class="desktop">2024-08-08 16:57:11</span>
+        <span class="mobile">2024-08-08 16:57:11</span>
         <span class="hover-info">Created</span>
     </span>
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2024-08-08 16:55:55</span>
-            <span class="mobile">2024-08-08 16:55:55</span>
+            <span class="desktop">2024-08-08 17:13:51</span>
+            <span class="mobile">2024-08-08 17:13:51</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -451,64 +448,40 @@
 
 
         <div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
-            <p>文章来源：<a class="link"   target="_blank" rel="noopener" href="https://github.com/x-wrt/x-wrt.github.io/tree/master/docs/build" >https://github.com/x-wrt/x-wrt.github.io/tree/master/docs/build <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
-<h1 id="编译教程"><a href="#编译教程" class="headerlink" title="编译教程"></a>编译教程</h1><p>很多人不知道怎样编译一个自己的固件，这里主要简单介绍大概的编译打包流程，具体的情况还需要大家自己发挥，情况千变万化，大家随机应变。</p>
-<h2 id="1-编译准备"><a href="#1-编译准备" class="headerlink" title="1 编译准备"></a>1 编译准备</h2><p>我们建议使用<a class="link"   target="_blank" rel="noopener" href="https://www.ubuntu.com/" >Ubuntu <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>系统作为编译环境，这里以Ubuntu 22.04作为例子，其他版本也是可以的。特别注意的是，整个编译过程，都是用普通用户操作，不要用<code>root</code>用户操作。</p>
-<p>首先要安装编译所需要的软件包:<br><code>sudo apt install build-essential ecj fastjar file flex g++ gcc-multilib g++-multilib gawk gettext git git-core java-propose-classpath libelf-dev libncurses5-dev libncursesw5-dev libssl-dev swig python3 python3-dev python3-distutils python3-pyelftools subversion unzip wget zlib1g-dev rsync qemu-utils</code></p>
-<p>下载源码:</p>
-<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/x-wrt/x-wrt.git</span><br><span class="line"><span class="built_in">cd</span> x-wrt</span><br><span class="line"></span><br><span class="line"><span class="comment">#更新代码tag:</span></span><br><span class="line">git fetch origin</span><br><span class="line">git fetch origin --tags</span><br><span class="line"></span><br><span class="line"><span class="comment">#列出可以使用的版本tag:</span></span><br><span class="line">git tag</span><br><span class="line"><span class="comment">#注意摁 q 键结束</span></span><br><span class="line"><span class="comment">#或者直接获取最新发布版本</span></span><br><span class="line">git describe --tags $(git rev-list --tags --max-count=1)</span><br><span class="line"></span><br><span class="line"><span class="comment">#选择并切换到指定的版本tag:</span></span><br><span class="line">git checkout -f &lt;tag-name&gt;</span><br><span class="line"><span class="comment">#例如</span></span><br><span class="line">git checkout -f 21.10_b202112032317</span><br><span class="line"><span class="comment">#或者</span></span><br><span class="line">git checkout -f $(git describe --tags $(git rev-list --tags --max-count=1))</span><br><span class="line"></span><br><span class="line"><span class="comment">#更新代码:</span></span><br><span class="line">./scripts/feeds update -a</span><br><span class="line">./scripts/feeds install -a</span><br></pre></td></tr></table></figure></div>
+            <p>文章来源：<a class="link"   target="_blank" rel="noopener" href="https://lgiki.net/post/compile-openwrt/" >https://lgiki.net/post/compile-openwrt/ <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h2 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h2><p>学校最近升级了校园网设备，终于从年久失修的龟速 100Mbps 升级到了 1Gbps，尽管还是使用锐捷的 ePortal 网页认证，还能通过简单的 Shell 脚本在路由器上自动认证，但新设备却限制了每个用户最多只能同时有两台设备在线，使用路由器会被检测出使用多设备，并被加入黑名单，被断网。</p>
+<p>都 2023 年了，随便手机、电脑再加个平板就仨设备了，更不用说可能还有 Kindle、Switch 等其他设备，只能同时两台设备在线怎么可能满足学生正常使用校园网的需求。更何况，计算机专业的学生可能还会使用虚拟机等软件，但虚拟机类的软件也可能被检测为是多设备同时在线，所以你让计算机专业的学生拿啥学习呢，内存条含嘴里脑补画面吗？</p>
+<p>限制校园网的同时在线设备数量无非就两个出发点：（1）如果不限制，一个宿舍只需要开通一个宽带账号，所有人都可以上网了，运营商的收入就减少了；（2）如果学生出现一些非法的上网行为，可以快速准确地定位到具体学生。但我觉得这都不是学校限制学生只能使用两个设备的理由，哪怕提升到 5 个设备我觉得也合理一些。</p>
+<p>对于限制校园网设备数量的学校，我只能说 Shame on you！</p>
+<p>对于限制校园网设备数量的学校，我只能说 Shame on you！</p>
+<p>对于限制校园网设备数量的学校，我只能说 Shame on you！</p>
+<p>那就…只能另辟蹊径，想其他办法了。</p>
+<p>还好，限制同时在线设备数量这件事早已有其他学校实施过了，也已经有人提出了一些对策。<br>例如，在 <a class="link"   target="_blank" rel="noopener" href="https://blog.sunbk201.site/posts/crack-campus-network" >https://blog.sunbk201.site/posts/crack-campus-network <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> 这篇博客里就详细列举了校园网检测在线设备可能采用的手段以及相应的应对措施，我们只需要照着做就行了。</p>
+<p>其实主要就是为 OpenWRT 编译 <a class="link"   target="_blank" rel="noopener" href="https://github.com/CHN-beta/rkp-ipid" >rkp-ipid <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> 和 <a class="link"   target="_blank" rel="noopener" href="https://github.com/Zxilly/UA2F" >UA2F <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> 这两个包，而这两个包需要在编译内核的时候开启一些选项，所以需要重新编译 OpenWRT 固件，也因此写下这篇文章记录一下编译 OpenWRT 的过程。</p>
+<h2 id="安装编译环境"><a href="#安装编译环境" class="headerlink" title="安装编译环境"></a>安装编译环境</h2><p>要编译 Linux 当然是使用 Linux 啦！</p>
+<p>如果是 Debian 系的发行版（例如 Ubuntu），可以使用以下指令来安装编译所需的依赖：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update -y</span><br><span class="line"><span class="built_in">sudo</span> apt full-upgrade -y</span><br><span class="line"><span class="built_in">sudo</span> apt install -y ack antlr3 aria2 asciidoc autoconf automake autopoint binutils bison build-essential \</span><br><span class="line">bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \</span><br><span class="line">git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \</span><br><span class="line">libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz \</span><br><span class="line">mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pip libpython3-dev qemu-utils \</span><br><span class="line">rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev</span><br></pre></td></tr></table></figure></div>
+<p>对于 Arch 系的发行版，直接安装 AUR 中的 openwrt-devel 即可：<br><a class="link"   target="_blank" rel="noopener" href="https://aur.archlinux.org/packages/openwrt-devel" >https://aur.archlinux.org/packages/openwrt-devel <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h2 id="获取-OpenWRT-源码"><a href="#获取-OpenWRT-源码" class="headerlink" title="获取 OpenWRT 源码"></a>获取 OpenWRT 源码</h2><p>如果你的设备是 OpenWRT 官方支持的设备，并且你想编译 OpenWRT 官方源码，则直接：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/openwrt/openwrt.git</span><br></pre></td></tr></table></figure></div>
+<p>即可。</p>
+<p>但现在有一些国产的路由器 OpenWRT 官方并不支持，可以看看有没有第三方的 OpenWRT 源码支持了你手上的路由器，下载相应的源代码。<br>可以通过<code>cat /etc/openwrt_release</code>命令来查看设备的 Arch、Target 信息：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">root@QWRT:~# <span class="built_in">cat</span> /etc/openwrt_release</span><br><span class="line">DISTRIB_ID=<span class="string">&#x27;OpenWrt&#x27;</span></span><br><span class="line">DISTRIB_RELEASE=<span class="string">&#x27;19.07-SNAPSHOT&#x27;</span></span><br><span class="line">DISTRIB_TARGET=<span class="string">&#x27;ipq60xx/generic&#x27;</span></span><br><span class="line">DISTRIB_ARCH=<span class="string">&#x27;aarch64_cortex-a53+crypto&#x27;</span></span><br><span class="line">DISTRIB_TAINTS=<span class="string">&#x27;no-all busybox override&#x27;</span></span><br><span class="line">DISTRIB_REVISION=<span class="string">&#x27;R23.1.20&#x27;</span></span><br><span class="line">DISTRIB_DESCRIPTION=<span class="string">&#x27;QWRT &#x27;</span></span><br></pre></td></tr></table></figure></div>
+<p>获取了 OpenWRT 源代码之后需要更新 Feeds：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> openwrt</span><br><span class="line">./scripts/feeds update -a</span><br><span class="line">./scripts/feeds install -a</span><br></pre></td></tr></table></figure></div>
 
-<p>配置固件的命令<code>make menuconfig</code> 但是我们可以从配置模版开始会更轻松一些。</p>
-<p>比如ramips-mt7621的设备可以用拷贝这个模版<code>feeds/x/rom/lede/config.ramips-mt7621</code><br>内核分区限制小的设备，选用 <code>-nosymbol</code> 结尾的<code>config</code>配置模版</p>
-<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cp</span> feeds/x/rom/lede/config.ramips-mt7621 .config</span><br></pre></td></tr></table></figure></div>
+<h2 id="添加想要编译的第三方包-可选"><a href="#添加想要编译的第三方包-可选" class="headerlink" title="添加想要编译的第三方包 (可选)"></a>添加想要编译的第三方包 (可选)</h2><p>因为我需要编译 rkp-ipid 和 UA2F，因此我还需要将这些包的源码下载下来：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/CHN-beta/rkp-ipid package/rkp-ipid</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/Zxilly/UA2F package/UA2F</span><br></pre></td></tr></table></figure></div>
 
-<p>由于这些模版是用来编译大量设备的，copy过来后，可以直接编译，不做任何改变。<br>但是如果需要改变，需要<code>make menuconfig</code>自定义，就要做下面的操作:</p>
-<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 上面已经cp 拷贝了模版配置到 .config</span></span><br><span class="line"><span class="comment"># 例如 cp feeds/x/rom/lede/config.ramips-mt7621 .config</span></span><br><span class="line"><span class="comment"># 下面继续操作和修改</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#1 执行</span></span><br><span class="line">make menuconfig</span><br><span class="line"></span><br><span class="line"><span class="comment">#2 进入 Target Profile 选择需要编译打包的设备型号，选择型号后立刻退出，保存</span></span><br></pre></td></tr></table></figure></div>
-
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://ghproxy.net/https://raw.githubusercontent.com/QC3284/x-wrt.github.io/master/docs/build/build-target.png"
-                     
-                ></p>
-<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#3 执行下面的命令修复 .config</span></span><br><span class="line">sh feeds/x/rom/lede/fix-config.sh</span><br><span class="line"></span><br><span class="line"><span class="comment">#4 再次执行 make menuconfig 然后立刻退出保存</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#5 最后一次 执行 make menuconfig 自定义选择你需要的软件包</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-
-<p>还有更多配置模版，请参考目录下的<code>config.*</code>文件:</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">feeds/x/rom/lede/config.ath79-generic</span><br><span class="line">feeds/x/rom/lede/config.ath79-generic-nosymbol</span><br><span class="line">feeds/x/rom/lede/config.ath79-nand</span><br><span class="line">feeds/x/rom/lede/config.bcm27xx-bcm2709</span><br><span class="line">feeds/x/rom/lede/config.bcm27xx-bcm2710</span><br><span class="line">feeds/x/rom/lede/config.bcm27xx-bcm2711</span><br><span class="line">feeds/x/rom/lede/config.bcm4908-generic</span><br><span class="line">feeds/x/rom/lede/config.bcm53xx-generic</span><br><span class="line">feeds/x/rom/lede/config.ipq40xx-generic</span><br><span class="line">feeds/x/rom/lede/config.ipq806x-generic</span><br><span class="line">feeds/x/rom/lede/config.kirkwood-generic</span><br><span class="line">feeds/x/rom/lede/config.mediatek-mt7622</span><br><span class="line">feeds/x/rom/lede/config.mvebu-cortexa53</span><br><span class="line">feeds/x/rom/lede/config.mvebu-cortexa9</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt7620</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt7620-nosymbol</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt7621</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt76x8</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt76x8-nosymbol</span><br><span class="line">feeds/x/rom/lede/config.ramips-rt305x</span><br><span class="line">feeds/x/rom/lede/config.ramips-rt3883-nosymbol</span><br><span class="line">feeds/x/rom/lede/config.rockchip-armv8</span><br><span class="line">feeds/x/rom/lede/config.sunxi-cortexa7</span><br><span class="line">feeds/x/rom/lede/config.x86_64</span><br><span class="line">feeds/x/rom/lede/config.x86_64-docker</span><br><span class="line">feeds/x/rom/lede/config.x86_generic</span><br></pre></td></tr></table></figure></div>
-
-<h2 id="2-配置目标"><a href="#2-配置目标" class="headerlink" title="2. 配置目标"></a>2. 配置目标</h2><p>在上述准备好的模版配置文件的基础上，执行<code>make menuconfig</code>命令进行个性化定制，增删应用。</p>
-<p>定位到各个子菜单，选择对应的软件包<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://ghproxy.net/https://raw.githubusercontent.com/QC3284/x-wrt.github.io/master/docs/build//build-m.png"
-                     
-                ></p>
-<h2 id="3-执行编译"><a href="#3-执行编译" class="headerlink" title="3. 执行编译"></a>3. 执行编译</h2><p>命令:</p>
-<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make</span><br></pre></td></tr></table></figure></div>
-<p>或者</p>
-<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make -j1 V=s</span><br></pre></td></tr></table></figure></div>
-
-<p>生成的包在<code>bin/targets/</code>下面</p>
-<p>如果需要再次修改配置编译，只要不是换设备，都可以直接 <code>make menuconfig</code> 修改后就编译，如果需要修改设备，请从拷贝模版配置的地方重新开始配置。</p>
-<h2 id="3-高阶配置"><a href="#3-高阶配置" class="headerlink" title="3. 高阶配置"></a>3. 高阶配置</h2><p>为了得到满意的固件，下面对编译配置选项做更多的详细说明，但是更多的可能并不局限于这些说明内容，还有更多期待大家自己探索。</p>
-<h3 id="3-1-选择应用"><a href="#3-1-选择应用" class="headerlink" title="3.1 选择应用"></a>3.1 选择应用</h3><p>首先，进入<code>make menuconfig</code>菜单</p>
-<p><strong>要编译到固件里面，就要选择<code>&lt;*&gt;</code>，如果只选择<code>&lt;M&gt;</code>只是编译成软件包<code>ipk</code>，不会打包进入固件。</strong></p>
-<p>进入<code>LuCI - Applications</code>子菜单下面，选择自己想要的应用</p>
-<p>常见的软件包:</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">luci-app-aria2 ARRIA2下载工具</span><br><span class="line">luci-app-ddns DDNS工具</span><br><span class="line">luci-app-mwan3 MWAN3负载均衡</span><br><span class="line">luci-app-openvpn OPENVPN</span><br><span class="line">luci-app-ksmbd Ksmbd文件网络共享（samba文件共享）</span><br><span class="line">luci-app-upnp UPNP设置</span><br><span class="line">luci-app-wireguard WireGuard配置界面</span><br><span class="line">luci-app-natcap 远程界面管理模块和全锥形nat实现模块</span><br><span class="line">luci-app-natflow-users 用户认证（用户流量显示）模块</span><br></pre></td></tr></table></figure></div>
-
-<p>进入<code>Kernel modules - USB Support</code>菜单，选择USB支持的驱动</p>
-<p>进入<code>Kernel modules - Filesystems</code>菜单，选择需要支持的文件系统，比如<code>ext4,ntfs,vfat</code>等</p>
-<p>进入<code>Kernel modules - Wireless Drivers</code>菜单，选择无线支持的驱动，如果需要挂卡的驱动，也是在这里找</p>
-<h3 id="3-2-关于natcap远程管理模块"><a href="#3-2-关于natcap远程管理模块" class="headerlink" title="3.2 关于natcap远程管理模块"></a>3.2 关于natcap远程管理模块</h3><p>这个模块包含这几个方面功能的实现：</p>
-<ol>
-<li>远程界面管理(<a class="link"   target="_blank" rel="noopener" href="http://x-wrt.dev/" >http://x-wrt.dev/ <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>) 模块</li>
-<li>全锥形nat实现模块</li>
-<li>一键VPN功能易用功能</li>
-</ol>
-<p>鉴于有些朋友不喜欢远程管理，这里说明下如何去掉这个模块，请自行选择是否需要这个模块。删除后就删除了这个功能包括全锥形nat功能和一键VPN功能，抱歉这些暂时是耦合的无法分离，远程管理界面需要连接中转服务器和报告动态DNS数据，才能生成根据mac地址匹配的动态域名，如果有公网IP才会生成对应的mac域名给一键VPN功能使用。</p>
-<p>编译选择不集成这个模块，可以:</p>
-<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 修改.config文件，删去掉这几个模块</span></span><br><span class="line">CONFIG_PACKAGE_luci-app-natcap=y</span><br><span class="line">CONFIG_PACKAGE_natcapd-client=y</span><br><span class="line">CONFIG_PACKAGE_natcapd-server=y</span><br><span class="line">CONFIG_PACKAGE_natcapd=y</span><br><span class="line">CONFIG_PACKAGE_kmod-natcap=y</span><br><span class="line"></span><br><span class="line"><span class="comment"># 为了单独让natflow软件加速功能工作，选择下面的包</span></span><br><span class="line">CONFIG_PACKAGE_natflow-boot=y</span><br></pre></td></tr></table></figure></div>
+<h2 id="配置编译目标"><a href="#配置编译目标" class="headerlink" title="配置编译目标"></a>配置编译目标</h2><p>一切准备就绪，接下来就是设定编译目标了，执行以下命令：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make menuconfig</span><br></pre></td></tr></table></figure></div>
+<p>然后会出现一个命令行 UI，首先需要重点设定好<code>Target System</code>,<code>Subtarget</code>,<code>Target Profile</code>，将这几个项目设定为你的路由器。 然后就可以选择你需要编译的包啦，使用空格可以选择要编译的包，设定为 &lt;*&gt; 的包将会内置到固件里，刷好就能直接用，设定为 <M> 的包将会编译成 ipk 文件，需要上传到路由器，然后使用<code>opkg install package_name.ipk</code>进行安装。</p>
+<p>设定好了之后，将配置文件保存为<code>.config</code>即可，如果有一些包需要对内核做一些自定义，也可以直接使用文本编辑器编辑保存下来的<code>.config</code>文件，例如<code>UA2F</code>就需要添加<code>CONFIG_NETFILTER_NETLINK_GLUE_CT=y</code>。</p>
+<h2 id="开始编译"><a href="#开始编译" class="headerlink" title="开始编译"></a>开始编译</h2><p>一切准备完毕，接下来开始编译！</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">make download -j8</span><br><span class="line">make V=s -j8</span><br></pre></td></tr></table></figure></div>
+<p>其中<code>V=s</code>表示输出<code>stdout</code>和<code>stderr</code>，方便在编译失败的时候根据输出信息确定是哪里的错误，<code>-jn</code>的<code>n</code>表示使用<code>n</code>个线程同时编译，对于核心数较多的机器可以将该数值设置得大一些，加快编译过程。</p>
+<p>编译完成之后，在<code>./bin/targets</code>下就可以找到固件以及相应的<code>ipk</code>包了。</p>
+<h2 id="UA2F-的注意事项"><a href="#UA2F-的注意事项" class="headerlink" title="UA2F 的注意事项"></a>UA2F 的注意事项</h2><p>要使 UA2F 正常工作需要关闭 “网络”——“Turbo ACC 网络加速设置” 下的所有选项，否则 UA2F 无法正常工作，具体表现为：重启路由器防火墙之后，第一次 HTTP 请求的 User-Agent 成功修改，但后续 HTTP 请求的 User-Agent 没有被修改。</p>
 
         </div>
 
@@ -516,18 +489,18 @@
             <div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
                 <div class="article-copyright-info-container">
     <ul>
-        <li><strong>Title:</strong> 如何编译X-WRT</li>
+        <li><strong>Title:</strong> 自己动手编译 OpenWRT</li>
         <li><strong>Author:</strong> github@QC3284</li>
         <li><strong>Created at
-                :</strong> 2024-08-08 12:39:53</li>
+                :</strong> 2024-08-08 16:57:11</li>
         
             <li>
                 <strong>Updated at
-                    :</strong> 2024-08-08 16:55:55
+                    :</strong> 2024-08-08 17:13:51
             </li>
         
         <li>
-            <strong>Link:</strong> https://github.com/QC3284/2024/08/08/如何编译X-WRT/
+            <strong>Link:</strong> https://github.com/QC3284/2024/08/08/自己动手编译-OpenWRT/
         </li>
         <li>
             <strong>
@@ -552,29 +525,14 @@
         
             <div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
                 
-                    <div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
-                        <a class="prev"
-                        rel="prev"
-                        href="/2024/08/08/Openwrt-%E7%9A%84README/"
-                        >
-                            <span class="left arrow-icon flex justify-center items-center">
-                                <i class="fa-solid fa-chevron-left"></i>
-                            </span>
-                            <span class="title flex justify-center items-center">
-                                <span class="post-nav-title-item">Openwrt 的README</span>
-                                <span class="post-nav-item">Prev posts</span>
-                            </span>
-                        </a>
-                    </div>
-                
                 
                     <div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
                         <a class="next"
                         rel="next"
-                        href="/2024/08/08/OpenWrt%EF%BC%9A%E4%BB%8E%E6%BA%90%E7%A0%81%E5%88%B0%E5%9B%BA%E4%BB%B6%EF%BC%8C%E7%BC%96%E8%AF%91%E8%87%AA%E5%B7%B1%E7%9A%84OpenWrt%E7%B3%BB%E7%BB%9F/"
+                        href="/2024/08/08/iStoreOS-README/"
                         >
                             <span class="title flex justify-center items-center">
-                                <span class="post-nav-title-item">OpenWrt：从源码到固件，编译自己的OpenWrt系统</span>
+                                <span class="post-nav-title-item">iStoreOS README</span>
                                 <span class="post-nav-item">Next posts</span>
                             </span>
                             <span class="right arrow-icon flex justify-center items-center">
@@ -638,8 +596,8 @@
             <div class="post-toc-wrap">
     <div class="post-toc">
         <div class="toc-title">On this page</div>
-        <div class="page-title">如何编译X-WRT</div>
-        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%E6%95%99%E7%A8%8B"><span class="nav-text">编译教程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E7%BC%96%E8%AF%91%E5%87%86%E5%A4%87"><span class="nav-text">1 编译准备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E9%85%8D%E7%BD%AE%E7%9B%AE%E6%A0%87"><span class="nav-text">2. 配置目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%89%A7%E8%A1%8C%E7%BC%96%E8%AF%91"><span class="nav-text">3. 执行编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E9%AB%98%E9%98%B6%E9%85%8D%E7%BD%AE"><span class="nav-text">3. 高阶配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E9%80%89%E6%8B%A9%E5%BA%94%E7%94%A8"><span class="nav-text">3.1 选择应用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E5%85%B3%E4%BA%8Enatcap%E8%BF%9C%E7%A8%8B%E7%AE%A1%E7%90%86%E6%A8%A1%E5%9D%97"><span class="nav-text">3.2 关于natcap远程管理模块</span></a></li></ol></li></ol></li></ol>
+        <div class="page-title">自己动手编译 OpenWRT</div>
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Intro"><span class="nav-text">Intro</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83"><span class="nav-text">安装编译环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96-OpenWRT-%E6%BA%90%E7%A0%81"><span class="nav-text">获取 OpenWRT 源码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E6%83%B3%E8%A6%81%E7%BC%96%E8%AF%91%E7%9A%84%E7%AC%AC%E4%B8%89%E6%96%B9%E5%8C%85-%E5%8F%AF%E9%80%89"><span class="nav-text">添加想要编译的第三方包 (可选)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E7%BC%96%E8%AF%91%E7%9B%AE%E6%A0%87"><span class="nav-text">配置编译目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E7%BC%96%E8%AF%91"><span class="nav-text">开始编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UA2F-%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-text">UA2F 的注意事项</span></a></li></ol>
 
     </div>
 </div>
