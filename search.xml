@@ -40,7 +40,7 @@
     <content><![CDATA[<p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/openwrt/openwrt/main/include/logo.png"
+                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/openwrt/openwrt/main/include/logo.png"
                       alt="OpenWrt logo"
                 ></p>
 <p>OpenWrt Project is a Linux operating system targeting embedded devices. Instead<br>of trying to create a single, static firmware, OpenWrt provides a fully<br>writable filesystem with package management. This frees you from the<br>application selection and configuration provided by the vendor and allows you<br>to customize the device through the use of packages to suit any application.<br>For developers, OpenWrt is the framework to build an application without having<br>to build a complete firmware around it; for users this means the ability for<br>full customization, to use the device in ways never envisioned.</p>
@@ -226,7 +226,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/QC3284/x-wrt.github.io/master/docs/build/build-target.png"
+                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/QC3284/x-wrt.github.io/master/docs/build/build-target.png"
                      
                 ></p>
 <div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment">#3 执行下面的命令修复 .config</span></span><br><span class="line">sh feeds/x/rom/lede/fix-config.sh</span><br><span class="line"></span><br><span class="line"><span class="comment">#4 再次执行 make menuconfig 然后立刻退出保存</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#5 最后一次 执行 make menuconfig 自定义选择你需要的软件包</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
@@ -238,7 +238,7 @@
 <p>定位到各个子菜单，选择对应的软件包<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/QC3284/x-wrt.github.io/master/docs/build//build-m.png"
+                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/QC3284/x-wrt.github.io/master/docs/build//build-m.png"
                      
                 ></p>
 <h2 id="3-执行编译"><a href="#3-执行编译" class="headerlink" title="3. 执行编译"></a>3. 执行编译</h2><p>命令:</p>
@@ -314,7 +314,7 @@
     <content><![CDATA[<h1 id="MLinux-Minimal-A-Tiny-Linux-distro"><a href="#MLinux-Minimal-A-Tiny-Linux-distro" class="headerlink" title="MLinux Minimal - A Tiny Linux distro"></a>MLinux Minimal - A Tiny Linux distro</h1><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/mlinux-project/.github/main/images/mlinux-minimal.svg"
+                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/mlinux-project/.github/main/images/mlinux-minimal.svg"
                       width="25%" alt="MLinux Minimal"
                 >
 
@@ -538,7 +538,7 @@
 <div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">qemu-system-x86_64 -m 1024 -kernel vmlinuz</span><br></pre></td></tr></table></figure></div>
 
 <p><strong>This vmlinuz contians initramfs, so you can execute it directly using QEMU.</strong></p>
-<h2 id="Copyright"><a href="#Copyright" class="headerlink" title="Copyright"></a>Copyright</h2><p>The MLinux Minimal is under GPL 2.0,<br>see file <a class="link"   href="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/mlinux-project/minimal/main/LICENSE" >LICENSE<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>.</p>
+<h2 id="Copyright"><a href="#Copyright" class="headerlink" title="Copyright"></a>Copyright</h2><p>The MLinux Minimal is under GPL 2.0,<br>see file <a class="link"   href="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/mlinux-project/minimal/main/LICENSE" >LICENSE<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>.</p>
 <h2 id="Download"><a href="#Download" class="headerlink" title="Download"></a>Download</h2><p><a class="link"   href="https://github.com/mlinux-project/minimal/releases" >https://github.com/mlinux-project/minimal/releases<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 <h2 id="Homepage"><a href="#Homepage" class="headerlink" title="Homepage"></a>Homepage</h2><p><a class="link"   href="https://github.com/mlinux-project/minimal" >https://github.com/mlinux-project/minimal<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 ]]></content>
@@ -551,7 +551,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/ssh-open/ssh1.png"
+                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/ssh-open/ssh1.png"
                      
                 ></p>
 <p><strong>注意请使用谷歌浏览器，火狐浏览器，微软的浏览器，其他浏览器存在不可预知的问题。</strong></p>
@@ -613,19 +613,19 @@
 <h3 id="1-1-首先，正常设置好wan口拨号上网"><a href="#1-1-首先，正常设置好wan口拨号上网" class="headerlink" title="1.1 首先，正常设置好wan口拨号上网"></a>1.1 首先，正常设置好wan口拨号上网</h3><p>在<a href="#">网络-接口</a>页面，编辑<a href="#">wan口-基本设置</a>，选择协议PPPoE，填写宽带账户密码:<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/xwan/xwan-pppoe1.png"
+                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/xwan/xwan-pppoe1.png"
                      
                 ></p>
 <p>修改<a href="#">wan口-高级设置</a>，使用网关跃点 填写<code>40</code>，<a href="#">防火墙设置</a> 选择wan<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/xwan/xwan-pppoe2.png"
+                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/xwan/xwan-pppoe2.png"
                      
                 ></p>
 <h3 id="1-2-然后，开启多拨"><a href="#1-2-然后，开启多拨" class="headerlink" title="1.2 然后，开启多拨"></a>1.2 然后，开启多拨</h3><p>进入<a href="#">网络-多拨</a>页面，开启多拨，填写想要的多拨数，启用自动负载均衡和叠加:<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/xwan/xwan1.png"
+                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/xwan/xwan1.png"
                      
                 ></p>
 <p>开启多拨后，它会自动设置好负载均衡和叠加，对于高级用户，可以进入<a href="#">网络-负载均衡</a>页面进行高级的调整，小白用户可以忽略。</p>
