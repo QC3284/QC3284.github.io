@@ -27,23 +27,25 @@
     
     
         
-        <meta name="description" content="文章来源：https:&#x2F;&#x2F;lgiki.net&#x2F;post&#x2F;compile-openwrt&#x2F;  Intro学校最近升级了校园网设备，终于从年久失修的龟速 100Mbps 升级到了 1Gbps，尽管还是使用锐捷的 ePortal 网页认证，还能通过简单的 Shell 脚本在路由器上自动认证，但新设备却限制了每个用户最多只能同时有两台设备在线，使用路由器会被检测出使用多设备，并被加入黑名单，被断网。 都">
+        <meta name="description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
 <meta property="og:type" content="article">
 <meta property="og:title" content="自己动手编译 OpenWRT">
 <meta property="og:url" content="https://www.xcqcoo.top/2024/08/09/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E7%BC%96%E8%AF%91-OpenWRT/index.html">
 <meta property="og:site_name" content="QC3284的博客">
-<meta property="og:description" content="文章来源：https:&#x2F;&#x2F;lgiki.net&#x2F;post&#x2F;compile-openwrt&#x2F;  Intro学校最近升级了校园网设备，终于从年久失修的龟速 100Mbps 升级到了 1Gbps，尽管还是使用锐捷的 ePortal 网页认证，还能通过简单的 Shell 脚本在路由器上自动认证，但新设备却限制了每个用户最多只能同时有两台设备在线，使用路由器会被检测出使用多设备，并被加入黑名单，被断网。 都">
+<meta property="og:description" content="Hexo Theme Redefine, Redefine Your Hexo Journey.">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://www.xcqcoo.top/images/redefine-og.webp">
 <meta property="article:published_time" content="2024-08-08T16:57:11.000Z">
 <meta property="article:modified_time" content="2024-08-08T17:13:51.054Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://www.xcqcoo.top/images/redefine-og.webp">
     
     
     <!--- Icon Part-->
     <link rel="icon" type="image/png" href="https://kasuie.cc/avatar.webp" sizes="192x192">
     <link rel="apple-touch-icon" sizes="180x180" href="https://kasuie.cc/avatar.webp">
-    <meta name="theme-color" content="#00BFFF">
+    <meta name="theme-color" content="#A31F34">
     <link rel="shortcut icon" href="https://kasuie.cc/avatar.webp">
     <!--- Page Info-->
     
@@ -79,8 +81,8 @@
     
 
     <script id="hexo-configurations">
-    window.config = {"hostname":"www.xcqcoo.top","root":"/","language":"en"};
-    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#00BFFF","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":true},"scroll_progress":{"bar":true,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":true,"open_graph":true,"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"https://api-erciyuan-image.xcqcoo.top","dark":"https://api-erciyuan-image.xcqcoo.top"},"title":"Hello World!","subtitle":{"text":["Loading..."],"hitokoto":{"enable":true,"show_author":false,"api":"https://v1.hitokoto.cn/?c=a"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":"https://github.com/QC3284","instagram":null,"zhihu":null,"twitter":null,"email":"2078725082@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":false,"version":"9.3.0"}},"version":"2.8.2","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"}},"search":{"enable":false,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2024/8/9 01:30:10"};
+    window.config = {"hostname":"www.xcqcoo.top","root":"/","language":"en","path":"search.xml"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":true,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":3,"number":true,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":true,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#A31F34","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":true},"scroll_progress":{"bar":true,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":true,"custom_message":null},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":"Hexo Theme Redefine, Redefine Your Hexo Journey."},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"https://api-erciyuan-image.xcqcoo.top","dark":"https://api-erciyuan-image.xcqcoo.top"},"title":"QC3284's blog","subtitle":{"text":["Loading..."],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn/?c=a"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":true,"style":"default","links":{"github":"https://github.com/QC3284","instagram":null,"zhihu":null,"twitter":null,"email":"2078725082@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":false,"version":"11.4.1"}},"version":"2.8.2","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"Ghproxy":{"path":"https://ghproxy.xcqcoo.top","icon":"fa-brands fa-square-github"},"Github":{"path":"https://github.com/QC3284","icon":"fa-brands fa-github"}},"search":{"enable":true,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":"欢迎来到我的博客！","show_on_mobile":true,"links":null},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2024/8/9 12:45:00"};
     window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
     window.data = {"masonry":false};
   </script>
@@ -91,8 +93,6 @@
     <link rel="stylesheet" href="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/fontawesome/solid.min.css">
     <link rel="stylesheet" href="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/fontawesome/regular.min.css">
     
-    
-        <link rel="stylesheet" href="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/fontawesome/light.min.css">
     
     
     
@@ -300,11 +300,52 @@
                                 
                             </li>
                     
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://ghproxy.xcqcoo.top"
+                                        >
+                                    <i class="fa-brands fa-square-github fa-fw"></i>
+                                    GHPROXY
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/QC3284"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                        <li class="navbar-item search search-popup-trigger">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </li>
                     
                 </ul>
             </div>
             <!-- Mobile -->
             <div class="mobile">
+                
+                    <div class="icon-item search search-popup-trigger"><i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
                 
                 <div class="icon-item navbar-bar">
                     <div class="navbar-bar-middle"></div>
@@ -330,6 +371,46 @@
                             </span>
                             
                                 <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://ghproxy.xcqcoo.top"
+                        >
+                            <span>
+                                GHPROXY
+                            </span>
+                            
+                                <i class="fa-brands fa-square-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/QC3284"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
                             
                         </a>
                         
@@ -383,7 +464,7 @@
 		
 		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
 			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
-				<img src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/QC3284/openwrt-actions-config/main/yilang.png">
+				<img src="https://jsd.xcqcoo.top/gh/QC3284/main@openwrt-actions-config/yilang.png">
 			</div>
 			<div class="info flex flex-col justify-between">
 				<div class="author flex items-center">
@@ -414,6 +495,14 @@
 
     
     
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>1.5k Words</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>5 Mins</span>
+        </span>
     
     
         <span class="article-pv article-meta-item">
@@ -504,6 +593,35 @@
 		
 
 		
+  <div class="recommended-article px-2 sm:px-6 md:px-8">
+   <div class="recommended-desktop">
+    <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
+     <i aria-hidden="true"></i><span>推荐阅读</span>
+    </div>
+    <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/08/08/OpenWrt：从源码到固件，编译自己的OpenWrt系统/" title="OpenWrt：从源码到固件，编译自己的OpenWrt系统" rel="bookmark">
+  <img src="/images/wallhaven-wqery6-light.webp" alt="OpenWrt：从源码到固件，编译自己的OpenWrt系统" class="!max-w-none">
+  <span class="title">OpenWrt：从源码到固件，编译自己的OpenWrt系统</span>
+</a><a class="recommended-article-item" href="/2024/08/08/iStoreOS-README/" title="iStoreOS README" rel="bookmark">
+  <img src="/images/wallhaven-wqery6-light.webp" alt="iStoreOS README" class="!max-w-none">
+  <span class="title">iStoreOS README</span>
+</a><a class="recommended-article-item" href="/2024/08/08/如何编译X-WRT/" title="如何编译X-WRT" rel="bookmark">
+  <img src="/images/wallhaven-wqery6-light.webp" alt="如何编译X-WRT" class="!max-w-none">
+  <span class="title">如何编译X-WRT</span>
+</a></div>
+   </div>
+   <div class="recommended-mobile">
+   <div class="recommended-article-header text-xl md:text-3xl font-bold mt-10">
+     <i aria-hidden="true"></i><span>推荐阅读</span>
+   </div>
+   <div class="recommended-article-group"><a class="recommended-article-item" href="/2024/08/08/OpenWrt：从源码到固件，编译自己的OpenWrt系统/" title="OpenWrt：从源码到固件，编译自己的OpenWrt系统" rel="bookmark">
+  <img src="/images/wallhaven-wqery6-light.webp" alt="OpenWrt：从源码到固件，编译自己的OpenWrt系统" class="!max-w-none">
+  <span class="title">OpenWrt：从源码到固件，编译自己的OpenWrt系统</span>
+</a><a class="recommended-article-item" href="/2024/08/08/iStoreOS-README/" title="iStoreOS README" rel="bookmark">
+  <img src="/images/wallhaven-wqery6-light.webp" alt="iStoreOS README" class="!max-w-none">
+  <span class="title">iStoreOS README</span>
+</a></div>
+   </div>
+  </div>
 
 		
 		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
@@ -538,6 +656,49 @@
 
 
 		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        Comments
+    </div>
+    
+
+        
+            
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '/js/libs/waline.mjs';
+
+      function loadWaline() {
+        init({
+          el: '#waline',
+          serverURL: 'https://api-comment-ser.xcqcoo.top',
+          lang: 'zh-CN',
+          dark: 'body[class~="dark-mode"]',
+          reaction: false,
+          requiredMeta: ['nick', 'mail'],
+          emoji: [],
+          
+          
+        });
+      }
+
+      if (typeof swup !== 'undefined') {
+        loadWaline();
+      } else {
+        window.addEventListener('DOMContentLoaded', loadWaline);
+      }
+    </script>
+
+
+
+        
+    
+</div>
+
+		</div>
+		
 	</div>
 
 	
@@ -546,7 +707,7 @@
 	<div class="post-toc">
 		<div class="toc-title">On this page</div>
 		<div class="page-title">自己动手编译 OpenWRT</div>
-		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Intro"><span class="nav-text">Intro</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83"><span class="nav-text">安装编译环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96-OpenWRT-%E6%BA%90%E7%A0%81"><span class="nav-text">获取 OpenWRT 源码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E6%83%B3%E8%A6%81%E7%BC%96%E8%AF%91%E7%9A%84%E7%AC%AC%E4%B8%89%E6%96%B9%E5%8C%85-%E5%8F%AF%E9%80%89"><span class="nav-text">添加想要编译的第三方包 (可选)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E7%BC%96%E8%AF%91%E7%9B%AE%E6%A0%87"><span class="nav-text">配置编译目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E7%BC%96%E8%AF%91"><span class="nav-text">开始编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UA2F-%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-text">UA2F 的注意事项</span></a></li></ol>
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Intro"><span class="nav-number">1.</span> <span class="nav-text">Intro</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E7%BC%96%E8%AF%91%E7%8E%AF%E5%A2%83"><span class="nav-number">2.</span> <span class="nav-text">安装编译环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96-OpenWRT-%E6%BA%90%E7%A0%81"><span class="nav-number">3.</span> <span class="nav-text">获取 OpenWRT 源码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E6%83%B3%E8%A6%81%E7%BC%96%E8%AF%91%E7%9A%84%E7%AC%AC%E4%B8%89%E6%96%B9%E5%8C%85-%E5%8F%AF%E9%80%89"><span class="nav-number">4.</span> <span class="nav-text">添加想要编译的第三方包 (可选)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E7%BC%96%E8%AF%91%E7%9B%AE%E6%A0%87"><span class="nav-number">5.</span> <span class="nav-text">配置编译目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%80%E5%A7%8B%E7%BC%96%E8%AF%91"><span class="nav-number">6.</span> <span class="nav-text">开始编译</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#UA2F-%E7%9A%84%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="nav-number">7.</span> <span class="nav-text">UA2F 的注意事项</span></a></li></ol>
 
 	</div>
 </div>
@@ -576,6 +737,10 @@
                         10 posts in total
                     </span>
                     
+                        <span>
+                            9.9k words in total
+                        </span>
+                    
                 </p>
             
         </div>
@@ -600,6 +765,12 @@
             <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
             <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.2</a></span>
         </div>
+        
+            <div class="icp-info my-1"><a target="_blank" rel="nofollow" href="
+                
+                    https://icp.gov.moe/?keyword=20250129
+                
+                ">萌ICP备20250129号</a></div>
         
         
             <div>
@@ -642,6 +813,10 @@
 		
 
 		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
 		
 	</ul>
 </div>
@@ -693,6 +868,27 @@
 </div>
 
 	
+	<div class="search-pop-overlay">
+	<div class="popup search-popup">
+		<div class="search-header">
+			<span class="search-input-field-pre">
+				<i class="fa-solid fa-keyboard"></i>
+			</span>
+			<div class="search-input-container">
+				<input autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="Search..." spellcheck="false" type="search" class="search-input">
+			</div>
+			<span class="popup-btn-close">
+				<i class="fa-solid fa-times"></i>
+			</span>
+		</div>
+		<div id="search-result">
+			<div id="no-result">
+				<i class="fa-solid fa-spinner fa-spin-pulse fa-5x fa-fw"></i>
+			</div>
+		</div>
+	</div>
+</div>
+	
 
 </main>
 
@@ -722,6 +918,8 @@
 
 	<script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/tools/imageViewer.js" ></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/utils.js" ></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/main.js" ></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/layouts/navbarShrink.js" ></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/tools/scrollTopBottom.js" ></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/tools/lightDarkSwitch.js" ></script><script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/layouts/categoryList.js" ></script>
 
+
+    <script type="module" src="https://registry.npmmirror.com/hexo-theme-redefine/2.8.2/files/source/js/build/tools/localSearch.js" ></script>
 
 
 

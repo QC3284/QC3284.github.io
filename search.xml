@@ -1,0 +1,669 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>OpenWrt：从源码到固件，编译自己的OpenWrt系统</title>
+    <url>/2024/08/08/OpenWrt%EF%BC%9A%E4%BB%8E%E6%BA%90%E7%A0%81%E5%88%B0%E5%9B%BA%E4%BB%B6%EF%BC%8C%E7%BC%96%E8%AF%91%E8%87%AA%E5%B7%B1%E7%9A%84OpenWrt%E7%B3%BB%E7%BB%9F/</url>
+    <content><![CDATA[<p>本文说明如何一步一步地从源码编译出自己的OpenWrt镜像<br>文章来源：知乎@小耸</p>
+<h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><p>准备一个GNU&#x2F;Linux, BSD 或 MacOSX 操作系统。并且，在环境中准备好以下官方教程中要求的工具：<br><a class="link"   href="https://openwrt.org/docs/guide-developer/toolchain/install-buildsystem" >https://openwrt.org/docs/guide-developer/toolchain/install-buildsystem <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p>我的环境是Ubuntu22.04，执行：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update </span><br><span class="line"><span class="built_in">sudo</span> apt install build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev python3-distutils rsync unzip zlib1g-dev file wget</span><br></pre></td></tr></table></figure></div>
+
+<h1 id="编译系统"><a href="#编译系统" class="headerlink" title="编译系统"></a>编译系统</h1><h2 id="下载源码"><a href="#下载源码" class="headerlink" title="下载源码"></a>下载源码</h2><p>下载代码：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/openwrt/openwrt.git</span><br><span class="line"><span class="built_in">cd</span> openwrt</span><br><span class="line">git pull</span><br></pre></td></tr></table></figure></div>
+<p>切换分支，一般选择最新的稳定版本：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">git branch -a</span><br><span class="line">git tag</span><br><span class="line">git checkout v23.05.4</span><br></pre></td></tr></table></figure></div>
+<h2 id="下载软件包"><a href="#下载软件包" class="headerlink" title="下载软件包"></a>下载软件包</h2><p>运行<code>./scripts/feeds update -a</code>命令，下载或更新在<code>feeds.conf/feeds.conf.default</code>中定义的所有最新软件包。</p>
+<p>！！注意！！<br>受限于国内的访问国际互联网的环境中，feeds update这一步特别容易失败。可以通过以下几条方式来提高成功率：<br><code>git config --global http.postBuffer 524288000</code> <code>git config --global http.lowSpeedLimit 1000</code> <code>git config --global http.lowSpeedTime 600 </code>以上配置的含义为：配置git缓冲区为500M，配置git访问超时的条件为：速率小于1KB&#x2F;s，且持续600秒<br>（有条件的可以开代理）</p>
+<p>运行<code>./scripts/feeds install -a</code>命令使安装上述软件包在后续的<code>make menuconfig</code>中生效。</p>
+<h1 id="配置编译选项"><a href="#配置编译选项" class="headerlink" title="配置编译选项"></a>配置编译选项</h1><h2 id="使用已有固件的编译配置"><a href="#使用已有固件的编译配置" class="headerlink" title="使用已有固件的编译配置"></a>使用已有固件的编译配置</h2><p>网络上已编译出的固件通常都会把编译配置一并提供（config.buildinfo或config.seed），可以直接使用。<br>我的目标机是一台小米WR30U，使用mtk的filogic芯片方案，从OpenWrt官网找到对应的编译配置并下载，置于OpenWrt工程根目录下的<code>.config</code>文件中：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">wget https://downloads.openwrt.org/releases/23.05.4/targets/mediatek/filogic/config.buildinfo -O .config</span><br></pre></td></tr></table></figure></div>
+<p>但这份配置中包含了filogic芯片方案的所有设备的配置，还需进行裁剪和修改。</p>
+<h2 id="menuconfig"><a href="#menuconfig" class="headerlink" title="menuconfig"></a>menuconfig</h2><p>在以上配置的基础上，运行<code>make menuconfig</code>命令来完成进一步的自定义配置。完成后配置会更新至<code>.config</code>文件中。<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://pic1.zhimg.com/v2-2be9869a274b1a4728fce7dbe1ca1770_r.jpg"
+                      alt="v2-2_r"
+                ></p>
+<p>在Target Profile中，仅保留Xiaomi WR30U的设备支持（我的设备是Xiaomi Mi Router WR30U (112M UBI with NMBM-Enabled layout)），把其它设备的支持删除。</p>
+<h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p>使用<code>make download</code>预先下载编译过程中需要的代码和依赖项等资源。</p>
+<p>. . . . . . . 经过漫长的等待下载完成。到此为止，我们已做好了所有的编译准备。<br>正式开始编译吧，运行<code>make</code>命令来构建固件。该命令将下载所有源代码和依赖项（即使之前已经<code>make download</code>，也还有其它包需要下载），构建交叉编译工具链，然后为目标系统交叉编译出OpenWrt内核和应用程序。</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">make -j4 V=s</span><br></pre></td></tr></table></figure></div>
+<h2 id="编译选项说明"><a href="#编译选项说明" class="headerlink" title="编译选项说明"></a>编译选项说明</h2><p><code>-jN</code>: make命令可以加上-j参数用于指定使用多少cpu核编译，可以加速编译过程。例如：<code>make download -j4，make -j5</code></p>
+<p><code>V=s</code>：make命令可以加上V&#x3D;s可以输出更多的编译错误信息。</p>
+<p>如果顺利的话，这里make完就可以编译出镜像了。但是实际不太可能完全顺利。</p>
+<h2 id="编译输出"><a href="#编译输出" class="headerlink" title="编译输出"></a>编译输出</h2><p>. . . . . . . 经过漫长的编译过程（我的环境中编了5个小时），编译结果存放于<code>openwrt/bin/targets/</code>目录下。几类编译产出的镜像说明如下：<br>1.factory：用于替换厂商的原厂固件，兼容原厂的安装包格式。通常使用原厂的web GUI进行升级或在Uboot中刷入。<br>2.sysupgrade：用于升级替换已有的OpenWrt版本，这是最常用的镜像。<br>3.initramfs-kernel：用于开发或特殊情况下的一次性引导，作为安装常规sysupgrade版本的过渡步骤。由于initramfs版本完全运行在RAM中，不会在闪存中存储任何设置，因此不适合用于操作性使用。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Openwrt 的README</title>
+    <url>/2024/08/08/Openwrt-%E7%9A%84README/</url>
+    <content><![CDATA[<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/openwrt/openwrt/main/include/logo.png"
+                      alt="OpenWrt logo"
+                ></p>
+<p>OpenWrt Project is a Linux operating system targeting embedded devices. Instead<br>of trying to create a single, static firmware, OpenWrt provides a fully<br>writable filesystem with package management. This frees you from the<br>application selection and configuration provided by the vendor and allows you<br>to customize the device through the use of packages to suit any application.<br>For developers, OpenWrt is the framework to build an application without having<br>to build a complete firmware around it; for users this means the ability for<br>full customization, to use the device in ways never envisioned.</p>
+<p>Sunshine!</p>
+<h2 id="Download"><a href="#Download" class="headerlink" title="Download"></a>Download</h2><p>Built firmware images are available for many architectures and come with a<br>package selection to be used as WiFi home router. To quickly find a factory<br>image usable to migrate from a vendor stock firmware to OpenWrt, try the<br><em>Firmware Selector</em>.</p>
+<ul>
+<li><a class="link"   href="https://firmware-selector.openwrt.org/" >OpenWrt Firmware Selector<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+<p>If your device is supported, please follow the <strong>Info</strong> link to see install<br>instructions or consult the support resources listed below.</p>
+<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p>An advanced user may require additional or specific package. (Toolchain, SDK, …) For everything else than simple firmware download, try the wiki download page:</p>
+<ul>
+<li><a class="link"   href="https://openwrt.org/downloads" >OpenWrt Wiki Download<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+<h2 id="Development"><a href="#Development" class="headerlink" title="Development"></a>Development</h2><p>To build your own firmware you need a GNU&#x2F;Linux, BSD or macOS system (case<br>sensitive filesystem required). Cygwin is unsupported because of the lack of a<br>case sensitive file system.</p>
+<h3 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h3><p>You need the following tools to compile OpenWrt, the package names vary between<br>distributions. A complete list with distribution specific packages is found in<br>the <a class="link"   href="https://openwrt.org/docs/guide-developer/build-system/install-buildsystem" >Build System Setup<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br>documentation.</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">binutils bzip2 diff find flex gawk gcc-6+ getopt grep install libc-dev libz-dev</span><br><span class="line">make4.1+ perl python3.7+ rsync subversion unzip which</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="Quickstart"><a href="#Quickstart" class="headerlink" title="Quickstart"></a>Quickstart</h3><ol>
+<li><p>Run <code>./scripts/feeds update -a</code> to obtain all the latest package definitions<br>defined in feeds.conf &#x2F; feeds.conf.default</p>
+</li>
+<li><p>Run <code>./scripts/feeds install -a</code> to install symlinks for all obtained<br>packages into package&#x2F;feeds&#x2F;</p>
+</li>
+<li><p>Run <code>make menuconfig</code> to select your preferred configuration for the<br>toolchain, target system &amp; firmware packages.</p>
+</li>
+<li><p>Run <code>make</code> to build your firmware. This will download all sources, build the<br>cross-compile toolchain and then cross-compile the GNU&#x2F;Linux kernel &amp; all chosen<br>applications for your target system.</p>
+</li>
+</ol>
+<h3 id="Related-Repositories"><a href="#Related-Repositories" class="headerlink" title="Related Repositories"></a>Related Repositories</h3><p>The main repository uses multiple sub-repositories to manage packages of<br>different categories. All packages are installed via the OpenWrt package<br>manager called <code>opkg</code>. If you’re looking to develop the web interface or port<br>packages to OpenWrt, please find the fitting repository below.</p>
+<ul>
+<li><p><a class="link"   href="https://github.com/openwrt/luci" >LuCI Web Interface<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Modern and modular<br>interface to control the device via a web browser.</p>
+</li>
+<li><p><a class="link"   href="https://github.com/openwrt/packages" >OpenWrt Packages<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Community repository<br>of ported packages.</p>
+</li>
+<li><p><a class="link"   href="https://github.com/openwrt/routing" >OpenWrt Routing<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Packages specifically<br>focused on (mesh) routing.</p>
+</li>
+<li><p><a class="link"   href="https://github.com/openwrt/video" >OpenWrt Video<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Packages specifically<br>focused on display servers and clients (Xorg and Wayland).</p>
+</li>
+</ul>
+<h2 id="Support-Information"><a href="#Support-Information" class="headerlink" title="Support Information"></a>Support Information</h2><p>For a list of supported devices see the <a class="link"   href="https://openwrt.org/supported_devices" >OpenWrt Hardware Database<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h3 id="Documentation"><a href="#Documentation" class="headerlink" title="Documentation"></a>Documentation</h3><ul>
+<li><a class="link"   href="https://openwrt.org/docs/guide-quick-start/start" >Quick Start Guide<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://openwrt.org/docs/guide-user/start" >User Guide<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://openwrt.org/docs/guide-developer/start" >Developer Documentation<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://openwrt.org/docs/techref/start" >Technical Reference<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+<h3 id="Support-Community"><a href="#Support-Community" class="headerlink" title="Support Community"></a>Support Community</h3><ul>
+<li><a class="link"   href="https://forum.openwrt.org/" >Forum<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: For usage, projects, discussions and hardware advise.</li>
+<li><a class="link"   href="https://webchat.oftc.net/#openwrt" >Support Chat<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Channel <code>#openwrt</code> on <strong>oftc.net</strong>.</li>
+</ul>
+<h3 id="Developer-Community"><a href="#Developer-Community" class="headerlink" title="Developer Community"></a>Developer Community</h3><ul>
+<li><a class="link"   href="https://bugs.openwrt.org/" >Bug Reports<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Report bugs in OpenWrt</li>
+<li><a class="link"   href="https://lists.openwrt.org/mailman/listinfo/openwrt-devel" >Dev Mailing List<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Send patches</li>
+<li><a class="link"   href="https://webchat.oftc.net/#openwrt-devel" >Dev Chat<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Channel <code>#openwrt-devel</code> on <strong>oftc.net</strong>.</li>
+</ul>
+<h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><p>OpenWrt is licensed under GPL-2.0</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>iStoreOS README</title>
+    <url>/2024/08/08/iStoreOS-README/</url>
+    <content><![CDATA[<h1 id="iStoreOS-固件"><a href="#iStoreOS-固件" class="headerlink" title="iStoreOS 固件"></a>iStoreOS 固件</h1><p>iStoreOS 目标是提供一个人人会用的路由兼轻 NAS 系统，不管是作为路由还是 NAS，你都有相似的操作体验。</p>
+<p>系统本身开源免费，目前系统代码开源在：<a href="https://www.github.com/istoreos/istoreos">Github iStoreOS</a></p>
+<p>iStoreOS 来源于 OpenWRT，相较于原版 OpenWRT，iStoreOS 具有以下优势：</p>
+<ol>
+<li>iStoreOS 提供了<strong>软件中心</strong>：<a href="https://github.com/linkease/istore"><strong>iStore</strong></a>，尽可能解决插件之间的依赖关系，可让大家自由自在安装插件。手动安装离线包也是支持的。</li>
+<li>iStoreOS 固件升级时会保留用户安装的插件，避免升级以后还要再安装一遍插件。</li>
+<li>iStoreOS 官方支持的硬件都可以<strong>在线升级</strong>，无需手动下载固件升级。</li>
+<li>iStoreOS 拥有<strong>沙箱模式</strong>。通过 U 盘进入沙箱模式，后续的软件安装更新以及系统配置都在沙箱进行。不管安装插件搞坏了系统还是配置错误导致系统故障，拔掉 U 盘就回到进沙箱前的状态。如果对当前状态满意还可以回写到非沙箱环境。沙箱模式本身也是系统扩容的最简单的方法。</li>
+<li>救援模式，即使固件损坏，也可以进入救援模式刷机或恢复出厂设置。目前仅仅自家硬件 <a href="https://item.taobao.com/item.htm?ft=t&id=655381846734">ARS2</a> 支持</li>
+</ol>
+<p>iStoreOS 还做了很多很多的交互简化，但是即使再简化，对于不同的用户级别，我们还是得提供了三套完全不一样的交互 UI：</p>
+<h2 id="入门极客版本-UI"><a href="#入门极客版本-UI" class="headerlink" title="入门极客版本 UI"></a>入门极客版本 UI</h2><p>iStoreOS 入门极客版本 UI 是默认的 UI，目标是提供给懂点技术的入门极客爱好者，或者偷懒极客老手，核心特性：</p>
+<ul>
+<li>首页提供网络向导，磁盘向导，Docker 向导等等众多向导，不管是新手还是老手，都能快速配置自己想要的东西</li>
+<li>修复众多 OpenWRT 不人性的小问题，比如 Samba 设置独立用户名密码很麻烦，磁盘挂载等</li>
+<li>更多首页工具好帮手，比如在线升级，各种错误检测，网口图形化配置等</li>
+<li>其它很多常用的，比如 DDNS 配置，Docker 配置等</li>
+</ul>
+<h3 id="入门极客版本预览"><a href="#入门极客版本预览" class="headerlink" title="入门极客版本预览"></a>入门极客版本预览</h3><p><img src="https://doc.linkease.com/assets/img/geek-preview1.9987f6a0.jpg" alt="首页"><br><img src="https://doc.linkease.com/assets/img/geek-istore-preview2.5e9c0323.jpg" alt="软件中心"></p>
+<h2 id="小白路由版本"><a href="#小白路由版本" class="headerlink" title="小白路由版本"></a>小白路由版本</h2><p>最标准的小白路由版本，减去了超多的复杂的眼花缭乱的功能，回归最本质的路由功能。</p>
+<p>对于路由器硬件卖家来说，最好默认帮用户安装此版本。</p>
+<p>安装方法：</p>
+<ol>
+<li>在默认的极客版本上，从软件中心，安装 iStoreX</li>
+<li>退出重新登录，就到了小白路由器版本</li>
+</ol>
+<h3 id="小白路由版本预览"><a href="#小白路由版本预览" class="headerlink" title="小白路由版本预览"></a>小白路由版本预览</h3><p><img src="https://doc.linkease.com/assets/img/router-preview1.7729ec63.jpg" alt="网络向导"><br><img src="https://doc.linkease.com/assets/img/router-istore.f031ae04.jpg" alt="软件中心"></p>
+<h2 id="轻-NAS-版本"><a href="#轻-NAS-版本" class="headerlink" title="轻 NAS 版本"></a>轻 NAS 版本</h2><p>如果你不是重度的BT下载用户，也不是重度在线看电影需要视频硬解码的用户，那么用个软路由当NAS，是完全没问题的。毕竟网络转发跟硬盘存储不冲突。</p>
+<p>当然，iStoreOS 也会提供给你一个纯正独立的 NAS 系统，底层也完全是 OpenWRT，且软件中心完全互通，你懂的路由器的知识，也可以完全搬到 NAS 系统上。那么我们的 NAS 系统有哪些功能？</p>
+<ol>
+<li>RAID 磁盘阵列</li>
+<li>S.M.A.R.T 检测</li>
+<li>个人私有网盘，借助<a href="https://app.linkease.com/">易有云插件</a> 实现</li>
+<li>相册自动备份，借助<a href="https://app.linkease.com/">易有云插件</a> 实现</li>
+<li>异地多设备文件同步，借助<a href="https://app.linkease.com/">易有云插件</a> 实现</li>
+<li>异地组网，借助<a href="https://app.linkease.com/">易有云插件</a> 实现</li>
+<li>远程域名访问，借助<a href="https://www.ddnsto.com/">DDNSTO插件</a> 实现</li>
+<li>软件中心（当然软件中心有 NasTool、Jellyfin 影院、下载等等）</li>
+</ol>
+<p>注意：目前此交互还在活跃开发中</p>
+<h3 id="轻-NAS-预览"><a href="#轻-NAS-预览" class="headerlink" title="轻 NAS 预览"></a>轻 NAS 预览</h3><p><img src="https://doc.linkease.com/assets/img/nas-preview1.3d49cb9a.png" alt="首页"><br><img src="https://doc.linkease.com/assets/img/nas-istore-preview2.902df65b.png" alt="应用中心"></p>
+<h2 id="支持硬件"><a href="#支持硬件" class="headerlink" title="支持硬件"></a>支持硬件</h2><ul>
+<li><a href="https://item.taobao.com/item.htm?ft=t&id=655381846734">ARS2</a> [固件最初支持的硬件，没有这个硬件，就没有这个项目]</li>
+<li>X86</li>
+<li>R2S</li>
+<li>R4S</li>
+<li>R5S</li>
+<li>R68S</li>
+</ul>
+<h3 id="功能组合"><a href="#功能组合" class="headerlink" title="功能组合"></a>功能组合</h3><ul>
+<li>建议使用<a href="https://app.linkease.com/">易有云 APP</a> 做异地组网，相册备份，文件同步，远程应用导航等</li>
+<li>建议用 <a href="https://www.ddnsto.com/">DDNSTO</a> 从网页域名远程访问路由器</li>
+</ul>
+<h3 id="固件下载"><a href="#固件下载" class="headerlink" title="固件下载"></a>固件下载</h3><p><a href="https://fw.koolcenter.com/iStoreOS/">下载地址</a></p>
+<h3 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h3><ul>
+<li>默认IP <a href="http://192.168.100.1/">http://192.168.100.1</a></li>
+<li>默认密码：password</li>
+<li>如果只有一个网口，默认的网口是 LAN；如果大于一个网口，默认 eth0 是 WAN 口，其它都是 LAN。</li>
+<li>如果在 LAN 口修改 IP，或者任何修改之后导致无法连接路由器，都会导致刚才的修改被回滚。所以要修改 LAN&#x2F;WAN 口 IP，可以选择强制应用，保证修改肯定生效。</li>
+</ul>
+<h2 id="定制固件"><a href="#定制固件" class="headerlink" title="定制固件"></a>定制固件</h2><p>如果想自己制作固件，也是可以的。</p>
+<p>iStoreOS 来源于官方的 OpenWRT Release 分支源码，都是通过 OpenWRT 标准组件形式实现，100% 兼容 OpenWRT 的源主干分支。我们修改或者开发的部分，都以插件形式，具体源代码如下：</p>
+<ul>
+<li><a href="https://github.com/istoreos/istoreos">iStoreOS 固件</a> 核心固件源代码</li>
+<li><a href="https://github.com/linkease/nas-packages-luci">nas-packages-luci</a> 我们自己开发的插件 UI 代码</li>
+<li><a href="https://github.com/linkease/nas-packages">nas-packages</a> 我们自己开发插件的程序代码，部分程序并不开源</li>
+<li><a href="https://github.com/linkease/istore">istore</a> 软件中心核心代码，包含备份插件功能等，全部开源</li>
+<li><a href="https://github.com/linkease/istore-packages">istore-packages</a> 软件中心的一些非 OpenWRT 官方包</li>
+<li><a href="https://github.com/linkease/openwrt-app-actions">openwrt-app-actions</a> 其他一些软件包</li>
+</ul>
+<p>iStoreOS 就是在 OpenWRT 最基础最原始的固件基础上，加上了上面插件的能力来实现。</p>
+<h3 id="编译参考"><a href="#编译参考" class="headerlink" title="编译参考"></a>编译参考</h3><p>请动手能力强的人自己编译固件，跟标准 OpenWRT 一样。</p>
+<h3 id="离线包制作"><a href="#离线包制作" class="headerlink" title="离线包制作"></a>离线包制作</h3><p>iStoreOS离线包不是一个压缩包，也没啥黑科技，而是借助第三方软件实现。原理是<a href="https://github.com/megastep/makeself">makeself项目</a>：</p>
+<p>生成方法例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">./makeself.sh --nox11 ./xxx ./out/xxx_x86.run &quot;OneClick install&quot; ./install.sh</span><br></pre></td></tr></table></figure>
+
+<p>install.sh脚本内容大致为：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">opkg update</span><br><span class="line">opkg install *.ipk</span><br></pre></td></tr></table></figure>
+
+<p>把 ipk 跟 install.sh 结合在一起，本质会生成一个包含所有 ipk 跟 install.sh 的自解压自运行的程序。</p>
+<h2 id="关注更新"><a href="#关注更新" class="headerlink" title="关注更新"></a>关注更新</h2><p>更多iStoreOS 功能，请关注我们的账号：</p>
+<ul>
+<li><a href="https://space.bilibili.com/1492058311?spm_id_from=333.788.0.0">酷友社B站账号</a></li>
+<li><a href="https://www.youtube.com/channel/UCvENMyIFurJi_SrnbnbyiZw">酷友社 Youtube</a></li>
+<li><a href="https://www.koolcenter.com/posts/117">QQ 群</a></li>
+<li><a href="https://t.me/+QwxW7aimSMeRdQJX">TG 群</a></li>
+<li>微信扫码关注公众号：<br><img src="https://doc.linkease.com/assets/img/istoreos-gongzhong.7b082729.png" alt="istoreos-gongzhong"></li>
+</ul>
+<h2 id="问题反馈"><a href="#问题反馈" class="headerlink" title="问题反馈"></a>问题反馈</h2><ul>
+<li><a href="https://github.com/linkease/istoreos/issues">提交反馈</a></li>
+</ul>
+<p>大家也可以选择加入 iStoreOS 固件互助群。</p>
+<ul>
+<li><a href="https://www.koolcenter.com/posts/117">入群</a></li>
+</ul>
+<h2 id="精力不足，求助一臂之力"><a href="#精力不足，求助一臂之力" class="headerlink" title="精力不足，求助一臂之力"></a>精力不足，求助一臂之力</h2><p>因为各种原因，我们维护 iStoreOS 精力不足。如果有大神对本项目感兴趣，欢迎联系我们加入。</p>
+<h2 id="鸣谢"><a href="#鸣谢" class="headerlink" title="鸣谢"></a>鸣谢</h2><ul>
+<li><a href="https://github.com/ziguayungui">ziguayungui</a>，<a href="https://github.com/jjm2473">jjm2473</a>，<a href="https://github.com/fw867">Koolshare LEDE 的作者 fw867</a>，<a href="https://github.com/xiangfeidexiaohuo">xiangfeidexiaohuo</a></li>
+<li>感谢 LEAN 等相关人员，搞定了 i226 驱动等</li>
+<li>OpenWRT 官方团队</li>
+<li>众多 OpenWRT 的固件或者插件开发者</li>
+<li><a href="https://www.koolcenter.com/">KoolCenter</a>，<a href="https://www.linkease.com/">易有云</a> 团队相关同事</li>
+</ul>
+]]></content>
+  </entry>
+  <entry>
+    <title>如何编译X-WRT</title>
+    <url>/2024/08/08/%E5%A6%82%E4%BD%95%E7%BC%96%E8%AF%91X-WRT/</url>
+    <content><![CDATA[<p>文章来源：<a class="link"   href="https://github.com/x-wrt/x-wrt.github.io/tree/master/docs/build" >https://github.com/x-wrt/x-wrt.github.io/tree/master/docs/build<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h1 id="编译教程"><a href="#编译教程" class="headerlink" title="编译教程"></a>编译教程</h1><p>很多人不知道怎样编译一个自己的固件，这里主要简单介绍大概的编译打包流程，具体的情况还需要大家自己发挥，情况千变万化，大家随机应变。</p>
+<h2 id="1-编译准备"><a href="#1-编译准备" class="headerlink" title="1 编译准备"></a>1 编译准备</h2><p>我们建议使用<a class="link"   href="https://www.ubuntu.com/" >Ubuntu<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>系统作为编译环境，这里以Ubuntu 22.04作为例子，其他版本也是可以的。特别注意的是，整个编译过程，都是用普通用户操作，不要用<code>root</code>用户操作。</p>
+<p>首先要安装编译所需要的软件包:<br><code>sudo apt install build-essential ecj fastjar file flex g++ gcc-multilib g++-multilib gawk gettext git git-core java-propose-classpath libelf-dev libncurses5-dev libncursesw5-dev libssl-dev swig python3 python3-dev python3-distutils python3-pyelftools subversion unzip wget zlib1g-dev rsync qemu-utils</code></p>
+<p>下载源码:</p>
+<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/x-wrt/x-wrt.git</span><br><span class="line"><span class="built_in">cd</span> x-wrt</span><br><span class="line"></span><br><span class="line"><span class="comment">#更新代码tag:</span></span><br><span class="line">git fetch origin</span><br><span class="line">git fetch origin --tags</span><br><span class="line"></span><br><span class="line"><span class="comment">#列出可以使用的版本tag:</span></span><br><span class="line">git tag</span><br><span class="line"><span class="comment">#注意摁 q 键结束</span></span><br><span class="line"><span class="comment">#或者直接获取最新发布版本</span></span><br><span class="line">git describe --tags $(git rev-list --tags --max-count=1)</span><br><span class="line"></span><br><span class="line"><span class="comment">#选择并切换到指定的版本tag:</span></span><br><span class="line">git checkout -f &lt;tag-name&gt;</span><br><span class="line"><span class="comment">#例如</span></span><br><span class="line">git checkout -f 21.10_b202112032317</span><br><span class="line"><span class="comment">#或者</span></span><br><span class="line">git checkout -f $(git describe --tags $(git rev-list --tags --max-count=1))</span><br><span class="line"></span><br><span class="line"><span class="comment">#更新代码:</span></span><br><span class="line">./scripts/feeds update -a</span><br><span class="line">./scripts/feeds install -a</span><br></pre></td></tr></table></figure></div>
+
+<p>配置固件的命令<code>make menuconfig</code> 但是我们可以从配置模版开始会更轻松一些。</p>
+<p>比如ramips-mt7621的设备可以用拷贝这个模版<code>feeds/x/rom/lede/config.ramips-mt7621</code><br>内核分区限制小的设备，选用 <code>-nosymbol</code> 结尾的<code>config</code>配置模版</p>
+<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cp</span> feeds/x/rom/lede/config.ramips-mt7621 .config</span><br></pre></td></tr></table></figure></div>
+
+<p>由于这些模版是用来编译大量设备的，copy过来后，可以直接编译，不做任何改变。<br>但是如果需要改变，需要<code>make menuconfig</code>自定义，就要做下面的操作:</p>
+<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 上面已经cp 拷贝了模版配置到 .config</span></span><br><span class="line"><span class="comment"># 例如 cp feeds/x/rom/lede/config.ramips-mt7621 .config</span></span><br><span class="line"><span class="comment"># 下面继续操作和修改</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#1 执行</span></span><br><span class="line">make menuconfig</span><br><span class="line"></span><br><span class="line"><span class="comment">#2 进入 Target Profile 选择需要编译打包的设备型号，选择型号后立刻退出，保存</span></span><br></pre></td></tr></table></figure></div>
+
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/QC3284/x-wrt.github.io/master/docs/build/build-target.png"
+                     
+                ></p>
+<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment">#3 执行下面的命令修复 .config</span></span><br><span class="line">sh feeds/x/rom/lede/fix-config.sh</span><br><span class="line"></span><br><span class="line"><span class="comment">#4 再次执行 make menuconfig 然后立刻退出保存</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#5 最后一次 执行 make menuconfig 自定义选择你需要的软件包</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<p>还有更多配置模版，请参考目录下的<code>config.*</code>文件:</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">feeds/x/rom/lede/config.ath79-generic</span><br><span class="line">feeds/x/rom/lede/config.ath79-generic-nosymbol</span><br><span class="line">feeds/x/rom/lede/config.ath79-nand</span><br><span class="line">feeds/x/rom/lede/config.bcm27xx-bcm2709</span><br><span class="line">feeds/x/rom/lede/config.bcm27xx-bcm2710</span><br><span class="line">feeds/x/rom/lede/config.bcm27xx-bcm2711</span><br><span class="line">feeds/x/rom/lede/config.bcm4908-generic</span><br><span class="line">feeds/x/rom/lede/config.bcm53xx-generic</span><br><span class="line">feeds/x/rom/lede/config.ipq40xx-generic</span><br><span class="line">feeds/x/rom/lede/config.ipq806x-generic</span><br><span class="line">feeds/x/rom/lede/config.kirkwood-generic</span><br><span class="line">feeds/x/rom/lede/config.mediatek-mt7622</span><br><span class="line">feeds/x/rom/lede/config.mvebu-cortexa53</span><br><span class="line">feeds/x/rom/lede/config.mvebu-cortexa9</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt7620</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt7620-nosymbol</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt7621</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt76x8</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt76x8-nosymbol</span><br><span class="line">feeds/x/rom/lede/config.ramips-rt305x</span><br><span class="line">feeds/x/rom/lede/config.ramips-rt3883-nosymbol</span><br><span class="line">feeds/x/rom/lede/config.rockchip-armv8</span><br><span class="line">feeds/x/rom/lede/config.sunxi-cortexa7</span><br><span class="line">feeds/x/rom/lede/config.x86_64</span><br><span class="line">feeds/x/rom/lede/config.x86_64-docker</span><br><span class="line">feeds/x/rom/lede/config.x86_generic</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="2-配置目标"><a href="#2-配置目标" class="headerlink" title="2. 配置目标"></a>2. 配置目标</h2><p>在上述准备好的模版配置文件的基础上，执行<code>make menuconfig</code>命令进行个性化定制，增删应用。</p>
+<p>定位到各个子菜单，选择对应的软件包<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/QC3284/x-wrt.github.io/master/docs/build//build-m.png"
+                     
+                ></p>
+<h2 id="3-执行编译"><a href="#3-执行编译" class="headerlink" title="3. 执行编译"></a>3. 执行编译</h2><p>命令:</p>
+<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">make</span><br></pre></td></tr></table></figure></div>
+<p>或者</p>
+<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">make -j1 V=s</span><br></pre></td></tr></table></figure></div>
+
+<p>生成的包在<code>bin/targets/</code>下面</p>
+<p>如果需要再次修改配置编译，只要不是换设备，都可以直接 <code>make menuconfig</code> 修改后就编译，如果需要修改设备，请从拷贝模版配置的地方重新开始配置。</p>
+<h2 id="3-高阶配置"><a href="#3-高阶配置" class="headerlink" title="3. 高阶配置"></a>3. 高阶配置</h2><p>为了得到满意的固件，下面对编译配置选项做更多的详细说明，但是更多的可能并不局限于这些说明内容，还有更多期待大家自己探索。</p>
+<h3 id="3-1-选择应用"><a href="#3-1-选择应用" class="headerlink" title="3.1 选择应用"></a>3.1 选择应用</h3><p>首先，进入<code>make menuconfig</code>菜单</p>
+<p><strong>要编译到固件里面，就要选择<code>&lt;*&gt;</code>，如果只选择<code>&lt;M&gt;</code>只是编译成软件包<code>ipk</code>，不会打包进入固件。</strong></p>
+<p>进入<code>LuCI - Applications</code>子菜单下面，选择自己想要的应用</p>
+<p>常见的软件包:</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">luci-app-aria2 ARRIA2下载工具</span><br><span class="line">luci-app-ddns DDNS工具</span><br><span class="line">luci-app-mwan3 MWAN3负载均衡</span><br><span class="line">luci-app-openvpn OPENVPN</span><br><span class="line">luci-app-ksmbd Ksmbd文件网络共享（samba文件共享）</span><br><span class="line">luci-app-upnp UPNP设置</span><br><span class="line">luci-app-wireguard WireGuard配置界面</span><br><span class="line">luci-app-natcap 远程界面管理模块和全锥形nat实现模块</span><br><span class="line">luci-app-natflow-users 用户认证（用户流量显示）模块</span><br></pre></td></tr></table></figure></div>
+
+<p>进入<code>Kernel modules - USB Support</code>菜单，选择USB支持的驱动</p>
+<p>进入<code>Kernel modules - Filesystems</code>菜单，选择需要支持的文件系统，比如<code>ext4,ntfs,vfat</code>等</p>
+<p>进入<code>Kernel modules - Wireless Drivers</code>菜单，选择无线支持的驱动，如果需要挂卡的驱动，也是在这里找</p>
+<h3 id="3-2-关于natcap远程管理模块"><a href="#3-2-关于natcap远程管理模块" class="headerlink" title="3.2 关于natcap远程管理模块"></a>3.2 关于natcap远程管理模块</h3><p>这个模块包含这几个方面功能的实现：</p>
+<ol>
+<li>远程界面管理(<a class="link"   href="http://x-wrt.dev/" >http://x-wrt.dev/<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>) 模块</li>
+<li>全锥形nat实现模块</li>
+<li>一键VPN功能易用功能</li>
+</ol>
+<p>鉴于有些朋友不喜欢远程管理，这里说明下如何去掉这个模块，请自行选择是否需要这个模块。删除后就删除了这个功能包括全锥形nat功能和一键VPN功能，抱歉这些暂时是耦合的无法分离，远程管理界面需要连接中转服务器和报告动态DNS数据，才能生成根据mac地址匹配的动态域名，如果有公网IP才会生成对应的mac域名给一键VPN功能使用。</p>
+<p>编译选择不集成这个模块，可以:</p>
+<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 修改.config文件，删去掉这几个模块</span></span><br><span class="line">CONFIG_PACKAGE_luci-app-natcap=y</span><br><span class="line">CONFIG_PACKAGE_natcapd-client=y</span><br><span class="line">CONFIG_PACKAGE_natcapd-server=y</span><br><span class="line">CONFIG_PACKAGE_natcapd=y</span><br><span class="line">CONFIG_PACKAGE_kmod-natcap=y</span><br><span class="line"></span><br><span class="line"><span class="comment"># 为了单独让natflow软件加速功能工作，选择下面的包</span></span><br><span class="line">CONFIG_PACKAGE_natflow-boot=y</span><br></pre></td></tr></table></figure></div>
+]]></content>
+  </entry>
+  <entry>
+    <title>自己动手编译 OpenWRT</title>
+    <url>/2024/08/09/%E8%87%AA%E5%B7%B1%E5%8A%A8%E6%89%8B%E7%BC%96%E8%AF%91-OpenWRT/</url>
+    <content><![CDATA[<p>文章来源：<a class="link"   href="https://lgiki.net/post/compile-openwrt/" >https://lgiki.net/post/compile-openwrt/ <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h2 id="Intro"><a href="#Intro" class="headerlink" title="Intro"></a>Intro</h2><p>学校最近升级了校园网设备，终于从年久失修的龟速 100Mbps 升级到了 1Gbps，尽管还是使用锐捷的 ePortal 网页认证，还能通过简单的 Shell 脚本在路由器上自动认证，但新设备却限制了每个用户最多只能同时有两台设备在线，使用路由器会被检测出使用多设备，并被加入黑名单，被断网。</p>
+<p>都 2023 年了，随便手机、电脑再加个平板就仨设备了，更不用说可能还有 Kindle、Switch 等其他设备，只能同时两台设备在线怎么可能满足学生正常使用校园网的需求。更何况，计算机专业的学生可能还会使用虚拟机等软件，但虚拟机类的软件也可能被检测为是多设备同时在线，所以你让计算机专业的学生拿啥学习呢，内存条含嘴里脑补画面吗？</p>
+<p>限制校园网的同时在线设备数量无非就两个出发点：（1）如果不限制，一个宿舍只需要开通一个宽带账号，所有人都可以上网了，运营商的收入就减少了；（2）如果学生出现一些非法的上网行为，可以快速准确地定位到具体学生。但我觉得这都不是学校限制学生只能使用两个设备的理由，哪怕提升到 5 个设备我觉得也合理一些。</p>
+<p>对于限制校园网设备数量的学校，我只能说 Shame on you！</p>
+<p>对于限制校园网设备数量的学校，我只能说 Shame on you！</p>
+<p>对于限制校园网设备数量的学校，我只能说 Shame on you！</p>
+<p>那就…只能另辟蹊径，想其他办法了。</p>
+<p>还好，限制同时在线设备数量这件事早已有其他学校实施过了，也已经有人提出了一些对策。<br>例如，在 <a class="link"   href="https://blog.sunbk201.site/posts/crack-campus-network" >https://blog.sunbk201.site/posts/crack-campus-network <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> 这篇博客里就详细列举了校园网检测在线设备可能采用的手段以及相应的应对措施，我们只需要照着做就行了。</p>
+<p>其实主要就是为 OpenWRT 编译 <a class="link"   href="https://github.com/CHN-beta/rkp-ipid" >rkp-ipid <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> 和 <a class="link"   href="https://github.com/Zxilly/UA2F" >UA2F <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a> 这两个包，而这两个包需要在编译内核的时候开启一些选项，所以需要重新编译 OpenWRT 固件，也因此写下这篇文章记录一下编译 OpenWRT 的过程。</p>
+<h2 id="安装编译环境"><a href="#安装编译环境" class="headerlink" title="安装编译环境"></a>安装编译环境</h2><p>要编译 Linux 当然是使用 Linux 啦！</p>
+<p>如果是 Debian 系的发行版（例如 Ubuntu），可以使用以下指令来安装编译所需的依赖：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update -y</span><br><span class="line"><span class="built_in">sudo</span> apt full-upgrade -y</span><br><span class="line"><span class="built_in">sudo</span> apt install -y ack antlr3 aria2 asciidoc autoconf automake autopoint binutils bison build-essential \</span><br><span class="line">bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \</span><br><span class="line">git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \</span><br><span class="line">libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz \</span><br><span class="line">mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pip libpython3-dev qemu-utils \</span><br><span class="line">rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev</span><br></pre></td></tr></table></figure></div>
+<p>对于 Arch 系的发行版，直接安装 AUR 中的 openwrt-devel 即可：<br><a class="link"   href="https://aur.archlinux.org/packages/openwrt-devel" >https://aur.archlinux.org/packages/openwrt-devel <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h2 id="获取-OpenWRT-源码"><a href="#获取-OpenWRT-源码" class="headerlink" title="获取 OpenWRT 源码"></a>获取 OpenWRT 源码</h2><p>如果你的设备是 OpenWRT 官方支持的设备，并且你想编译 OpenWRT 官方源码，则直接：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/openwrt/openwrt.git</span><br></pre></td></tr></table></figure></div>
+<p>即可。</p>
+<p>但现在有一些国产的路由器 OpenWRT 官方并不支持，可以看看有没有第三方的 OpenWRT 源码支持了你手上的路由器，下载相应的源代码。<br>可以通过<code>cat /etc/openwrt_release</code>命令来查看设备的 Arch、Target 信息：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">root@QWRT:~# <span class="built_in">cat</span> /etc/openwrt_release</span><br><span class="line">DISTRIB_ID=<span class="string">&#x27;OpenWrt&#x27;</span></span><br><span class="line">DISTRIB_RELEASE=<span class="string">&#x27;19.07-SNAPSHOT&#x27;</span></span><br><span class="line">DISTRIB_TARGET=<span class="string">&#x27;ipq60xx/generic&#x27;</span></span><br><span class="line">DISTRIB_ARCH=<span class="string">&#x27;aarch64_cortex-a53+crypto&#x27;</span></span><br><span class="line">DISTRIB_TAINTS=<span class="string">&#x27;no-all busybox override&#x27;</span></span><br><span class="line">DISTRIB_REVISION=<span class="string">&#x27;R23.1.20&#x27;</span></span><br><span class="line">DISTRIB_DESCRIPTION=<span class="string">&#x27;QWRT &#x27;</span></span><br></pre></td></tr></table></figure></div>
+<p>获取了 OpenWRT 源代码之后需要更新 Feeds：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> openwrt</span><br><span class="line">./scripts/feeds update -a</span><br><span class="line">./scripts/feeds install -a</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="添加想要编译的第三方包-可选"><a href="#添加想要编译的第三方包-可选" class="headerlink" title="添加想要编译的第三方包 (可选)"></a>添加想要编译的第三方包 (可选)</h2><p>因为我需要编译 rkp-ipid 和 UA2F，因此我还需要将这些包的源码下载下来：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/CHN-beta/rkp-ipid package/rkp-ipid</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/Zxilly/UA2F package/UA2F</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="配置编译目标"><a href="#配置编译目标" class="headerlink" title="配置编译目标"></a>配置编译目标</h2><p>一切准备就绪，接下来就是设定编译目标了，执行以下命令：</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">make menuconfig</span><br></pre></td></tr></table></figure></div>
+<p>然后会出现一个命令行 UI，首先需要重点设定好<code>Target System</code>,<code>Subtarget</code>,<code>Target Profile</code>，将这几个项目设定为你的路由器。 然后就可以选择你需要编译的包啦，使用空格可以选择要编译的包，设定为 &lt;*&gt; 的包将会内置到固件里，刷好就能直接用，设定为 <M> 的包将会编译成 ipk 文件，需要上传到路由器，然后使用<code>opkg install package_name.ipk</code>进行安装。</p>
+<p>设定好了之后，将配置文件保存为<code>.config</code>即可，如果有一些包需要对内核做一些自定义，也可以直接使用文本编辑器编辑保存下来的<code>.config</code>文件，例如<code>UA2F</code>就需要添加<code>CONFIG_NETFILTER_NETLINK_GLUE_CT=y</code>。</p>
+<h2 id="开始编译"><a href="#开始编译" class="headerlink" title="开始编译"></a>开始编译</h2><p>一切准备完毕，接下来开始编译！</p>
+<div class="highlight-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">make download -j8</span><br><span class="line">make V=s -j8</span><br></pre></td></tr></table></figure></div>
+<p>其中<code>V=s</code>表示输出<code>stdout</code>和<code>stderr</code>，方便在编译失败的时候根据输出信息确定是哪里的错误，<code>-jn</code>的<code>n</code>表示使用<code>n</code>个线程同时编译，对于核心数较多的机器可以将该数值设置得大一些，加快编译过程。</p>
+<p>编译完成之后，在<code>./bin/targets</code>下就可以找到固件以及相应的<code>ipk</code>包了。</p>
+<h2 id="UA2F-的注意事项"><a href="#UA2F-的注意事项" class="headerlink" title="UA2F 的注意事项"></a>UA2F 的注意事项</h2><p>要使 UA2F 正常工作需要关闭 “网络”——“Turbo ACC 网络加速设置” 下的所有选项，否则 UA2F 无法正常工作，具体表现为：重启路由器防火墙之后，第一次 HTTP 请求的 User-Agent 成功修改，但后续 HTTP 请求的 User-Agent 没有被修改。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>MLinux Minimal READMW</title>
+    <url>/2024/08/09/MLinux-Minimal-READMW/</url>
+    <content><![CDATA[<h1 id="MLinux-Minimal-A-Tiny-Linux-distro"><a href="#MLinux-Minimal-A-Tiny-Linux-distro" class="headerlink" title="MLinux Minimal - A Tiny Linux distro"></a>MLinux Minimal - A Tiny Linux distro</h1><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/mlinux-project/.github/main/images/mlinux-minimal.svg"
+                      width="25%" alt="MLinux Minimal"
+                >
+
+<h2 id="Dependencies"><a href="#Dependencies" class="headerlink" title="Dependencies"></a>Dependencies</h2><h3 id="For-building-binary"><a href="#For-building-binary" class="headerlink" title="For building binary"></a>For building binary</h3><ul>
+<li><p>A x86_64 C runtime, compiler, linker, etc.</p>
+<ul>
+<li>Mandatory.</li>
+<li>Either the platform’s native ‘cc’, or GCC 4.2 or newer. For building BusyBox and Linux.</li>
+<li>GCC Homepage:<br><a class="link"   href="https://gcc.gnu.org/" >https://gcc.gnu.org<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/gcc" >https://ftp.gnu.org/gnu/gcc<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>A shell</p>
+<ul>
+<li>Mandatory.</li>
+<li>Either the platform’s native ‘sh’, or GNU Bash.</li>
+<li>GNU Bash Homepage:<br><a class="link"   href="https://www.gnu.org/software/bash" >https://www.gnu.org/software/bash<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/bash" >https://ftp.gnu.org/gnu/bash<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>Awk</p>
+<ul>
+<li>Mandatory.</li>
+<li>Either the platform’s native awk, mawk, or nawk, or GNU awk.</li>
+<li>GNU awk Homepage:<br><a class="link"   href="https://www.gnu.org/software/gawk" >https://www.gnu.org/software/gawk<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/gawk" >https://ftp.gnu.org/gnu/gawk<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>Bc</p>
+<ul>
+<li>Mandatory.</li>
+<li>Either the platform’s native bc, or GNU bc. For building Linux.</li>
+<li>GNU bc Homepage:<br><a class="link"   href="https://www.gnu.org/software/bc" >https://www.gnu.org/software/bc<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/bc" >https://ftp.gnu.org/gnu/bc<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>Bison</p>
+<ul>
+<li>Mandatory.</li>
+<li>Either the platform’s native bison, or GNU bison. For building Linux.</li>
+<li>GNU Bison Homepace:<br><a class="link"   href="https://www.gnu.org/software/bison" >https://www.gnu.org/software/bison<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/bison" >https://ftp.gnu.org/gnu/bison<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>Core POSIX utilities</p>
+<ul>
+<li>Mandatory.</li>
+<li>Either the platform’s native utilities, or GNU coreutils.</li>
+<li>GNU coreutils Homepage:<br><a class="link"   href="https://www.gnu.org/software/coreutils" >https://www.gnu.org/software/coreutils<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/coreutils" >https://ftp.gnu.org/gnu/coreutils<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>Cpio</p>
+<ul>
+<li>Mandatory.</li>
+<li>Either the platfrom’s native cpio, or GNU cpio.</li>
+<li>GNU cpio Homepage:<br><a class="link"   href="https://www.gnu.org/software/cpio" >https://www.gnu.org/software/cpio<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/cpio" >https://ftp.gnu.org/gnu/cpio<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>Flex</p>
+<ul>
+<li>Mandatory.</li>
+<li>For building Linux.</li>
+<li>Homepage:<br><a class="link"   href="https://github.com/westes/flex" >https://github.com/westes/flex<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://github.com/westes/flex/releases" >https://github.com/westes/flex/releases<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>GNU Make</p>
+<ul>
+<li>Mandatory.</li>
+<li>GNU Make 3.79.1 or newer.</li>
+<li>GNU Make Homepage:<br><a class="link"   href="https://www.gnu.org/software/make" >https://www.gnu.org/software/make<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/make" >https://ftp.gnu.org/gnu/make<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>Grep</p>
+<ul>
+<li>Mandatory.</li>
+<li>Either the platform’s native grep, or GNU grep.</li>
+<li>Homepage:<br><a class="link"   href="https://www.gnu.org/software/grep" >https://www.gnu.org/software/grep<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/grep" >https://ftp.gnu.org/gnu/grep<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>libelf</p>
+<ul>
+<li>Mandatory.</li>
+<li>Must be libelf-dev. For building Linux.</li>
+</ul>
+</li>
+<li><p>libssl</p>
+<ul>
+<li>Mandatory.</li>
+<li>Must be libssl-dev. For building Linux.</li>
+</ul>
+</li>
+<li><p>QEMU Utils</p>
+<ul>
+<li>Mandatory.</li>
+<li>For creating disk image.</li>
+<li>Homepage:<br><a class="link"   href="https://www.qemu.org/" >https://www.qemu.org<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://www.qemu.org/download" >https://www.qemu.org/download<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>Sed</p>
+<ul>
+<li>Mandatory.</li>
+<li>Either the platform’s native sed, or GNU sed.</li>
+<li>Homepage:<br><a class="link"   href="https://www.gnu.org/software/sed" >https://www.gnu.org/software/sed<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/sed" >https://ftp.gnu.org/gnu/sed<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>Sudo</p>
+<ul>
+<li>Mandatory.</li>
+<li>Homepage:<br><a class="link"   href="https://www.sudo.ws/" >https://www.sudo.ws<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://www.sudo.ws/dist" >https://www.sudo.ws/dist<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>Syslinux</p>
+<ul>
+<li>Mandatory.</li>
+<li>For creating disk image.</li>
+<li>Homepage:<br><a class="link"   href="https://www.syslinux.org/" >https://www.syslinux.org<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:</li>
+<li><a class="link"   href="https://www.kernel.org/pub/linux/utils/boot/syslinux" >https://www.kernel.org/pub/linux/utils/boot/syslinux<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>Util-linux</p>
+<ul>
+<li>Mandatory.</li>
+<li>Homepage:<br><a class="link"   href="https://github.com/util-linux/util-linux" >https://github.com/util-linux/util-linux<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://github.com/util-linux/util-linux/tags" >https://github.com/util-linux/util-linux/tags<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>Wget</p>
+<ul>
+<li>Mandatory.</li>
+<li>Either the platform’s native ‘wget’, or GNU Wget. For getting source codes.</li>
+<li>GNU Wget Homepage:<br><a class="link"   href="https://www.gnu.org/software/wget" >https://www.gnu.org/software/wget<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/wget" >https://ftp.gnu.org/gnu/wget<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>XZ Utils</p>
+<ul>
+<li>Mandatory.</li>
+<li>For compressing image file and Linux kernel.</li>
+<li>XZ Utils Homepage:<br><a class="link"   href="https://xz.tukaani.org/xz-utils" >https://xz.tukaani.org/xz-utils<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://xz.tukaani.org/xz-utils/#releases" >https://xz.tukaani.org/xz-utils/#releases<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>rsync</p>
+<ul>
+<li>Mandatory</li>
+<li>For installing Linux header.</li>
+<li>rsync Homepage:<br><a class="link"   href="https://rsync.samba.org/" >https://rsync.samba.org<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://rsync.samba.org/download.html" >https://rsync.samba.org/download.html<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+</ul>
+<h4 id="Install-binary-building-dependencies-on-Debian"><a href="#Install-binary-building-dependencies-on-Debian" class="headerlink" title="Install binary building dependencies on Debian"></a>Install binary building dependencies on Debian</h4><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt-get update &amp;&amp; sudo apt-get install gcc cpio xz-utils gawk make grep qemu-utils sed util-linux wget binutils libelf-dev libssl-dev bc flex bison rsync -y</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="For-building-tarball"><a href="#For-building-tarball" class="headerlink" title="For building tarball"></a>For building tarball</h3><ul>
+<li><p>GNU Autoconf</p>
+<ul>
+<li>Mandatory.</li>
+<li>Homepage:<br><a class="link"   href="https://www.gnu.org/software/autoconf" >https://www.gnu.org/software/autoconf<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/autoconf" >https://ftp.gnu.org/gnu/autoconf<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+<li><p>GNU Automake</p>
+<ul>
+<li>Mandatory.</li>
+<li>Homepage:<br><a class="link"   href="https://www.gnu.org/software/automake" >https://www.gnu.org/software/automake<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/automake" >https://ftp.gnu.org/gnu/automake<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+</ul>
+</li>
+</ul>
+<h4 id="Install-tarball-building-dependencies-Debian"><a href="#Install-tarball-building-dependencies-Debian" class="headerlink" title="Install tarball building dependencies Debian"></a>Install tarball building dependencies Debian</h4><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt-get update &amp;&amp; sudo apt-get install autoconf automake -y</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Build-source-tarball"><a href="#Build-source-tarball" class="headerlink" title="Build source tarball"></a>Build source tarball</h2><p><strong>You need to install the dependencies first, and make sure you are in source directory.</strong></p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">make -f Makefile.devel dist</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Build-rootfs-linux-kernel-and-disk-image"><a href="#Build-rootfs-linux-kernel-and-disk-image" class="headerlink" title="Build rootfs, linux kernel and disk image"></a>Build rootfs, linux kernel and disk image</h2><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">./configure</span><br><span class="line">make -j$(nproc)</span><br></pre></td></tr></table></figure></div>
+
+<p>The compressed rootfs will be name to <code>rootfs.tar.xz</code>.<br>The compressed linux kernel will be name to <code>vmlinuz.xz</code>.<br>The compressed disk image will be name to <code>disk.img</code>.</p>
+<h2 id="Configuration-options"><a href="#Configuration-options" class="headerlink" title="Configuration options"></a>Configuration options</h2><ul>
+<li><p><code>--with-busybox-version=X.X.X</code></p>
+<ul>
+<li>Specify the version of Busybox.</li>
+<li>Default is <code>1.36.1</code>.</li>
+</ul>
+</li>
+<li><p><code>--with-linux-version=X.X.X</code></p>
+<ul>
+<li>Specify the version of Linux kernel.</li>
+<li>Default is <code>6.7.5</code>.</li>
+</ul>
+</li>
+<li><p><code>--with-busybox-mirror=OFFICIAL | &lt;URL&gt;</code></p>
+<ul>
+<li>Specify the mirror of Busybox. If you want to use the official mirror, set it to <code>OFFICIAL</code>. Otherwise, set it to the URL of the mirror.</li>
+<li>Default is <code>OFFICIAL</code>.</li>
+</ul>
+</li>
+<li><p><code>--with-linux-mirror=OFFICIAL | CDN | TSINGHUA | ALIYUN | USTC | &lt;URL&gt;</code></p>
+<ul>
+<li>Specify the mirror of Linux kernel. If you want to use the Tsinghua mirror, set it to <code>TSINGHUA</code>. Otherwise, set it to the URL of the mirror.</li>
+<li>Default is <code>OFFICIAL</code>.</li>
+</ul>
+</li>
+</ul>
+<p>Like this:</p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">./configure --with-busybox-version=1.36.1 --with-linux-version=6.7.5 --with-busybox-mirror=OFFICIAL --with-linux-mirror=TSINGHUA</span><br></pre></td></tr></table></figure></div>
+
+<h2 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h2><p><strong>You should use origin binary file instead of XZ compressed one!!!</strong></p>
+<p>Using this command to run <code>disk.img</code>.</p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">qemu-system-x86_64 -m 1024 -hda disk.img</span><br></pre></td></tr></table></figure></div>
+
+<p>Using this command to run <code>vmlinuz</code>.</p>
+<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">qemu-system-x86_64 -m 1024 -kernel vmlinuz</span><br></pre></td></tr></table></figure></div>
+
+<p><strong>This vmlinuz contians initramfs, so you can execute it directly using QEMU.</strong></p>
+<h2 id="Copyright"><a href="#Copyright" class="headerlink" title="Copyright"></a>Copyright</h2><p>The MLinux Minimal is under GPL 2.0,<br>see file <a class="link"   href="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/mlinux-project/minimal/main/LICENSE" >LICENSE<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>.</p>
+<h2 id="Download"><a href="#Download" class="headerlink" title="Download"></a>Download</h2><p><a class="link"   href="https://github.com/mlinux-project/minimal/releases" >https://github.com/mlinux-project/minimal/releases<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h2 id="Homepage"><a href="#Homepage" class="headerlink" title="Homepage"></a>Homepage</h2><p><a class="link"   href="https://github.com/mlinux-project/minimal" >https://github.com/mlinux-project/minimal<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>（x-wrt）SSH-open</title>
+    <url>/2024/08/09/%EF%BC%88x-wrt%EF%BC%89SSH-open/</url>
+    <content><![CDATA[<p>文章来源：<a class="link"   href="https://github.com/x-wrt/x-wrt.github.io/tree/master/docs/ssh-open" >https://github.com/x-wrt/x-wrt.github.io/tree/master/docs/ssh-open<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h1 id="X-WRT-开启ssh的方法"><a href="#X-WRT-开启ssh的方法" class="headerlink" title="X-WRT 开启ssh的方法"></a>X-WRT 开启ssh的方法</h1><p>很多⼈说 X-WRT 的ssh无法登录，这其实是因为默认的ssh没有开启用户登录，大家可以进入界面，进入<a href="#">系统-管理权</a>页面，进入<a href="#">SSH访问</a>标签，开启<strong>密码验证</strong>和<strong>允许 root 用户凭密码登录</strong>就可以了。</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/ssh-open/ssh1.png"
+                     
+                ></p>
+<p><strong>注意请使用谷歌浏览器，火狐浏览器，微软的浏览器，其他浏览器存在不可预知的问题。</strong></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>(x-wrt）install-on-vps2</title>
+    <url>/2024/08/09/%EF%BC%88x-wrt%EF%BC%89install-on-vps2/</url>
+    <content><![CDATA[<p>文章来源：<a class="link"   href="https://github.com/x-wrt/x-wrt.github.io/tree/master/docs/install-on-vps2" >https://github.com/x-wrt/x-wrt.github.io/tree/master/docs/install-on-vps2 <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h1 id="X-WRT-安装部署到VPS上-新"><a href="#X-WRT-安装部署到VPS上-新" class="headerlink" title="X-WRT 安装部署到VPS上(新)"></a>X-WRT 安装部署到VPS上(新)</h1><h3 id="1-介绍"><a href="#1-介绍" class="headerlink" title="1. 介绍:"></a>1. 介绍:</h3><p>本教程旨在介绍如何将 X-WRT 系统部署到云服务器（VPS）上。X-WRT 是一个专为路由器设计的开源系统，具有出色的网络转发优化和友好的配置界面。同时，该系统还提供了许多方便的服务，如 OpenVPN 等，可以轻松地一键部署。</p>
+<p>需要注意的是，本教程适用于大多数 VPS，如 vultr、digitalocean、Amazon 的 AWS、Linode、阿里云、腾讯云等。然而，由于不同云服务商的实际情况不同，您需要灵活应对，根据实际情况做出正确的处理。</p>
+<p>本教程只适用于 X-WRT 固件，可以保证几乎 100% 成功地将 X-WRT 系统部署到所有的 VPS 上。</p>
+<h3 id="2-教程"><a href="#2-教程" class="headerlink" title="2. 教程:"></a>2. 教程:</h3><h4 id="2-1-固件下载"><a href="#2-1-固件下载" class="headerlink" title="2.1 固件下载"></a>2.1 固件下载</h4><p>我们选择 x86 64 位 (MBR dos) 或 x86 64 位 (UEFI gpt) 的固件进行部署。您可以从以下链接下载所需的文件：</p>
+<p><a class="link"   href="https://downloads.x-wrt.com/rom/" >https://downloads.x-wrt.com/rom/ <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p>刷机所需的文件如下：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">x-wrt-x86-64-generic-initramfs-kernel.bin</span><br><span class="line">x-wrt-x86-64-generic-ext4-combined.img.gz</span><br></pre></td></tr></table></figure></div>
+
+<p>如果您的系统是 EFI 系统，则还需要下载以下文件：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">x-wrt-x86-64-generic-ext4-combined-efi.img.gz</span><br></pre></td></tr></table></figure></div>
+
+<h4 id="2-2-VPS系统部署"><a href="#2-2-VPS系统部署" class="headerlink" title="2.2 VPS系统部署"></a>2.2 VPS系统部署</h4><p>本教程所涉及的 VPS 系统要求比较宽松，可以是 Ubuntu、CentOS、Debian 或其他类 Unix 系统。</p>
+<h4 id="2-3-VPS系统的网络配置识别"><a href="#2-3-VPS系统的网络配置识别" class="headerlink" title="2.3 VPS系统的网络配置识别"></a>2.3 VPS系统的网络配置识别</h4><p>在开始部署之前，我们需要了解 VPS 的 IP 地址是如何分配的。有些 VPS 是通过 DHCP 自动获取 IP 地址，有些是静态配置的，还有一些是双网卡或多网卡的。</p>
+<p>登录 VPS 后，可以使用 <code>ifconfig</code> 或者 <code>ip addr list</code> 命令查看 VPS 的网卡 IP 地址。然后，使用命令 <code>grep /etc -nre &lt;IP&gt;</code> 查找包含此 <code>&lt;IP&gt;</code> 的文件。如果找到了相关文件，并且文件内容包含静态配置的脚本，那么我们可以确定该 VPS 是静态配置的。否则，它是动态配置的。</p>
+<p>此外，我们还需要观察 VPS 是否具有多个网口。如果是，那么在安装过程中需要特别注意。下面将有进一步的说明。</p>
+<h4 id="2-4-确定磁盘的路径和分区类型"><a href="#2-4-确定磁盘的路径和分区类型" class="headerlink" title="2.4 确定磁盘的路径和分区类型"></a>2.4 确定磁盘的路径和分区类型</h4><p>使用 <code>df</code> 和 <code>mount</code> 命令可以查看 VPS 的磁盘信息，确定磁盘的第一个分区挂载路径，例如 <code>/dev/sda1</code>、<code>/dev/vda1</code>、<code>/dev/xvda1</code> 等等。需要注意的是，此分区的挂载路径以及可用空间大小，通常情况下此分区挂载在 <code>/</code> 或者 <code>/boot</code> 下，而我们在刷机过程中需要将固件等文件保存在此路径下。</p>
+<p>使用 <code>fdisk -l</code> 命令可以查看分区类型，以确定分区是否为 GPT。如果分区为 GPT，则需要刷写 EFI 固件。但通常情况下分区不是 GPT 类型。</p>
+<h4 id="2-5-开始刷机"><a href="#2-5-开始刷机" class="headerlink" title="2.5 开始刷机"></a>2.5 开始刷机</h4><p>以下是刷机所需的文件，您可以使用 wget 命令进行下载：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">x-wrt-x86-64-generic-initramfs-kernel.bin</span><br><span class="line">x-wrt-x86-64-generic-ext4-combined.img.gz 或者 x-wrt-x86-64-generic-ext4-combined-efi.img.gz</span><br></pre></td></tr></table></figure></div>
+
+<p>在刷机之前，需要确定当前系统运行的内核路径。一般来说，这个路径是 <code>/boot/vmlinuz*</code>。您可以使用 <code>uname -r</code> 命令查看内核版本。比如，如果路径是 <code>/boot/vmlinuz-4.15.0-111-generic</code>，那么我们需要把 <code>x-wrt-x86-64-generic-initramfs-kernel.bin</code> 替换为这个内核：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">cp x-wrt-x86-64-generic-initramfs-kernel.bin /boot/vmlinuz-4.15.0-111-generic</span><br></pre></td></tr></table></figure></div>
+
+<p>然后我们需要确定第一个分区的路径，假如第一个分区是 <code>/</code> 我们把固件拷贝到 <code>/</code> 保存好，注意保存的名字是 <code>x-wrt.img.gz</code></p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">cp x-wrt-x86-64-generic-ext4-combined.img.gz /x-wrt.img.gz</span><br></pre></td></tr></table></figure></div>
+
+<p>同时我们还需要一个安装脚本，脚本路径和固件保存的目录相同，这个例子是<code>/</code> ，脚本名字是 <code>x-wrt-install-vps.sh</code> 脚本的代码参考如下：（根据情况修改）</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line"></span><br><span class="line"># install to sda</span><br><span class="line">BDEV=sda</span><br><span class="line"></span><br><span class="line"># x-wrt.img.gz in disk part sda1</span><br><span class="line">DDEV=sda1</span><br><span class="line"></span><br><span class="line"># static ip</span><br><span class="line">#network=172.21.170.245,255.255.240.0,172.21.175.253,8.8.8.8</span><br><span class="line"></span><br><span class="line"># static ip swap eth0 eth1</span><br><span class="line">#network=&quot;117.18.13.159,255.255.255.0,117.18.13.1,8.8.8.8,initscript=dWNpIHNldCBuZXR3b3JrLmxhbi5pZm5hbWU9ZXRoMQp1Y2kgc2V0IG5ldHdvcmsud2FuLmlmbmFtZT1ldGgwCnVjaSBjb21taXQgbmV0d29yawo=&quot;</span><br><span class="line"></span><br><span class="line"># dhcp ip</span><br><span class="line">network=dhcp</span><br><span class="line"></span><br><span class="line">vmroot=/tmp/block</span><br><span class="line">mkdir -p $vmroot</span><br><span class="line">mount /dev/$&#123;DDEV&#125; $vmroot || exit 0</span><br><span class="line">cp $vmroot/x-wrt.img.gz /tmp/x-wrt.img.gz &amp;&amp; &#123;</span><br><span class="line">	cd /</span><br><span class="line">	umount $vmroot</span><br><span class="line">	sync</span><br><span class="line">	(zcat /tmp/x-wrt.img.gz;</span><br><span class="line">	 echo open=443,network=$network;</span><br><span class="line">	) &gt;/dev/$BDEV &amp;&amp; reboot</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>这个脚本准备刷机的磁盘是sda，第一个分区是sda1，它是DHCP动态获取IP的。你需要根据情况修改刷机脚本，脚本会在重启后启动initramfs内核并且执行。</p>
+<p>如果磁盘是vda，就修改BDEV的值，注意，如果是静态IP，就注释掉<code>network=dhcp</code>，启用静态IP那一行的<code>network=&lt;ip&gt;,&lt;mask&gt;,&lt;gateway&gt;,&lt;dns&gt;</code>，如果VPS有多个网卡，比如有2个<code>eth0 eth1</code>，我们需要附加一个<code>initscript=&lt;script base64 codes&gt;</code>来做交换网口，这个<code>&lt;script base64 codes&gt;</code>其实是如下脚本的base64编码，你要根据情况修改。</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">uci set network.lan.ifname=eth1</span><br><span class="line">uci set network.wan.ifname=eth0</span><br><span class="line">uci commit network</span><br></pre></td></tr></table></figure></div>
+
+<p>如果以上操作正确无误，就执行<code>reboot</code>重启系统。由于我们使用initramfs-kernel替换了原有内核，重启后系统会进入initramfs-kernel环境。然后，该环境会查找 x-wrt-install-vps.sh 脚本并执行刷机操作。这个脚本执行的内容很简单：挂载第一个分区、将固件拷贝到 &#x2F;tmp 目录中，然后执行刷机并重启。这个过程大概需要5分钟，看情况了。</p>
+<h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结:"></a>3. 总结:</h3><p>整个刷机过程，大概就三个步骤:</p>
+<ol>
+<li>下载好两个固件文件，保存到特定的路径</li>
+<li>拷贝并且根据情况修改好一个脚本(<code>x-wrt-install-vps.sh</code>)，保存到特定路径</li>
+<li>重启(reboot)并等待自动安装完成</li>
+</ol>
+<p>系统重启后，你将能够通过访问 X-WRT 的管理界面来配置路由器。以本文的例子为例，管理界面的地址(HTTPS)是 <code>https://[VPS_IP]/</code>。进入管理界面后，你需要立即修改默认的管理密码。默认的账号&#x2F;密码是 admin&#x2F;admin。此外，如果需要，你可以进入系统管理页面，启用 SSH 账户密码登录，并设置防火墙以允许来自 WAN 区域的22端口访问。这样可以使你能够远程登录到路由器并进行更多的配置。</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>（x-wrt）多拨和负载均衡配置教程</title>
+    <url>/2024/08/09/%EF%BC%88x-wrt%EF%BC%89%E5%A4%9A%E6%8B%A8%E5%92%8C%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E9%85%8D%E7%BD%AE%E6%95%99%E7%A8%8B/</url>
+    <content><![CDATA[<p>文章来源：<a class="link"   href="https://github.com/x-wrt/x-wrt.github.io/master/docs/xwan/" >https://github.com/x-wrt/x-wrt.github.io/master/docs/xwan/<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h1 id="多拨和负载均衡配置教程"><a href="#多拨和负载均衡配置教程" class="headerlink" title="多拨和负载均衡配置教程"></a>多拨和负载均衡配置教程</h1><h2 id="1-介绍-单网口多拨"><a href="#1-介绍-单网口多拨" class="headerlink" title="1. 介绍(单网口多拨)"></a>1. 介绍(单网口多拨)</h2><p>很多⼈不知道怎么配置OpenWrt多拨，特写⼀个简易的教程，只要你的运营商⽀持多拨，照着这个教程做都可以多拨叠加⽹速。本教程适用于OpenWrt衍生版本<a class="link"   href="https://downloads.x-wrt.com/rom/" >X-WRT的固件<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>。</p>
+<p><strong>注意请使用谷歌浏览器，火狐浏览器，微软的浏览器，其他浏览器存在不可预知的问题。</strong></p>
+<h3 id="1-1-首先，正常设置好wan口拨号上网"><a href="#1-1-首先，正常设置好wan口拨号上网" class="headerlink" title="1.1 首先，正常设置好wan口拨号上网"></a>1.1 首先，正常设置好wan口拨号上网</h3><p>在<a href="#">网络-接口</a>页面，编辑<a href="#">wan口-基本设置</a>，选择协议PPPoE，填写宽带账户密码:<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/xwan/xwan-pppoe1.png"
+                     
+                ></p>
+<p>修改<a href="#">wan口-高级设置</a>，使用网关跃点 填写<code>40</code>，<a href="#">防火墙设置</a> 选择wan<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/xwan/xwan-pppoe2.png"
+                     
+                ></p>
+<h3 id="1-2-然后，开启多拨"><a href="#1-2-然后，开启多拨" class="headerlink" title="1.2 然后，开启多拨"></a>1.2 然后，开启多拨</h3><p>进入<a href="#">网络-多拨</a>页面，开启多拨，填写想要的多拨数，启用自动负载均衡和叠加:<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://ghproxy.xcqcoo.us.kg/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/xwan/xwan1.png"
+                     
+                ></p>
+<p>开启多拨后，它会自动设置好负载均衡和叠加，对于高级用户，可以进入<a href="#">网络-负载均衡</a>页面进行高级的调整，小白用户可以忽略。</p>
+<p><strong>PS: 这里开启多拨，实际上用的网口就是1.1设置的wan口的接口</strong></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>(x-wrt）luci-app-fakemesh</title>
+    <url>/2024/08/09/%EF%BC%88x-wr%EF%BC%89luci-app-fakemesh/</url>
+    <content><![CDATA[<p>文章来源：<a class="link"   href="https://github.com/x-wrt/com.x-wrt/tree/master/luci-app-fakemesh" >https://github.com/x-wrt/com.x-wrt/tree/master/luci-app-fakemesh <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<h2 id="fakemesh简介"><a href="#fakemesh简介" class="headerlink" title="fakemesh简介"></a>fakemesh简介</h2><p>fakemesh是一种网络拓扑结构，由一个<code>控制器（AC）</code>和一个或多个<code>有线AP（Wired AP）</code>和<code>卫星（Agent）</code>组成。它是一种混合了<code>无线Mesh</code>和<code>AC+AP</code>两种组网模式的混合网络，其中，<code>有线AP</code>通过网线和<code>控制器（AC）</code>相连，而<code>卫星（Agent）</code>则通过无线STA方式接入，共同构成一个无线（包括有线）覆盖网络。</p>
+<p>fakemesh的部署确实相对较为方便，只需要将节点设备连接到正确的网络，并设置节点设备的角色，Mesh ID等信息即可。因为fakemesh结合了无线Mesh和AC+AP两种组网模式，所以也可以很方便地进行混合组网，提高了网络的覆盖范围和可靠性。</p>
+<p>目前<a class="link"   href="https://github.com/x-wrt/x-wrt" >X-WRT <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>默认集成了fakemesh功能</p>
+<h2 id="fakemesh-使用"><a href="#fakemesh-使用" class="headerlink" title="fakemesh 使用"></a>fakemesh 使用</h2><h3 id="组网成功后统一的访问设备的地址格式如下"><a href="#组网成功后统一的访问设备的地址格式如下" class="headerlink" title="组网成功后统一的访问设备的地址格式如下:"></a>组网成功后统一的访问设备的地址格式如下:</h3><p>访问控制器的地址: <code>http://controller.fakemesh/</code>或者<code>http://ac.fakemesh/</code></p>
+<p>访问AP的地址: <code>http://&#123;mac&#125;.ap.fakemesh/</code> 或者 <code>http://N.ap.fakemesh/</code></p>
+<p>其中<code>&#123;mac&#125;</code>是AP的MAC地址，比如<code>&#123;mac&#125;=1122334455AB</code>，<code>N</code>是AP的自动编号，比如 N&#x3D;1, N&#x3D;2, N&#x3D;3, …</p>
+<p>例子:</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">http://1.ap.fakemesh/</span><br><span class="line">http://1122334455AB.ap.fakemesh/</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="故障处理"><a href="#故障处理" class="headerlink" title="故障处理:"></a>故障处理:</h3><p>AP离线3分钟左右进入故障模式，这个模式开启默认SSID，可以提供接入管理重新配置。<br>故障模式的默认SSID和密码是:</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">SSID: X-WRT_XXXX</span><br><span class="line">PASSWD: 88888888</span><br></pre></td></tr></table></figure></div>
+
+<p>故障模式下AP的管理IP地址是DHCP的网关地址，比如电脑获取到<code>192.168.16.x</code>的IP，那么AP的管理IP就是<code>192.168.16.1</code></p>
+<h2 id="fakemesh-基本组成"><a href="#fakemesh-基本组成" class="headerlink" title="fakemesh 基本组成"></a>fakemesh 基本组成</h2><p>组网由一个<code>控制器(controller)</code>和一个或者多个<code>AP</code>组成</p>
+<p>AP包括: <code>卫星(Agent)</code>和<code>有线AP(Wired AP)</code>两种</p>
+<p><strong>控制器(Controller)</strong>:  作为AC和出口路由器，提供网络出口上网，统一管理下挂的卫星和有线AP，统一管理无线</p>
+<p><strong>卫星(Agent)</strong>:  通过Wi-Fi组网接入的AP</p>
+<p><strong>有线AP(Wired AP)</strong>:  通过网线组网接入的AP</p>
+<h2 id="fakemesh-配置参数"><a href="#fakemesh-配置参数" class="headerlink" title="fakemesh 配置参数"></a>fakemesh 配置参数</h2><h3 id="1-Mesh-ID"><a href="#1-Mesh-ID" class="headerlink" title="1. Mesh ID"></a>1. Mesh ID</h3><p>   这个参数是fakemesh网络组网的统一ID，控制器、卫星、有线AP都要设置相同的Mesh ID。</p>
+<h3 id="2-密钥-Key"><a href="#2-密钥-Key" class="headerlink" title="2. 密钥(Key)"></a>2. 密钥(Key)</h3><p>   这是组网的统一密钥，组网加密需要，如果不需要加密可以留空白。</p>
+<h3 id="3-带宽-Band"><a href="#3-带宽-Band" class="headerlink" title="3. 带宽(Band)"></a>3. 带宽(Band)</h3><p>   这是组网使用的无线频段，要设置相同，5G或者2G。</p>
+<h3 id="4-角色-Role"><a href="#4-角色-Role" class="headerlink" title="4. 角色(Role)"></a>4. 角色(Role)</h3><p>   可以是控制器、卫星、有线AP。</p>
+<h3 id="5-同步配置-Sync-Config"><a href="#5-同步配置-Sync-Config" class="headerlink" title="5. 同步配置(Sync Config)"></a>5. 同步配置(Sync Config)</h3><p>   是否统一管理Wi-Fi配置等，Wi-Fi配置由控制器统一配置管理。</p>
+<h3 id="6-访问-IP-地址-Access-IP-address"><a href="#6-访问-IP-地址-Access-IP-address" class="headerlink" title="6. 访问 IP 地址(Access IP address)"></a>6. 访问 IP 地址(Access IP address)</h3><p>   设置一个特定的IP地址给控制器，可以通过这个IP访问控制器的管理界面。</p>
+<h3 id="7-关闭前传-Fronthaul-Disabled"><a href="#7-关闭前传-Fronthaul-Disabled" class="headerlink" title="7. 关闭前传(Fronthaul Disabled)"></a>7. 关闭前传(Fronthaul Disabled)</h3><p>   这个节点关闭前传无线信号，也就是不允许其他AP节点通过这个节点Wi-Fi接入。</p>
+<h3 id="8-漫游组件-Band-Steer-Helper"><a href="#8-漫游组件-Band-Steer-Helper" class="headerlink" title="8. 漫游组件(Band Steer Helper)"></a>8. 漫游组件(Band Steer Helper)</h3><p>   目前可以选择<a class="link"   href="https://github.com/fakemesh/dawn" >DAWN <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>或者<a class="link"   href="https://github.com/fakemesh/usteer" >usteer <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a>作为漫游辅助控件。</p>
+<h2 id="无线管理-Wireless-Management"><a href="#无线管理-Wireless-Management" class="headerlink" title="无线管理(Wireless Management)"></a>无线管理(Wireless Management)</h2><p>   可以在控制器界面上统一管理无线，包括增删SSID，设置SSID的加密方式，频宽。</p>
+<h2 id="控制器-Controller-旁路部署"><a href="#控制器-Controller-旁路部署" class="headerlink" title="控制器(Controller)旁路部署"></a>控制器(Controller)旁路部署</h2><p>   需要注意的是，如果控制器不作为网关出口并且不提供DHCP服务，用户需要手动配置网络设置，包括设置控制器的LAN口IP地址、网关IP和DNS。此外，通常控制器的LAN口会默认启用DHCP客户端，从第三方网关获取IP和网关，如果需要使用静态IP，则需要保证控制器和第三方网关在同一个网段且可以相互通信。否则，就无法实现控制器与其他AP的同步配置。</p>
+]]></content>
+  </entry>
+</search>
