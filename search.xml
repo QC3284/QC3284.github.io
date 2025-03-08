@@ -1,238 +1,246 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>MLinux Minimal READMW</title>
-    <url>/2024/08/09/MLinux-Minimal-READMW/</url>
-    <content><![CDATA[<h1 id="MLinux-Minimal-A-Tiny-Linux-distro"><a href="#MLinux-Minimal-A-Tiny-Linux-distro" class="headerlink" title="MLinux Minimal - A Tiny Linux distro"></a>MLinux Minimal - A Tiny Linux distro</h1><figure class="image-caption"><img  
+    <title>MLinux Minimal 说明文档</title>
+    <url>/2024/08/09/MLinux-Minimal-README(%E4%B8%AD%E6%96%87)/</url>
+    <content><![CDATA[<h1 id="MLinux-Minimal-微型-Linux-发行版"><a href="#MLinux-Minimal-微型-Linux-发行版" class="headerlink" title="MLinux Minimal - 微型 Linux 发行版"></a>MLinux Minimal - 微型 Linux 发行版</h1><figure class="image-caption"><img  
                      lazyload
                      src="/images/loading.svg"
                      data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/mlinux-project/.github/main/images/mlinux-minimal.svg"
                       width="25%" alt="MLinux Minimal"
-                ><figcaption>MLinux Minimal</figcaption></figure>
+                ><figcaption>MLinux Minimal</figcaption></figure>  
 
-<h2 id="Dependencies"><a href="#Dependencies" class="headerlink" title="Dependencies"></a>Dependencies</h2><h3 id="For-building-binary"><a href="#For-building-binary" class="headerlink" title="For building binary"></a>For building binary</h3><ul>
-<li><p>A x86_64 C runtime, compiler, linker, etc.</p>
+<h2 id="依赖项"><a href="#依赖项" class="headerlink" title="依赖项"></a>依赖项</h2><h3 id="编译二进制文件所需"><a href="#编译二进制文件所需" class="headerlink" title="编译二进制文件所需"></a>编译二进制文件所需</h3><ul>
+<li><p><strong>x86_64 C 运行时、编译器、链接器等</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Either the platform’s native ‘cc’, or GCC 4.2 or newer. For building BusyBox and Linux.</li>
-<li>GCC Homepage:<br><a class="link"   href="https://gcc.gnu.org/" >https://gcc.gnu.org<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/gcc" >https://ftp.gnu.org/gnu/gcc<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>可使用系统原生的 <code>cc</code> 或 GCC 4.2 及以上版本（用于编译 BusyBox 和 Linux 内核）。  </li>
+<li>GCC 主页：<br><a class="link"   href="https://gcc.gnu.org/" >https://gcc.gnu.org<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://ftp.gnu.org/gnu/gcc" >https://ftp.gnu.org/gnu/gcc<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>A shell</p>
+<li><p><strong>Shell</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Either the platform’s native ‘sh’, or GNU Bash.</li>
-<li>GNU Bash Homepage:<br><a class="link"   href="https://www.gnu.org/software/bash" >https://www.gnu.org/software/bash<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/bash" >https://ftp.gnu.org/gnu/bash<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>可使用系统原生的 <code>sh</code> 或 GNU Bash。  </li>
+<li>GNU Bash 主页：<br><a class="link"   href="https://www.gnu.org/software/bash" >https://www.gnu.org/software/bash<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://ftp.gnu.org/gnu/bash" >https://ftp.gnu.org/gnu/bash<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>Awk</p>
+<li><p><strong>Awk</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Either the platform’s native awk, mawk, or nawk, or GNU awk.</li>
-<li>GNU awk Homepage:<br><a class="link"   href="https://www.gnu.org/software/gawk" >https://www.gnu.org/software/gawk<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/gawk" >https://ftp.gnu.org/gnu/gawk<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>可使用系统原生的 awk、mawk、nawk 或 GNU awk。  </li>
+<li>GNU awk 主页：<br><a class="link"   href="https://www.gnu.org/software/gawk" >https://www.gnu.org/software/gawk<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://ftp.gnu.org/gnu/gawk" >https://ftp.gnu.org/gnu/gawk<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>Bc</p>
+<li><p><strong>Bc</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Either the platform’s native bc, or GNU bc. For building Linux.</li>
-<li>GNU bc Homepage:<br><a class="link"   href="https://www.gnu.org/software/bc" >https://www.gnu.org/software/bc<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/bc" >https://ftp.gnu.org/gnu/bc<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>可使用系统原生的 bc 或 GNU bc（用于编译 Linux 内核）。  </li>
+<li>GNU bc 主页：<br><a class="link"   href="https://www.gnu.org/software/bc" >https://www.gnu.org/software/bc<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://ftp.gnu.org/gnu/bc" >https://ftp.gnu.org/gnu/bc<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>Bison</p>
+<li><p><strong>Bison</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Either the platform’s native bison, or GNU bison. For building Linux.</li>
-<li>GNU Bison Homepace:<br><a class="link"   href="https://www.gnu.org/software/bison" >https://www.gnu.org/software/bison<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/bison" >https://ftp.gnu.org/gnu/bison<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>可使用系统原生的 bison 或 GNU Bison（用于编译 Linux 内核）。  </li>
+<li>GNU Bison 主页：<br><a class="link"   href="https://www.gnu.org/software/bison" >https://www.gnu.org/software/bison<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://ftp.gnu.org/gnu/bison" >https://ftp.gnu.org/gnu/bison<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>Core POSIX utilities</p>
+<li><p><strong>核心 POSIX 工具集</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Either the platform’s native utilities, or GNU coreutils.</li>
-<li>GNU coreutils Homepage:<br><a class="link"   href="https://www.gnu.org/software/coreutils" >https://www.gnu.org/software/coreutils<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/coreutils" >https://ftp.gnu.org/gnu/coreutils<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>可使用系统原生工具或 GNU coreutils。  </li>
+<li>GNU coreutils 主页：<br><a class="link"   href="https://www.gnu.org/software/coreutils" >https://www.gnu.org/software/coreutils<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://ftp.gnu.org/gnu/coreutils" >https://ftp.gnu.org/gnu/coreutils<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>Cpio</p>
+<li><p><strong>Cpio</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Either the platfrom’s native cpio, or GNU cpio.</li>
-<li>GNU cpio Homepage:<br><a class="link"   href="https://www.gnu.org/software/cpio" >https://www.gnu.org/software/cpio<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/cpio" >https://ftp.gnu.org/gnu/cpio<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>可使用系统原生的 cpio 或 GNU cpio。  </li>
+<li>GNU cpio 主页：<br><a class="link"   href="https://www.gnu.org/software/cpio" >https://www.gnu.org/software/cpio<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://ftp.gnu.org/gnu/cpio" >https://ftp.gnu.org/gnu/cpio<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>Flex</p>
+<li><p><strong>Flex</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>For building Linux.</li>
-<li>Homepage:<br><a class="link"   href="https://github.com/westes/flex" >https://github.com/westes/flex<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://github.com/westes/flex/releases" >https://github.com/westes/flex/releases<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>用于编译 Linux 内核。  </li>
+<li>主页：<br><a class="link"   href="https://github.com/westes/flex" >https://github.com/westes/flex<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://github.com/westes/flex/releases" >https://github.com/westes/flex/releases<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>GNU Make</p>
+<li><p><strong>GNU Make</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>GNU Make 3.79.1 or newer.</li>
-<li>GNU Make Homepage:<br><a class="link"   href="https://www.gnu.org/software/make" >https://www.gnu.org/software/make<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/make" >https://ftp.gnu.org/gnu/make<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>需 GNU Make 3.79.1 或更高版本。  </li>
+<li>GNU Make 主页：<br><a class="link"   href="https://www.gnu.org/software/make" >https://www.gnu.org/software/make<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://ftp.gnu.org/gnu/make" >https://ftp.gnu.org/gnu/make<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>Grep</p>
+<li><p><strong>Grep</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Either the platform’s native grep, or GNU grep.</li>
-<li>Homepage:<br><a class="link"   href="https://www.gnu.org/software/grep" >https://www.gnu.org/software/grep<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/grep" >https://ftp.gnu.org/gnu/grep<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>可使用系统原生的 grep 或 GNU grep。  </li>
+<li>主页：<br><a class="link"   href="https://www.gnu.org/software/grep" >https://www.gnu.org/software/grep<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://ftp.gnu.org/gnu/grep" >https://ftp.gnu.org/gnu/grep<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>libelf</p>
+<li><p><strong>libelf</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Must be libelf-dev. For building Linux.</li>
+<li><strong>必需</strong>。  </li>
+<li>需安装 libelf-dev（用于编译 Linux 内核）。</li>
 </ul>
 </li>
-<li><p>libssl</p>
+<li><p><strong>libssl</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Must be libssl-dev. For building Linux.</li>
+<li><strong>必需</strong>。  </li>
+<li>需安装 libssl-dev（用于编译 Linux 内核）。</li>
 </ul>
 </li>
-<li><p>QEMU Utils</p>
+<li><p><strong>QEMU 工具集</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>For creating disk image.</li>
-<li>Homepage:<br><a class="link"   href="https://www.qemu.org/" >https://www.qemu.org<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://www.qemu.org/download" >https://www.qemu.org/download<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>用于创建磁盘镜像。  </li>
+<li>主页：<br><a class="link"   href="https://www.qemu.org/" >https://www.qemu.org<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://www.qemu.org/download" >https://www.qemu.org/download<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>Sed</p>
+<li><p><strong>Sed</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Either the platform’s native sed, or GNU sed.</li>
-<li>Homepage:<br><a class="link"   href="https://www.gnu.org/software/sed" >https://www.gnu.org/software/sed<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/sed" >https://ftp.gnu.org/gnu/sed<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>可使用系统原生的 sed 或 GNU sed。  </li>
+<li>主页：<br><a class="link"   href="https://www.gnu.org/software/sed" >https://www.gnu.org/software/sed<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://ftp.gnu.org/gnu/sed" >https://ftp.gnu.org/gnu/sed<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>Sudo</p>
+<li><p><strong>Sudo</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Homepage:<br><a class="link"   href="https://www.sudo.ws/" >https://www.sudo.ws<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://www.sudo.ws/dist" >https://www.sudo.ws/dist<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>主页：<br><a class="link"   href="https://www.sudo.ws/" >https://www.sudo.ws<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://www.sudo.ws/dist" >https://www.sudo.ws/dist<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>Syslinux</p>
+<li><p><strong>Syslinux</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>For creating disk image.</li>
-<li>Homepage:<br><a class="link"   href="https://www.syslinux.org/" >https://www.syslinux.org<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:</li>
-<li><a class="link"   href="https://www.kernel.org/pub/linux/utils/boot/syslinux" >https://www.kernel.org/pub/linux/utils/boot/syslinux<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>用于创建磁盘镜像。  </li>
+<li>主页：<br><a class="link"   href="https://www.syslinux.org/" >https://www.syslinux.org<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://www.kernel.org/pub/linux/utils/boot/syslinux" >https://www.kernel.org/pub/linux/utils/boot/syslinux<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>Util-linux</p>
+<li><p><strong>Util-linux</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Homepage:<br><a class="link"   href="https://github.com/util-linux/util-linux" >https://github.com/util-linux/util-linux<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://github.com/util-linux/util-linux/tags" >https://github.com/util-linux/util-linux/tags<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>主页：<br><a class="link"   href="https://github.com/util-linux/util-linux" >https://github.com/util-linux/util-linux<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://github.com/util-linux/util-linux/tags" >https://github.com/util-linux/util-linux/tags<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>Wget</p>
+<li><p><strong>Wget</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>Either the platform’s native ‘wget’, or GNU Wget. For getting source codes.</li>
-<li>GNU Wget Homepage:<br><a class="link"   href="https://www.gnu.org/software/wget" >https://www.gnu.org/software/wget<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/wget" >https://ftp.gnu.org/gnu/wget<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>可使用系统原生的 <code>wget</code> 或 GNU Wget（用于获取源代码）。  </li>
+<li>GNU Wget 主页：<br><a class="link"   href="https://www.gnu.org/software/wget" >https://www.gnu.org/software/wget<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://ftp.gnu.org/gnu/wget" >https://ftp.gnu.org/gnu/wget<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>XZ Utils</p>
+<li><p><strong>XZ Utils</strong>  </p>
 <ul>
-<li>Mandatory.</li>
-<li>For compressing image file and Linux kernel.</li>
-<li>XZ Utils Homepage:<br><a class="link"   href="https://xz.tukaani.org/xz-utils" >https://xz.tukaani.org/xz-utils<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://xz.tukaani.org/xz-utils/#releases" >https://xz.tukaani.org/xz-utils/#releases<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>用于压缩镜像文件及 Linux 内核。  </li>
+<li>XZ Utils 主页：<br><a class="link"   href="https://xz.tukaani.org/xz-utils" >https://xz.tukaani.org/xz-utils<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://xz.tukaani.org/xz-utils/#releases" >https://xz.tukaani.org/xz-utils/#releases<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p>rsync</p>
+<li><p><strong>rsync</strong>  </p>
 <ul>
-<li>Mandatory</li>
-<li>For installing Linux header.</li>
-<li>rsync Homepage:<br><a class="link"   href="https://rsync.samba.org/" >https://rsync.samba.org<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://rsync.samba.org/download.html" >https://rsync.samba.org/download.html<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-</ul>
-</li>
-</ul>
-<h4 id="Install-binary-building-dependencies-on-Debian"><a href="#Install-binary-building-dependencies-on-Debian" class="headerlink" title="Install binary building dependencies on Debian"></a>Install binary building dependencies on Debian</h4><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt-get update &amp;&amp; sudo apt-get install gcc cpio xz-utils gawk make grep qemu-utils sed util-linux wget binutils libelf-dev libssl-dev bc flex bison rsync -y</span><br></pre></td></tr></table></figure></div>
-
-<h3 id="For-building-tarball"><a href="#For-building-tarball" class="headerlink" title="For building tarball"></a>For building tarball</h3><ul>
-<li><p>GNU Autoconf</p>
-<ul>
-<li>Mandatory.</li>
-<li>Homepage:<br><a class="link"   href="https://www.gnu.org/software/autoconf" >https://www.gnu.org/software/autoconf<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/autoconf" >https://ftp.gnu.org/gnu/autoconf<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-</ul>
-</li>
-<li><p>GNU Automake</p>
-<ul>
-<li>Mandatory.</li>
-<li>Homepage:<br><a class="link"   href="https://www.gnu.org/software/automake" >https://www.gnu.org/software/automake<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li>Download:<br><a class="link"   href="https://ftp.gnu.org/gnu/automake" >https://ftp.gnu.org/gnu/automake<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><strong>必需</strong>。  </li>
+<li>用于安装 Linux 头文件。  </li>
+<li>rsync 主页：<br><a class="link"   href="https://rsync.samba.org/" >https://rsync.samba.org<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://rsync.samba.org/download.html" >https://rsync.samba.org/download.html<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
 </ul>
-<h4 id="Install-tarball-building-dependencies-Debian"><a href="#Install-tarball-building-dependencies-Debian" class="headerlink" title="Install tarball building dependencies Debian"></a>Install tarball building dependencies Debian</h4><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">sudo apt-get update &amp;&amp; sudo apt-get install autoconf automake -y</span><br></pre></td></tr></table></figure></div>
-
-<h2 id="Build-source-tarball"><a href="#Build-source-tarball" class="headerlink" title="Build source tarball"></a>Build source tarball</h2><p><strong>You need to install the dependencies first, and make sure you are in source directory.</strong></p>
-<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">make -f Makefile.devel dist</span><br></pre></td></tr></table></figure></div>
-
-<h2 id="Build-rootfs-linux-kernel-and-disk-image"><a href="#Build-rootfs-linux-kernel-and-disk-image" class="headerlink" title="Build rootfs, linux kernel and disk image"></a>Build rootfs, linux kernel and disk image</h2><div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">./configure</span><br><span class="line">make -j$(nproc)</span><br></pre></td></tr></table></figure></div>
-
-<p>The compressed rootfs will be name to <code>rootfs.tar.xz</code>.<br>The compressed linux kernel will be name to <code>vmlinuz.xz</code>.<br>The compressed disk image will be name to <code>disk.img</code>.</p>
-<h2 id="Configuration-options"><a href="#Configuration-options" class="headerlink" title="Configuration options"></a>Configuration options</h2><ul>
-<li><p><code>--with-busybox-version=X.X.X</code></p>
+<h4 id="在-Debian-上安装编译依赖项"><a href="#在-Debian-上安装编译依赖项" class="headerlink" title="在 Debian 上安装编译依赖项"></a>在 Debian 上安装编译依赖项</h4><pre><code class="language-shell">sudo apt-get update &amp;&amp; sudo apt-get install gcc cpio xz-utils gawk make grep qemu-utils sed util-linux wget binutils libelf-dev libssl-dev bc flex bison rsync -y  
+</code></pre>
+<h3 id="构建压缩包所需"><a href="#构建压缩包所需" class="headerlink" title="构建压缩包所需"></a>构建压缩包所需</h3><ul>
+<li><p><strong>GNU Autoconf</strong>  </p>
 <ul>
-<li>Specify the version of Busybox.</li>
-<li>Default is <code>1.36.1</code>.</li>
+<li><strong>必需</strong>。  </li>
+<li>主页：<br><a class="link"   href="https://www.gnu.org/software/autoconf" >https://www.gnu.org/software/autoconf<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://ftp.gnu.org/gnu/autoconf" >https://ftp.gnu.org/gnu/autoconf<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
-<li><p><code>--with-linux-version=X.X.X</code></p>
+<li><p><strong>GNU Automake</strong>  </p>
 <ul>
-<li>Specify the version of Linux kernel.</li>
-<li>Default is <code>6.7.5</code>.</li>
-</ul>
-</li>
-<li><p><code>--with-busybox-mirror=OFFICIAL | &lt;URL&gt;</code></p>
-<ul>
-<li>Specify the mirror of Busybox. If you want to use the official mirror, set it to <code>OFFICIAL</code>. Otherwise, set it to the URL of the mirror.</li>
-<li>Default is <code>OFFICIAL</code>.</li>
-</ul>
-</li>
-<li><p><code>--with-linux-mirror=OFFICIAL | CDN | TSINGHUA | ALIYUN | USTC | &lt;URL&gt;</code></p>
-<ul>
-<li>Specify the mirror of Linux kernel. If you want to use the Tsinghua mirror, set it to <code>TSINGHUA</code>. Otherwise, set it to the URL of the mirror.</li>
-<li>Default is <code>OFFICIAL</code>.</li>
+<li><strong>必需</strong>。  </li>
+<li>主页：<br><a class="link"   href="https://www.gnu.org/software/automake" >https://www.gnu.org/software/automake<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li>下载地址：<br><a class="link"   href="https://ftp.gnu.org/gnu/automake" >https://ftp.gnu.org/gnu/automake<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
 </li>
 </ul>
-<p>Like this:</p>
-<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">./configure --with-busybox-version=1.36.1 --with-linux-version=6.7.5 --with-busybox-mirror=OFFICIAL --with-linux-mirror=TSINGHUA</span><br></pre></td></tr></table></figure></div>
-
-<h2 id="Run"><a href="#Run" class="headerlink" title="Run"></a>Run</h2><p><strong>You should use origin binary file instead of XZ compressed one!!!</strong></p>
-<p>Using this command to run <code>disk.img</code>.</p>
-<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">qemu-system-x86_64 -m 1024 -hda disk.img</span><br></pre></td></tr></table></figure></div>
-
-<p>Using this command to run <code>vmlinuz</code>.</p>
-<div class="code-container" data-rel="Shell"><figure class="iseeu highlight shell"><table><tr><td class="code"><pre><span class="line">qemu-system-x86_64 -m 1024 -kernel vmlinuz</span><br></pre></td></tr></table></figure></div>
-
-<p><strong>This vmlinuz contians initramfs, so you can execute it directly using QEMU.</strong></p>
-<h2 id="Copyright"><a href="#Copyright" class="headerlink" title="Copyright"></a>Copyright</h2><p>The MLinux Minimal is under GPL 2.0,<br>see file <a class="link"   href="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/mlinux-project/minimal/main/LICENSE" >LICENSE<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>.</p>
-<h2 id="Download"><a href="#Download" class="headerlink" title="Download"></a>Download</h2><p><a class="link"   href="https://github.com/mlinux-project/minimal/releases" >https://github.com/mlinux-project/minimal/releases<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<h2 id="Homepage"><a href="#Homepage" class="headerlink" title="Homepage"></a>Homepage</h2><p><a class="link"   href="https://github.com/mlinux-project/minimal" >https://github.com/mlinux-project/minimal<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h4 id="在-Debian-上安装压缩包构建依赖项"><a href="#在-Debian-上安装压缩包构建依赖项" class="headerlink" title="在 Debian 上安装压缩包构建依赖项"></a>在 Debian 上安装压缩包构建依赖项</h4><pre><code class="language-shell">sudo apt-get update &amp;&amp; sudo apt-get install autoconf automake -y  
+</code></pre>
+<h2 id="构建源代码压缩包"><a href="#构建源代码压缩包" class="headerlink" title="构建源代码压缩包"></a>构建源代码压缩包</h2><p><strong>需先安装依赖项，并确保位于源代码目录中。</strong>  </p>
+<pre><code class="language-shell">make -f Makefile.devel dist  
+</code></pre>
+<h2 id="构建根文件系统、Linux-内核及磁盘镜像"><a href="#构建根文件系统、Linux-内核及磁盘镜像" class="headerlink" title="构建根文件系统、Linux 内核及磁盘镜像"></a>构建根文件系统、Linux 内核及磁盘镜像</h2><pre><code class="language-shell">./configure  
+make -j$(nproc)  
+</code></pre>
+<p>生成的压缩根文件系统命名为 <code>rootfs.tar.xz</code>，压缩后的 Linux 内核命名为 <code>vmlinuz.xz</code>，压缩后的磁盘镜像命名为 <code>disk.img</code>。  </p>
+<h2 id="配置选项"><a href="#配置选项" class="headerlink" title="配置选项"></a>配置选项</h2><ul>
+<li><p><code>--with-busybox-version=X.X.X</code>  </p>
+<ul>
+<li>指定 Busybox 版本。  </li>
+<li>默认值为 <code>1.36.1</code>。</li>
+</ul>
+</li>
+<li><p><code>--with-linux-version=X.X.X</code>  </p>
+<ul>
+<li>指定 Linux 内核版本。  </li>
+<li>默认值为 <code>6.7.5</code>。</li>
+</ul>
+</li>
+<li><p><code>--with-busybox-mirror=OFFICIAL | &lt;URL&gt;</code>  </p>
+<ul>
+<li>指定 Busybox 镜像源。设置为 <code>OFFICIAL</code> 使用官方镜像，或输入镜像 URL。  </li>
+<li>默认值为 <code>OFFICIAL</code>。</li>
+</ul>
+</li>
+<li><p><code>--with-linux-mirror=OFFICIAL | CDN | TSINGHUA | ALIYUN | USTC | &lt;URL&gt;</code>  </p>
+<ul>
+<li>指定 Linux 内核镜像源。例如，使用清华镜像时设置为 <code>TSINGHUA</code>，或输入镜像 URL。  </li>
+<li>默认值为 <code>OFFICIAL</code>。</li>
+</ul>
+</li>
+</ul>
+<p>示例：  </p>
+<pre><code class="language-shell">./configure --with-busybox-version=1.36.1 --with-linux-version=6.7.5 --with-busybox-mirror=OFFICIAL --with-linux-mirror=TSINGHUA  
+</code></pre>
+<h2 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h2><p><strong>请使用原始二进制文件，而非 XZ 压缩文件！</strong>  </p>
+<p>运行 <code>disk.img</code> 的命令：  </p>
+<pre><code class="language-shell">qemu-system-x86_64 -m 1024 -hda disk.img  
+</code></pre>
+<p>运行 <code>vmlinuz</code> 的命令：  </p>
+<pre><code class="language-shell">qemu-system-x86_64 -m 1024 -kernel vmlinuz  
+</code></pre>
+<p><strong>此内核包含 initramfs，可直接通过 QEMU 运行。</strong>  </p>
+<h2 id="版权"><a href="#版权" class="headerlink" title="版权"></a>版权</h2><p>MLinux Minimal 遵循 <strong>GPL 2.0</strong> 协议，详见 <a class="link"   href="https://jsd.xcqcoo.top/mlinux-project/minimal@main/LICENSE" >LICENSE<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>。  </p>
+<h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><p><a class="link"   href="https://github.com/mlinux-project/minimal/releases" >https://github.com/mlinux-project/minimal/releases<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </p>
+<h2 id="主页"><a href="#主页" class="headerlink" title="主页"></a>主页</h2><p><a class="link"   href="https://github.com/mlinux-project/minimal" >https://github.com/mlinux-project/minimal<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br>[file content end]  </p>
+<hr>
+<h3 id="翻译说明"><a href="#翻译说明" class="headerlink" title="翻译说明"></a>翻译说明</h3><ol>
+<li>By Deepseek</li>
+<li><strong>术语规范</strong>：技术术语（如 <code>POSIX</code>、<code>initramfs</code>）保留原文，通用术语（如 <code>Mandatory</code> → <strong>必需</strong>）按标准翻译。  </li>
+<li><strong>格式保留</strong>：Markdown 语法、代码块、链接均未改动，确保文档结构一致。  </li>
+<li><strong>错误修正</strong>：修正原文件中的拼写错误（如 <code>platfrom</code> → <strong>platform</strong>），并规范标点使用。  </li>
+<li><strong>功能验证</strong>：所有命令和链接均保持原样，确保操作有效性。</li>
+</ol>
 ]]></content>
   </entry>
   <entry>
@@ -270,67 +278,67 @@
 ]]></content>
   </entry>
   <entry>
-    <title>Openwrt 的README</title>
-    <url>/2024/08/08/Openwrt-%E7%9A%84README/</url>
+    <title>OpenWrt 说明文档</title>
+    <url>/2024/08/08/Openwrt-%E7%9A%84README(%E4%B8%AD%E6%96%87)/</url>
     <content><![CDATA[<p><figure class="image-caption"><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/openwrt/openwrt/main/include/logo.png"
+                     data-src="https://jsd.xcqcoo.top/gh/openwrt/openwrt@main/include/logo.png"
                       alt="OpenWrt logo"
-                ><figcaption>OpenWrt logo</figcaption></figure></p>
-<p>OpenWrt Project is a Linux operating system targeting embedded devices. Instead<br>of trying to create a single, static firmware, OpenWrt provides a fully<br>writable filesystem with package management. This frees you from the<br>application selection and configuration provided by the vendor and allows you<br>to customize the device through the use of packages to suit any application.<br>For developers, OpenWrt is the framework to build an application without having<br>to build a complete firmware around it; for users this means the ability for<br>full customization, to use the device in ways never envisioned.</p>
-<p>Sunshine!</p>
-<h2 id="Download"><a href="#Download" class="headerlink" title="Download"></a>Download</h2><p>Built firmware images are available for many architectures and come with a<br>package selection to be used as WiFi home router. To quickly find a factory<br>image usable to migrate from a vendor stock firmware to OpenWrt, try the<br><em>Firmware Selector</em>.</p>
+                ><figcaption>OpenWrt logo</figcaption></figure>  </p>
+<p>OpenWrt 项目是一个面向嵌入式设备的 Linux 操作系统。它并非提供单一的静态固件，而是通过完全可写的文件系统与包管理机制，赋予用户自由选择应用和配置的能力。这意味着您可以摆脱厂商预置的限制，通过安装软件包定制设备功能，满足任何应用场景需求。对于开发者，OpenWrt 提供了一个无需构建完整固件的开发框架；对于用户，则意味着能够以厂商未曾设想的方式实现设备的全面定制。  </p>
+<h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><p>我们为多种架构提供了预编译的固件镜像，默认包含适用于家用无线路由器的软件包。若需快速找到从厂商原厂固件迁移至 OpenWrt 的可用出厂镜像，请使用 <strong>固件选择器</strong>：  </p>
 <ul>
-<li><a class="link"   href="https://firmware-selector.openwrt.org/" >OpenWrt Firmware Selector<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://firmware-selector.openwrt.org/" >OpenWrt 固件选择器<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
-<p>If your device is supported, please follow the <strong>Info</strong> link to see install<br>instructions or consult the support resources listed below.</p>
-<h2 id=""><a href="#" class="headerlink" title=""></a></h2><p>An advanced user may require additional or specific package. (Toolchain, SDK, …) For everything else than simple firmware download, try the wiki download page:</p>
+<p>如果您的设备已被支持，请点击 <strong>信息</strong> 链接查看安装说明，或参考下方列出的支持资源。  </p>
+<h2 id="高级下载"><a href="#高级下载" class="headerlink" title="高级下载"></a>高级下载</h2><p>高级用户可能需要特定或额外的软件包（如工具链、SDK 等）。除基础固件下载外，其他需求请访问 Wiki 下载页面：  </p>
 <ul>
-<li><a class="link"   href="https://openwrt.org/downloads" >OpenWrt Wiki Download<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<li><a class="link"   href="https://openwrt.org/downloads" >OpenWrt Wiki 下载页<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
-<h2 id="Development"><a href="#Development" class="headerlink" title="Development"></a>Development</h2><p>To build your own firmware you need a GNU&#x2F;Linux, BSD or macOS system (case<br>sensitive filesystem required). Cygwin is unsupported because of the lack of a<br>case sensitive file system.</p>
-<h3 id="Requirements"><a href="#Requirements" class="headerlink" title="Requirements"></a>Requirements</h3><p>You need the following tools to compile OpenWrt, the package names vary between<br>distributions. A complete list with distribution specific packages is found in<br>the <a class="link"   href="https://openwrt.org/docs/guide-developer/build-system/install-buildsystem" >Build System Setup<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a><br>documentation.</p>
-<div class="code-container" data-rel="Mipsasm"><figure class="iseeu highlight mipsasm"><table><tr><td class="code"><pre><span class="line"><span class="keyword">binutils </span><span class="keyword">bzip2 </span><span class="keyword">diff </span>find flex gawk gcc<span class="number">-6</span>+ getopt grep <span class="keyword">install </span>libc-dev libz-dev</span><br><span class="line">make4.<span class="number">1</span>+ perl python3.<span class="number">7</span>+ rsync <span class="keyword">subversion </span>unzip which</span><br></pre></td></tr></table></figure></div>
-
-<h3 id="Quickstart"><a href="#Quickstart" class="headerlink" title="Quickstart"></a>Quickstart</h3><ol>
-<li><p>Run <code>./scripts/feeds update -a</code> to obtain all the latest package definitions<br>defined in feeds.conf &#x2F; feeds.conf.default</p>
-</li>
-<li><p>Run <code>./scripts/feeds install -a</code> to install symlinks for all obtained<br>packages into package&#x2F;feeds&#x2F;</p>
-</li>
-<li><p>Run <code>make menuconfig</code> to select your preferred configuration for the<br>toolchain, target system &amp; firmware packages.</p>
-</li>
-<li><p>Run <code>make</code> to build your firmware. This will download all sources, build the<br>cross-compile toolchain and then cross-compile the GNU&#x2F;Linux kernel &amp; all chosen<br>applications for your target system.</p>
-</li>
+<h2 id="开发"><a href="#开发" class="headerlink" title="开发"></a>开发</h2><p>要自行编译固件，您需要 GNU&#x2F;Linux、BSD 或 macOS 系统（需区分大小写的文件系统）。由于缺乏大小写敏感的文件系统支持，Cygwin 不被支持。  </p>
+<h3 id="编译要求"><a href="#编译要求" class="headerlink" title="编译要求"></a>编译要求</h3><p>编译 OpenWrt 需以下工具，不同发行版的软件包名称可能不同。完整列表及发行版特定依赖项请参阅 <a class="link"   href="https://openwrt.org/docs/guide-developer/build-system/install-buildsystem" >构建系统配置文档<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>：  </p>
+<pre><code>binutils bzip2 diff find flex gawk gcc-6+ getopt grep install libc-dev libz-dev  
+make4.1+ perl python3.7+ rsync subversion unzip which  
+</code></pre>
+<h3 id="快速入门"><a href="#快速入门" class="headerlink" title="快速入门"></a>快速入门</h3><ol>
+<li>运行 <code>./scripts/feeds update -a</code> 以获取 <code>feeds.conf</code> 或 <code>feeds.conf.default</code> 中定义的所有最新软件包信息。  </li>
+<li>运行 <code>./scripts/feeds install -a</code> 将所有软件包的符号链接安装到 <code>package/feeds/</code> 目录。  </li>
+<li>运行 <code>make menuconfig</code> 配置工具链、目标系统及固件包的选项。  </li>
+<li>运行 <code>make</code> 开始编译固件。此过程将下载所有源码、构建交叉编译工具链，并为目标系统交叉编译 Linux 内核及所选应用程序。</li>
 </ol>
-<h3 id="Related-Repositories"><a href="#Related-Repositories" class="headerlink" title="Related Repositories"></a>Related Repositories</h3><p>The main repository uses multiple sub-repositories to manage packages of<br>different categories. All packages are installed via the OpenWrt package<br>manager called <code>opkg</code>. If you’re looking to develop the web interface or port<br>packages to OpenWrt, please find the fitting repository below.</p>
+<h3 id="相关代码库"><a href="#相关代码库" class="headerlink" title="相关代码库"></a>相关代码库</h3><p>主仓库通过多个子仓库管理不同类别的软件包。所有软件包均通过 OpenWrt 包管理器 <code>opkg</code> 安装。如需开发网页界面或移植软件包，请参考以下仓库：  </p>
 <ul>
-<li><p><a class="link"   href="https://github.com/openwrt/luci" >LuCI Web Interface<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Modern and modular<br>interface to control the device via a web browser.</p>
-</li>
-<li><p><a class="link"   href="https://github.com/openwrt/packages" >OpenWrt Packages<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Community repository<br>of ported packages.</p>
-</li>
-<li><p><a class="link"   href="https://github.com/openwrt/routing" >OpenWrt Routing<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Packages specifically<br>focused on (mesh) routing.</p>
-</li>
-<li><p><a class="link"   href="https://github.com/openwrt/video" >OpenWrt Video<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Packages specifically<br>focused on display servers and clients (Xorg and Wayland).</p>
-</li>
+<li><a class="link"   href="https://github.com/openwrt/luci" >LuCI 网页界面<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>：通过浏览器控制设备的现代化模块化界面。  </li>
+<li><a class="link"   href="https://github.com/openwrt/packages" >OpenWrt 软件包<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>：社区维护的移植软件包仓库。  </li>
+<li><a class="link"   href="https://github.com/openwrt/routing" >OpenWrt 路由<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>：专注于（网状）路由的软件包。  </li>
+<li><a class="link"   href="https://github.com/openwrt/video" >OpenWrt 视频<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>：专注于显示服务与客户端（Xorg 和 Wayland）的软件包。</li>
 </ul>
-<h2 id="Support-Information"><a href="#Support-Information" class="headerlink" title="Support Information"></a>Support Information</h2><p>For a list of supported devices see the <a class="link"   href="https://openwrt.org/supported_devices" >OpenWrt Hardware Database<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<h3 id="Documentation"><a href="#Documentation" class="headerlink" title="Documentation"></a>Documentation</h3><ul>
-<li><a class="link"   href="https://openwrt.org/docs/guide-quick-start/start" >Quick Start Guide<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://openwrt.org/docs/guide-user/start" >User Guide<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://openwrt.org/docs/guide-developer/start" >Developer Documentation<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
-<li><a class="link"   href="https://openwrt.org/docs/techref/start" >Technical Reference<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
+<h2 id="支持信息"><a href="#支持信息" class="headerlink" title="支持信息"></a>支持信息</h2><p>支持设备列表请查看 <a class="link"   href="https://openwrt.org/supported_devices" >OpenWrt 硬件数据库<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>。  </p>
+<h3 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h3><ul>
+<li><a class="link"   href="https://openwrt.org/docs/guide-quick-start/start" >快速入门指南<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li><a class="link"   href="https://openwrt.org/docs/guide-user/start" >用户指南<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li><a class="link"   href="https://openwrt.org/docs/guide-developer/start" >开发者文档<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>  </li>
+<li><a class="link"   href="https://openwrt.org/docs/techref/start" >技术参考<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></li>
 </ul>
-<h3 id="Support-Community"><a href="#Support-Community" class="headerlink" title="Support Community"></a>Support Community</h3><ul>
-<li><a class="link"   href="https://forum.openwrt.org/" >Forum<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: For usage, projects, discussions and hardware advise.</li>
-<li><a class="link"   href="https://webchat.oftc.net/#openwrt" >Support Chat<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Channel <code>#openwrt</code> on <strong>oftc.net</strong>.</li>
+<h3 id="支持社区"><a href="#支持社区" class="headerlink" title="支持社区"></a>支持社区</h3><ul>
+<li><a class="link"   href="https://forum.openwrt.org/" >论坛<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>：讨论使用、项目、硬件建议。  </li>
+<li><a class="link"   href="https://webchat.oftc.net/#openwrt" >支持聊天室<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>：<strong>oftc.net</strong> 的 <code>#openwrt</code> 频道。</li>
 </ul>
-<h3 id="Developer-Community"><a href="#Developer-Community" class="headerlink" title="Developer Community"></a>Developer Community</h3><ul>
-<li><a class="link"   href="https://bugs.openwrt.org/" >Bug Reports<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Report bugs in OpenWrt</li>
-<li><a class="link"   href="https://lists.openwrt.org/mailman/listinfo/openwrt-devel" >Dev Mailing List<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Send patches</li>
-<li><a class="link"   href="https://webchat.oftc.net/#openwrt-devel" >Dev Chat<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>: Channel <code>#openwrt-devel</code> on <strong>oftc.net</strong>.</li>
+<h3 id="开发者社区"><a href="#开发者社区" class="headerlink" title="开发者社区"></a>开发者社区</h3><ul>
+<li><a class="link"   href="https://bugs.openwrt.org/" >问题报告<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>：提交 OpenWrt 的 Bug。  </li>
+<li><a class="link"   href="https://lists.openwrt.org/mailman/listinfo/openwrt-devel" >开发邮件列表<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>：提交代码补丁。  </li>
+<li><a class="link"   href="https://webchat.oftc.net/#openwrt-devel" >开发聊天室<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>：<strong>oftc.net</strong> 的 <code>#openwrt-devel</code> 频道。</li>
 </ul>
-<h2 id="License"><a href="#License" class="headerlink" title="License"></a>License</h2><p>OpenWrt is licensed under GPL-2.0</p>
+<h2 id="许可证"><a href="#许可证" class="headerlink" title="许可证"></a>许可证</h2><p>OpenWrt 遵循 <strong>GPL-2.0</strong> 协议。<br>[file content end]  </p>
+<hr>
+<h3 id="翻译说明"><a href="#翻译说明" class="headerlink" title="翻译说明"></a>翻译说明</h3><ol>
+<li>By Deepseek</li>
+<li><strong>术语一致性</strong>：技术术语（如 <code>package management</code> → <strong>包管理</strong>）严格按行业标准翻译，专有名词（如 <code>LuCI</code>、<code>opkg</code>）保留原名。  </li>
+<li><strong>格式保留</strong>：Markdown 语法、代码块、链接均未改动，确保文档结构清晰。  </li>
+<li><strong>语句优化</strong>：在保持原意的基础上，调整部分长句结构以提高中文可读性。  </li>
+<li><strong>功能验证</strong>：所有外部链接均未修改，确保跳转功能正常。</li>
+</ol>
 ]]></content>
   </entry>
   <entry>
@@ -496,7 +504,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/QC3284/x-wrt.github.io/master/docs/build/build-target.png"
+                     data-src="https://jsd.xcqcoo.top/gh/x-wrt/x-wrt.github.io@master/docs/build/build-target.png"
                      
                 ></p>
 <div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment">#3 执行下面的命令修复 .config</span></span><br><span class="line">sh feeds/x/rom/lede/fix-config.sh</span><br><span class="line"></span><br><span class="line"><span class="comment">#4 再次执行 make menuconfig 然后立刻退出保存</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#5 最后一次 执行 make menuconfig 自定义选择你需要的软件包</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
@@ -508,7 +516,7 @@
 <p>定位到各个子菜单，选择对应的软件包<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/QC3284/x-wrt.github.io/master/docs/build//build-m.png"
+                     data-src="https://jsd.xcqcoo.top/gh/x-wrt/x-wrt.github.io@master/docs/build//build-m.png"
                      
                 ></p>
 <h2 id="3-执行编译"><a href="#3-执行编译" class="headerlink" title="3. 执行编译"></a>3. 执行编译</h2><p>命令:</p>
@@ -586,7 +594,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/ssh-open/ssh1.png"
+                     data-src="https://jsd.xcqcoo.top/gh/x-wrt/x-wrt.github.io@master/docs/ssh-open/ssh1.png"
                      
                 ></p>
 <p><strong>注意请使用谷歌浏览器，火狐浏览器，微软的浏览器，其他浏览器存在不可预知的问题。</strong></p>
@@ -648,19 +656,19 @@
 <h3 id="1-1-首先，正常设置好wan口拨号上网"><a href="#1-1-首先，正常设置好wan口拨号上网" class="headerlink" title="1.1 首先，正常设置好wan口拨号上网"></a>1.1 首先，正常设置好wan口拨号上网</h3><p>在<a href="#">网络-接口</a>页面，编辑<a href="#">wan口-基本设置</a>，选择协议PPPoE，填写宽带账户密码:<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/xwan/xwan-pppoe1.png"
+                     data-src="https://jsd.xcqcoo.top/gh/x-wrt/x-wrt.github.io@master/docs/xwan/xwan-pppoe1.png"
                      
                 ></p>
 <p>修改<a href="#">wan口-高级设置</a>，使用网关跃点 填写<code>40</code>，<a href="#">防火墙设置</a> 选择wan<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/xwan/xwan-pppoe2.png"
+                     data-src="https://jsd.xcqcoo.top/gh/x-wrt/x-wrt.github.io@master/docs/xwan/xwan-pppoe2.png"
                      
                 ></p>
 <h3 id="1-2-然后，开启多拨"><a href="#1-2-然后，开启多拨" class="headerlink" title="1.2 然后，开启多拨"></a>1.2 然后，开启多拨</h3><p>进入<a href="#">网络-多拨</a>页面，开启多拨，填写想要的多拨数，启用自动负载均衡和叠加:<br><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://ghproxy.xcqcoo.top/https://raw.githubusercontent.com/x-wrt/x-wrt.github.io/master/docs/xwan/xwan1.png"
+                     data-src="https://jsd.xcqcoo.top/gh/x-wrt/x-wrt.github.io@master/docs/xwan/xwan1.png"
                      
                 ></p>
 <p>开启多拨后，它会自动设置好负载均衡和叠加，对于高级用户，可以进入<a href="#">网络-负载均衡</a>页面进行高级的调整，小白用户可以忽略。</p>
