@@ -55,6 +55,16 @@
 
     <!--- Inject Part-->
     
+        
+            
+    
+            
+    
+            
+                
+                    <script data-swup-reload-script>const cdnPath='https://fastly.jsdelivr.net/gh/letere-gzj/live2d-widget-v3@main',config={path:{homePath:'/',modelPath:cdnPath+"/Resources/",cssPath:cdnPath+"/waifu.css",tipsJsonPath:cdnPath+"/waifu-tips.json",tipsJsPath:cdnPath+"/waifu-tips.js",live2dCorePath:cdnPath+"/Core/live2dcubismcore.js",live2dSdkPath:cdnPath+"/live2d-sdk.js"},tools:["hitokoto","asteroids","express","switch-model","switch-texture","photo","info","quit"],drag:{enable:!0,direction:["x","y"]},switchType:"order"},loadExternalResource=(e,t)=>new Promise((n,o)=>{let l;if("css"===t?(l=document.createElement("link")).rel="stylesheet",l.href=e:"js"===t&&(l=document.createElement("script")).src=e,l){l.onload=()=>n(e);l.onerror=()=>o(e);document.head.appendChild(l)}});screen.width>=768&&Promise.all([loadExternalResource(config.path.cssPath,"css"),loadExternalResource(config.path.live2dCorePath,"js"),loadExternalResource(config.path.live2dSdkPath,"js"),loadExternalResource(config.path.tipsJsPath,"js")]).then(()=>{initWidget({homePath:config.path.homePath,waifuPath:config.path.tipsJsonPath,cdnPath:config.path.modelPath,tools:config.tools,dragEnable:config.drag.enable,dragDirection:config.drag.direction,switchType:config.switchType})});</script>
+                
+    
 
     
 <link rel="stylesheet" href="/css/style.css">
@@ -903,6 +913,11 @@
                 } catch (error) {}
             </script>
         
+        
+            
+                
+        
+                
         
         
     </div>  
