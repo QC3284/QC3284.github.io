@@ -634,7 +634,7 @@
     
     
         <span class="article-wordcount article-meta-item">
-            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>983 字</span>
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>979 字</span>
         </span>
     
     
@@ -661,22 +661,17 @@
 			<p>本文说明如何一步一步地从源码编译出自己的OpenWrt镜像<br>文章来源：知乎@小耸</p>
 <h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><p>准备一个GNU&#x2F;Linux, BSD 或 MacOSX 操作系统。并且，在环境中准备好以下官方教程中要求的工具：<br><a class="link"   target="_blank" rel="noopener" href="https://openwrt.org/docs/guide-developer/toolchain/install-buildsystem" >https://openwrt.org/docs/guide-developer/toolchain/install-buildsystem<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 <p>我的环境是Ubuntu22.04，执行：</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">apt</span> update 
-<span class="token function">sudo</span> <span class="token function">apt</span> <span class="token function">install</span> build-essential clang flex bison g++ <span class="token function">gawk</span> gcc-multilib g++-multilib gettext <span class="token function">git</span> libncurses-dev libssl-dev python3-distutils <span class="token function">rsync</span> <span class="token function">unzip</span> zlib1g-dev <span class="token function">file</span> <span class="token function">wget</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update </span><br><span class="line"><span class="built_in">sudo</span> apt install build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev python3-distutils rsync unzip zlib1g-dev file wget</span><br></pre></td></tr></table></figure></div>
 
 <h1 id="编译系统"><a href="#编译系统" class="headerlink" title="编译系统"></a>编译系统</h1><h2 id="下载源码"><a href="#下载源码" class="headerlink" title="下载源码"></a>下载源码</h2><p>下载代码：</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> clone https://github.com/openwrt/openwrt.git
-<span class="token builtin class-name">cd</span> openwrt
-<span class="token function">git</span> pull<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/openwrt/openwrt.git</span><br><span class="line"><span class="built_in">cd</span> openwrt</span><br><span class="line">git pull</span><br></pre></td></tr></table></figure></div>
 <p>切换分支，一般选择最新的稳定版本：</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> branch <span class="token parameter variable">-a</span>
-<span class="token function">git</span> tag
-<span class="token function">git</span> checkout v23.05.4<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">git branch -a</span><br><span class="line">git tag</span><br><span class="line">git checkout v23.05.4</span><br></pre></td></tr></table></figure></div>
 <h2 id="下载软件包"><a href="#下载软件包" class="headerlink" title="下载软件包"></a>下载软件包</h2><p>运行<code>./scripts/feeds update -a</code>命令，下载或更新在<code>feeds.conf/feeds.conf.default</code>中定义的所有最新软件包。</p>
 <p>！！注意！！<br>受限于国内的访问国际互联网的环境中，feeds update这一步特别容易失败。可以通过以下几条方式来提高成功率：<br><code>git config --global http.postBuffer 524288000</code> <code>git config --global http.lowSpeedLimit 1000</code> <code>git config --global http.lowSpeedTime 600 </code>以上配置的含义为：配置git缓冲区为500M，配置git访问超时的条件为：速率小于1KB&#x2F;s，且持续600秒<br>（有条件的可以开代理）</p>
 <p>运行<code>./scripts/feeds install -a</code>命令使安装上述软件包在后续的<code>make menuconfig</code>中生效。</p>
 <h1 id="配置编译选项"><a href="#配置编译选项" class="headerlink" title="配置编译选项"></a>配置编译选项</h1><h2 id="使用已有固件的编译配置"><a href="#使用已有固件的编译配置" class="headerlink" title="使用已有固件的编译配置"></a>使用已有固件的编译配置</h2><p>网络上已编译出的固件通常都会把编译配置一并提供（config.buildinfo或config.seed），可以直接使用。<br>我的目标机是一台小米WR30U，使用mtk的filogic芯片方案，从OpenWrt官网找到对应的编译配置并下载，置于OpenWrt工程根目录下的<code>.config</code>文件中：</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">wget</span> https://downloads.openwrt.org/releases/23.05.4/targets/mediatek/filogic/config.buildinfo <span class="token parameter variable">-O</span> .config<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://downloads.openwrt.org/releases/23.05.4/targets/mediatek/filogic/config.buildinfo -O .config</span><br></pre></td></tr></table></figure></div>
 <p>但这份配置中包含了filogic芯片方案的所有设备的配置，还需进行裁剪和修改。</p>
 <h2 id="menuconfig"><a href="#menuconfig" class="headerlink" title="menuconfig"></a>menuconfig</h2><p>在以上配置的基础上，运行<code>make menuconfig</code>命令来完成进一步的自定义配置。完成后配置会更新至<code>.config</code>文件中。<br><figure class="image-caption"><img  
                      lazyload
@@ -687,7 +682,7 @@
 <p>在Target Profile中，仅保留Xiaomi WR30U的设备支持（我的设备是Xiaomi Mi Router WR30U (112M UBI with NMBM-Enabled layout)），把其它设备的支持删除。</p>
 <h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p>使用<code>make download</code>预先下载编译过程中需要的代码和依赖项等资源。</p>
 <p>. . . . . . . 经过漫长的等待下载完成。到此为止，我们已做好了所有的编译准备。<br>正式开始编译吧，运行<code>make</code>命令来构建固件。该命令将下载所有源代码和依赖项（即使之前已经<code>make download</code>，也还有其它包需要下载），构建交叉编译工具链，然后为目标系统交叉编译出OpenWrt内核和应用程序。</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">make</span> <span class="token parameter variable">-j4</span> <span class="token assign-left variable">V</span><span class="token operator">=</span>s<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make -j4 V=s</span><br></pre></td></tr></table></figure></div>
 <h2 id="编译选项说明"><a href="#编译选项说明" class="headerlink" title="编译选项说明"></a>编译选项说明</h2><p><code>-jN</code>: make命令可以加上-j参数用于指定使用多少cpu核编译，可以加速编译过程。例如：<code>make download -j4，make -j5</code></p>
 <p><code>V=s</code>：make命令可以加上V&#x3D;s可以输出更多的编译错误信息。</p>
 <p>如果顺利的话，这里make完就可以编译出镜像了。但是实际不太可能完全顺利。</p>
@@ -866,7 +861,7 @@
                     </span>
                     
                         <span>
-                            共 11k 字
+                            共 10.8k 字
                         </span>
                     
                 </p>
