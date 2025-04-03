@@ -249,17 +249,22 @@ make -j$(nproc)
     <content><![CDATA[<p>本文说明如何一步一步地从源码编译出自己的OpenWrt镜像<br>文章来源：知乎@小耸</p>
 <h1 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h1><p>准备一个GNU&#x2F;Linux, BSD 或 MacOSX 操作系统。并且，在环境中准备好以下官方教程中要求的工具：<br><a class="link"   href="https://openwrt.org/docs/guide-developer/toolchain/install-buildsystem" >https://openwrt.org/docs/guide-developer/toolchain/install-buildsystem<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 <p>我的环境是Ubuntu22.04，执行：</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update </span><br><span class="line"><span class="built_in">sudo</span> apt install build-essential clang flex bison g++ gawk gcc-multilib g++-multilib gettext git libncurses-dev libssl-dev python3-distutils rsync unzip zlib1g-dev file wget</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">apt</span> update 
+<span class="token function">sudo</span> <span class="token function">apt</span> <span class="token function">install</span> build-essential clang flex bison g++ <span class="token function">gawk</span> gcc-multilib g++-multilib gettext <span class="token function">git</span> libncurses-dev libssl-dev python3-distutils <span class="token function">rsync</span> <span class="token function">unzip</span> zlib1g-dev <span class="token function">file</span> <span class="token function">wget</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <h1 id="编译系统"><a href="#编译系统" class="headerlink" title="编译系统"></a>编译系统</h1><h2 id="下载源码"><a href="#下载源码" class="headerlink" title="下载源码"></a>下载源码</h2><p>下载代码：</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/openwrt/openwrt.git</span><br><span class="line"><span class="built_in">cd</span> openwrt</span><br><span class="line">git pull</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> clone https://github.com/openwrt/openwrt.git
+<span class="token builtin class-name">cd</span> openwrt
+<span class="token function">git</span> pull<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <p>切换分支，一般选择最新的稳定版本：</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">git branch -a</span><br><span class="line">git tag</span><br><span class="line">git checkout v23.05.4</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> branch <span class="token parameter variable">-a</span>
+<span class="token function">git</span> tag
+<span class="token function">git</span> checkout v23.05.4<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 <h2 id="下载软件包"><a href="#下载软件包" class="headerlink" title="下载软件包"></a>下载软件包</h2><p>运行<code>./scripts/feeds update -a</code>命令，下载或更新在<code>feeds.conf/feeds.conf.default</code>中定义的所有最新软件包。</p>
 <p>！！注意！！<br>受限于国内的访问国际互联网的环境中，feeds update这一步特别容易失败。可以通过以下几条方式来提高成功率：<br><code>git config --global http.postBuffer 524288000</code> <code>git config --global http.lowSpeedLimit 1000</code> <code>git config --global http.lowSpeedTime 600 </code>以上配置的含义为：配置git缓冲区为500M，配置git访问超时的条件为：速率小于1KB&#x2F;s，且持续600秒<br>（有条件的可以开代理）</p>
 <p>运行<code>./scripts/feeds install -a</code>命令使安装上述软件包在后续的<code>make menuconfig</code>中生效。</p>
 <h1 id="配置编译选项"><a href="#配置编译选项" class="headerlink" title="配置编译选项"></a>配置编译选项</h1><h2 id="使用已有固件的编译配置"><a href="#使用已有固件的编译配置" class="headerlink" title="使用已有固件的编译配置"></a>使用已有固件的编译配置</h2><p>网络上已编译出的固件通常都会把编译配置一并提供（config.buildinfo或config.seed），可以直接使用。<br>我的目标机是一台小米WR30U，使用mtk的filogic芯片方案，从OpenWrt官网找到对应的编译配置并下载，置于OpenWrt工程根目录下的<code>.config</code>文件中：</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">wget https://downloads.openwrt.org/releases/23.05.4/targets/mediatek/filogic/config.buildinfo -O .config</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">wget</span> https://downloads.openwrt.org/releases/23.05.4/targets/mediatek/filogic/config.buildinfo <span class="token parameter variable">-O</span> .config<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>但这份配置中包含了filogic芯片方案的所有设备的配置，还需进行裁剪和修改。</p>
 <h2 id="menuconfig"><a href="#menuconfig" class="headerlink" title="menuconfig"></a>menuconfig</h2><p>在以上配置的基础上，运行<code>make menuconfig</code>命令来完成进一步的自定义配置。完成后配置会更新至<code>.config</code>文件中。<br><figure class="image-caption"><img  
                      lazyload
@@ -270,7 +275,7 @@ make -j$(nproc)
 <p>在Target Profile中，仅保留Xiaomi WR30U的设备支持（我的设备是Xiaomi Mi Router WR30U (112M UBI with NMBM-Enabled layout)），把其它设备的支持删除。</p>
 <h2 id="编译"><a href="#编译" class="headerlink" title="编译"></a>编译</h2><p>使用<code>make download</code>预先下载编译过程中需要的代码和依赖项等资源。</p>
 <p>. . . . . . . 经过漫长的等待下载完成。到此为止，我们已做好了所有的编译准备。<br>正式开始编译吧，运行<code>make</code>命令来构建固件。该命令将下载所有源代码和依赖项（即使之前已经<code>make download</code>，也还有其它包需要下载），构建交叉编译工具链，然后为目标系统交叉编译出OpenWrt内核和应用程序。</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">make -j4 V=s</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">make</span> <span class="token parameter variable">-j4</span> <span class="token assign-left variable">V</span><span class="token operator">=</span>s<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <h2 id="编译选项说明"><a href="#编译选项说明" class="headerlink" title="编译选项说明"></a>编译选项说明</h2><p><code>-jN</code>: make命令可以加上-j参数用于指定使用多少cpu核编译，可以加速编译过程。例如：<code>make download -j4，make -j5</code></p>
 <p><code>V=s</code>：make命令可以加上V&#x3D;s可以输出更多的编译错误信息。</p>
 <p>如果顺利的话，这里make完就可以编译出镜像了。但是实际不太可能完全顺利。</p>
@@ -448,10 +453,11 @@ make4.1+ perl python3.7+ rsync subversion unzip which
 <h3 id="编译参考"><a href="#编译参考" class="headerlink" title="编译参考"></a>编译参考</h3><p>请动手能力强的人自己编译固件，跟标准 OpenWRT 一样。</p>
 <h3 id="离线包制作"><a href="#离线包制作" class="headerlink" title="离线包制作"></a>离线包制作</h3><p>iStoreOS离线包不是一个压缩包，也没啥黑科技，而是借助第三方软件实现。原理是<a class="link"   href="https://github.com/megastep/makeself" >makeself项目<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>：</p>
 <p>生成方法例子：</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">./makeself.sh --nox11 ./xxx ./out/xxx_x86.run &quot;OneClick install&quot; ./install.sh</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">.&#x2F;makeself.sh --nox11 .&#x2F;xxx .&#x2F;out&#x2F;xxx_x86.run &quot;OneClick install&quot; .&#x2F;install.sh<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>install.sh脚本内容大致为：</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">opkg update</span><br><span class="line">opkg install *.ipk</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">opkg update
+opkg install *.ipk<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p>把 ipk 跟 install.sh 结合在一起，本质会生成一个包含所有 ipk 跟 install.sh 的自解压自运行的程序。</p>
 <h2 id="关注更新"><a href="#关注更新" class="headerlink" title="关注更新"></a>关注更新</h2><p>更多iStoreOS 功能，请关注我们的账号：</p>
@@ -492,14 +498,43 @@ make4.1+ perl python3.7+ rsync subversion unzip which
 <h2 id="1-编译准备"><a href="#1-编译准备" class="headerlink" title="1 编译准备"></a>1 编译准备</h2><p>我们建议使用<a class="link"   href="https://www.ubuntu.com/" >Ubuntu<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>系统作为编译环境，这里以Ubuntu 22.04作为例子，其他版本也是可以的。特别注意的是，整个编译过程，都是用普通用户操作，不要用<code>root</code>用户操作。</p>
 <p>首先要安装编译所需要的软件包:<br><code>sudo apt install build-essential ecj fastjar file flex g++ gcc-multilib g++-multilib gawk gettext git git-core java-propose-classpath libelf-dev libncurses5-dev libncursesw5-dev libssl-dev swig python3 python3-dev python3-distutils python3-pyelftools subversion unzip wget zlib1g-dev rsync qemu-utils</code></p>
 <p>下载源码:</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/x-wrt/x-wrt.git</span><br><span class="line"><span class="built_in">cd</span> x-wrt</span><br><span class="line"></span><br><span class="line"><span class="comment">#更新代码tag:</span></span><br><span class="line">git fetch origin</span><br><span class="line">git fetch origin --tags</span><br><span class="line"></span><br><span class="line"><span class="comment">#列出可以使用的版本tag:</span></span><br><span class="line">git tag</span><br><span class="line"><span class="comment">#注意摁 q 键结束</span></span><br><span class="line"><span class="comment">#或者直接获取最新发布版本</span></span><br><span class="line">git describe --tags $(git rev-list --tags --max-count=1)</span><br><span class="line"></span><br><span class="line"><span class="comment">#选择并切换到指定的版本tag:</span></span><br><span class="line">git checkout -f &lt;tag-name&gt;</span><br><span class="line"><span class="comment">#例如</span></span><br><span class="line">git checkout -f 21.10_b202112032317</span><br><span class="line"><span class="comment">#或者</span></span><br><span class="line">git checkout -f $(git describe --tags $(git rev-list --tags --max-count=1))</span><br><span class="line"></span><br><span class="line"><span class="comment">#更新代码:</span></span><br><span class="line">./scripts/feeds update -a</span><br><span class="line">./scripts/feeds install -a</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> clone https://github.com/x-wrt/x-wrt.git
+<span class="token builtin class-name">cd</span> x-wrt
+
+<span class="token comment">#更新代码tag:</span>
+<span class="token function">git</span> fetch origin
+<span class="token function">git</span> fetch origin <span class="token parameter variable">--tags</span>
+
+<span class="token comment">#列出可以使用的版本tag:</span>
+<span class="token function">git</span> tag
+<span class="token comment">#注意摁 q 键结束</span>
+<span class="token comment">#或者直接获取最新发布版本</span>
+<span class="token function">git</span> describe <span class="token parameter variable">--tags</span> <span class="token variable"><span class="token variable">$(</span><span class="token function">git</span> rev-list <span class="token parameter variable">--tags</span> --max-count<span class="token operator">=</span><span class="token number">1</span><span class="token variable">)</span></span>
+
+<span class="token comment">#选择并切换到指定的版本tag:</span>
+<span class="token function">git</span> checkout <span class="token parameter variable">-f</span> <span class="token operator">&lt;</span>tag-name<span class="token operator">></span>
+<span class="token comment">#例如</span>
+<span class="token function">git</span> checkout <span class="token parameter variable">-f</span> <span class="token number">21</span>.10_b202112032317
+<span class="token comment">#或者</span>
+<span class="token function">git</span> checkout <span class="token parameter variable">-f</span> <span class="token variable"><span class="token variable">$(</span><span class="token function">git</span> describe <span class="token parameter variable">--tags</span> <span class="token punctuation">$(</span>git rev-list <span class="token parameter variable">--tags</span> --max-count<span class="token operator">=</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token variable">)</span></span>
+
+<span class="token comment">#更新代码:</span>
+./scripts/feeds update <span class="token parameter variable">-a</span>
+./scripts/feeds <span class="token function">install</span> <span class="token parameter variable">-a</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>配置固件的命令<code>make menuconfig</code> 但是我们可以从配置模版开始会更轻松一些。</p>
 <p>比如ramips-mt7621的设备可以用拷贝这个模版<code>feeds/x/rom/lede/config.ramips-mt7621</code><br>内核分区限制小的设备，选用 <code>-nosymbol</code> 结尾的<code>config</code>配置模版</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cp</span> feeds/x/rom/lede/config.ramips-mt7621 .config</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">cp</span> feeds/x/rom/lede/config.ramips-mt7621 .config<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>由于这些模版是用来编译大量设备的，copy过来后，可以直接编译，不做任何改变。<br>但是如果需要改变，需要<code>make menuconfig</code>自定义，就要做下面的操作:</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 上面已经cp 拷贝了模版配置到 .config</span></span><br><span class="line"><span class="comment"># 例如 cp feeds/x/rom/lede/config.ramips-mt7621 .config</span></span><br><span class="line"><span class="comment"># 下面继续操作和修改</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#1 执行</span></span><br><span class="line">make menuconfig</span><br><span class="line"></span><br><span class="line"><span class="comment">#2 进入 Target Profile 选择需要编译打包的设备型号，选择型号后立刻退出，保存</span></span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># 上面已经cp 拷贝了模版配置到 .config</span>
+<span class="token comment"># 例如 cp feeds/x/rom/lede/config.ramips-mt7621 .config</span>
+<span class="token comment"># 下面继续操作和修改</span>
+
+<span class="token comment">#1 执行</span>
+<span class="token function">make</span> menuconfig
+
+<span class="token comment">#2 进入 Target Profile 选择需要编译打包的设备型号，选择型号后立刻退出，保存</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p><img  
                      lazyload
@@ -507,10 +542,41 @@ make4.1+ perl python3.7+ rsync subversion unzip which
                      data-src="https://jsd.xcqcoo.top/gh/x-wrt/x-wrt.github.io@master/docs/build/build-target.png"
                      
                 ></p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment">#3 执行下面的命令修复 .config</span></span><br><span class="line">sh feeds/x/rom/lede/fix-config.sh</span><br><span class="line"></span><br><span class="line"><span class="comment">#4 再次执行 make menuconfig 然后立刻退出保存</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#5 最后一次 执行 make menuconfig 自定义选择你需要的软件包</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment">#3 执行下面的命令修复 .config</span>
+<span class="token function">sh</span> feeds/x/rom/lede/fix-config.sh
+
+<span class="token comment">#4 再次执行 make menuconfig 然后立刻退出保存</span>
+
+<span class="token comment">#5 最后一次 执行 make menuconfig 自定义选择你需要的软件包</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>还有更多配置模版，请参考目录下的<code>config.*</code>文件:</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">feeds/x/rom/lede/config.ath79-generic</span><br><span class="line">feeds/x/rom/lede/config.ath79-generic-nosymbol</span><br><span class="line">feeds/x/rom/lede/config.ath79-nand</span><br><span class="line">feeds/x/rom/lede/config.bcm27xx-bcm2709</span><br><span class="line">feeds/x/rom/lede/config.bcm27xx-bcm2710</span><br><span class="line">feeds/x/rom/lede/config.bcm27xx-bcm2711</span><br><span class="line">feeds/x/rom/lede/config.bcm4908-generic</span><br><span class="line">feeds/x/rom/lede/config.bcm53xx-generic</span><br><span class="line">feeds/x/rom/lede/config.ipq40xx-generic</span><br><span class="line">feeds/x/rom/lede/config.ipq806x-generic</span><br><span class="line">feeds/x/rom/lede/config.kirkwood-generic</span><br><span class="line">feeds/x/rom/lede/config.mediatek-mt7622</span><br><span class="line">feeds/x/rom/lede/config.mvebu-cortexa53</span><br><span class="line">feeds/x/rom/lede/config.mvebu-cortexa9</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt7620</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt7620-nosymbol</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt7621</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt76x8</span><br><span class="line">feeds/x/rom/lede/config.ramips-mt76x8-nosymbol</span><br><span class="line">feeds/x/rom/lede/config.ramips-rt305x</span><br><span class="line">feeds/x/rom/lede/config.ramips-rt3883-nosymbol</span><br><span class="line">feeds/x/rom/lede/config.rockchip-armv8</span><br><span class="line">feeds/x/rom/lede/config.sunxi-cortexa7</span><br><span class="line">feeds/x/rom/lede/config.x86_64</span><br><span class="line">feeds/x/rom/lede/config.x86_64-docker</span><br><span class="line">feeds/x/rom/lede/config.x86_generic</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.ath79-generic
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.ath79-generic-nosymbol
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.ath79-nand
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.bcm27xx-bcm2709
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.bcm27xx-bcm2710
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.bcm27xx-bcm2711
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.bcm4908-generic
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.bcm53xx-generic
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.ipq40xx-generic
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.ipq806x-generic
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.kirkwood-generic
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.mediatek-mt7622
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.mvebu-cortexa53
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.mvebu-cortexa9
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.ramips-mt7620
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.ramips-mt7620-nosymbol
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.ramips-mt7621
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.ramips-mt76x8
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.ramips-mt76x8-nosymbol
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.ramips-rt305x
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.ramips-rt3883-nosymbol
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.rockchip-armv8
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.sunxi-cortexa7
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.x86_64
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.x86_64-docker
+feeds&#x2F;x&#x2F;rom&#x2F;lede&#x2F;config.x86_generic<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h2 id="2-配置目标"><a href="#2-配置目标" class="headerlink" title="2. 配置目标"></a>2. 配置目标</h2><p>在上述准备好的模版配置文件的基础上，执行<code>make menuconfig</code>命令进行个性化定制，增删应用。</p>
 <p>定位到各个子菜单，选择对应的软件包<br><img  
@@ -520,9 +586,9 @@ make4.1+ perl python3.7+ rsync subversion unzip which
                      
                 ></p>
 <h2 id="3-执行编译"><a href="#3-执行编译" class="headerlink" title="3. 执行编译"></a>3. 执行编译</h2><p>命令:</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">make</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">make</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>或者</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">make -j1 V=s</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">make</span> <span class="token parameter variable">-j1</span> <span class="token assign-left variable">V</span><span class="token operator">=</span>s<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>生成的包在<code>bin/targets/</code>下面</p>
 <p>如果需要再次修改配置编译，只要不是换设备，都可以直接 <code>make menuconfig</code> 修改后就编译，如果需要修改设备，请从拷贝模版配置的地方重新开始配置。</p>
@@ -531,7 +597,15 @@ make4.1+ perl python3.7+ rsync subversion unzip which
 <p><strong>要编译到固件里面，就要选择<code>&lt;*&gt;</code>，如果只选择<code>&lt;M&gt;</code>只是编译成软件包<code>ipk</code>，不会打包进入固件。</strong></p>
 <p>进入<code>LuCI - Applications</code>子菜单下面，选择自己想要的应用</p>
 <p>常见的软件包:</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">luci-app-aria2 ARRIA2下载工具</span><br><span class="line">luci-app-ddns DDNS工具</span><br><span class="line">luci-app-mwan3 MWAN3负载均衡</span><br><span class="line">luci-app-openvpn OPENVPN</span><br><span class="line">luci-app-ksmbd Ksmbd文件网络共享（samba文件共享）</span><br><span class="line">luci-app-upnp UPNP设置</span><br><span class="line">luci-app-wireguard WireGuard配置界面</span><br><span class="line">luci-app-natcap 远程界面管理模块和全锥形nat实现模块</span><br><span class="line">luci-app-natflow-users 用户认证（用户流量显示）模块</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">luci-app-aria2 ARRIA2下载工具
+luci-app-ddns DDNS工具
+luci-app-mwan3 MWAN3负载均衡
+luci-app-openvpn OPENVPN
+luci-app-ksmbd Ksmbd文件网络共享（samba文件共享）
+luci-app-upnp UPNP设置
+luci-app-wireguard WireGuard配置界面
+luci-app-natcap 远程界面管理模块和全锥形nat实现模块
+luci-app-natflow-users 用户认证（用户流量显示）模块<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>进入<code>Kernel modules - USB Support</code>菜单，选择USB支持的驱动</p>
 <p>进入<code>Kernel modules - Filesystems</code>菜单，选择需要支持的文件系统，比如<code>ext4,ntfs,vfat</code>等</p>
@@ -544,7 +618,15 @@ make4.1+ perl python3.7+ rsync subversion unzip which
 </ol>
 <p>鉴于有些朋友不喜欢远程管理，这里说明下如何去掉这个模块，请自行选择是否需要这个模块。删除后就删除了这个功能包括全锥形nat功能和一键VPN功能，抱歉这些暂时是耦合的无法分离，远程管理界面需要连接中转服务器和报告动态DNS数据，才能生成根据mac地址匹配的动态域名，如果有公网IP才会生成对应的mac域名给一键VPN功能使用。</p>
 <p>编译选择不集成这个模块，可以:</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 修改.config文件，删去掉这几个模块</span></span><br><span class="line">CONFIG_PACKAGE_luci-app-natcap=y</span><br><span class="line">CONFIG_PACKAGE_natcapd-client=y</span><br><span class="line">CONFIG_PACKAGE_natcapd-server=y</span><br><span class="line">CONFIG_PACKAGE_natcapd=y</span><br><span class="line">CONFIG_PACKAGE_kmod-natcap=y</span><br><span class="line"></span><br><span class="line"><span class="comment"># 为了单独让natflow软件加速功能工作，选择下面的包</span></span><br><span class="line">CONFIG_PACKAGE_natflow-boot=y</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment"># 修改.config文件，删去掉这几个模块</span>
+CONFIG_PACKAGE_luci-app-natcap<span class="token operator">=</span>y
+CONFIG_PACKAGE_natcapd-client<span class="token operator">=</span>y
+CONFIG_PACKAGE_natcapd-server<span class="token operator">=</span>y
+<span class="token assign-left variable">CONFIG_PACKAGE_natcapd</span><span class="token operator">=</span>y
+CONFIG_PACKAGE_kmod-natcap<span class="token operator">=</span>y
+
+<span class="token comment"># 为了单独让natflow软件加速功能工作，选择下面的包</span>
+CONFIG_PACKAGE_natflow-boot<span class="token operator">=</span>y<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 ]]></content>
   </entry>
   <entry>
@@ -562,25 +644,43 @@ make4.1+ perl python3.7+ rsync subversion unzip which
 <p>其实主要就是为 OpenWRT 编译 <a class="link"   href="https://github.com/CHN-beta/rkp-ipid" >rkp-ipid<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 和 <a class="link"   href="https://github.com/Zxilly/UA2F" >UA2F<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 这两个包，而这两个包需要在编译内核的时候开启一些选项，所以需要重新编译 OpenWRT 固件，也因此写下这篇文章记录一下编译 OpenWRT 的过程。</p>
 <h2 id="安装编译环境"><a href="#安装编译环境" class="headerlink" title="安装编译环境"></a>安装编译环境</h2><p>要编译 Linux 当然是使用 Linux 啦！</p>
 <p>如果是 Debian 系的发行版（例如 Ubuntu），可以使用以下指令来安装编译所需的依赖：</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update -y</span><br><span class="line"><span class="built_in">sudo</span> apt full-upgrade -y</span><br><span class="line"><span class="built_in">sudo</span> apt install -y ack antlr3 aria2 asciidoc autoconf automake autopoint binutils bison build-essential \</span><br><span class="line">bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \</span><br><span class="line">git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \</span><br><span class="line">libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz \</span><br><span class="line">mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pip libpython3-dev qemu-utils \</span><br><span class="line">rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">sudo</span> <span class="token function">apt</span> update <span class="token parameter variable">-y</span>
+<span class="token function">sudo</span> <span class="token function">apt</span> full-upgrade <span class="token parameter variable">-y</span>
+<span class="token function">sudo</span> <span class="token function">apt</span> <span class="token function">install</span> <span class="token parameter variable">-y</span> ack antlr3 aria2 asciidoc autoconf automake autopoint binutils bison build-essential <span class="token punctuation">\</span>
+<span class="token function">bzip2</span> ccache cmake cpio <span class="token function">curl</span> device-tree-compiler fastjar flex <span class="token function">gawk</span> gettext gcc-multilib g++-multilib <span class="token punctuation">\</span>
+<span class="token function">git</span> gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev <span class="token punctuation">\</span>
+libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz <span class="token punctuation">\</span>
+<span class="token function">mkisofs</span> msmtp <span class="token function">nano</span> ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pip libpython3-dev qemu-utils <span class="token punctuation">\</span>
+<span class="token function">rsync</span> scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl <span class="token function">unzip</span> <span class="token function">vim</span> <span class="token function">wget</span> xmlto xxd zlib1g-dev<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>对于 Arch 系的发行版，直接安装 AUR 中的 openwrt-devel 即可：<br><a class="link"   href="https://aur.archlinux.org/packages/openwrt-devel" >https://aur.archlinux.org/packages/openwrt-devel<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 <h2 id="获取-OpenWRT-源码"><a href="#获取-OpenWRT-源码" class="headerlink" title="获取 OpenWRT 源码"></a>获取 OpenWRT 源码</h2><p>如果你的设备是 OpenWRT 官方支持的设备，并且你想编译 OpenWRT 官方源码，则直接：</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/openwrt/openwrt.git</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> clone https://github.com/openwrt/openwrt.git<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>即可。</p>
 <p>但现在有一些国产的路由器 OpenWRT 官方并不支持，可以看看有没有第三方的 OpenWRT 源码支持了你手上的路由器，下载相应的源代码。<br>可以通过<code>cat /etc/openwrt_release</code>命令来查看设备的 Arch、Target 信息：</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">root@QWRT:~# <span class="built_in">cat</span> /etc/openwrt_release</span><br><span class="line">DISTRIB_ID=<span class="string">&#x27;OpenWrt&#x27;</span></span><br><span class="line">DISTRIB_RELEASE=<span class="string">&#x27;19.07-SNAPSHOT&#x27;</span></span><br><span class="line">DISTRIB_TARGET=<span class="string">&#x27;ipq60xx/generic&#x27;</span></span><br><span class="line">DISTRIB_ARCH=<span class="string">&#x27;aarch64_cortex-a53+crypto&#x27;</span></span><br><span class="line">DISTRIB_TAINTS=<span class="string">&#x27;no-all busybox override&#x27;</span></span><br><span class="line">DISTRIB_REVISION=<span class="string">&#x27;R23.1.20&#x27;</span></span><br><span class="line">DISTRIB_DESCRIPTION=<span class="string">&#x27;QWRT &#x27;</span></span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">root@QWRT:~<span class="token comment"># cat /etc/openwrt_release</span>
+<span class="token assign-left variable">DISTRIB_ID</span><span class="token operator">=</span><span class="token string">'OpenWrt'</span>
+<span class="token assign-left variable">DISTRIB_RELEASE</span><span class="token operator">=</span><span class="token string">'19.07-SNAPSHOT'</span>
+<span class="token assign-left variable">DISTRIB_TARGET</span><span class="token operator">=</span><span class="token string">'ipq60xx/generic'</span>
+<span class="token assign-left variable">DISTRIB_ARCH</span><span class="token operator">=</span><span class="token string">'aarch64_cortex-a53+crypto'</span>
+<span class="token assign-left variable">DISTRIB_TAINTS</span><span class="token operator">=</span><span class="token string">'no-all busybox override'</span>
+<span class="token assign-left variable">DISTRIB_REVISION</span><span class="token operator">=</span><span class="token string">'R23.1.20'</span>
+<span class="token assign-left variable">DISTRIB_DESCRIPTION</span><span class="token operator">=</span><span class="token string">'QWRT '</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>获取了 OpenWRT 源代码之后需要更新 Feeds：</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> openwrt</span><br><span class="line">./scripts/feeds update -a</span><br><span class="line">./scripts/feeds install -a</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">cd</span> openwrt
+./scripts/feeds update <span class="token parameter variable">-a</span>
+./scripts/feeds <span class="token function">install</span> <span class="token parameter variable">-a</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 <h2 id="添加想要编译的第三方包-可选"><a href="#添加想要编译的第三方包-可选" class="headerlink" title="添加想要编译的第三方包 (可选)"></a>添加想要编译的第三方包 (可选)</h2><p>因为我需要编译 rkp-ipid 和 UA2F，因此我还需要将这些包的源码下载下来：</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/CHN-beta/rkp-ipid package/rkp-ipid</span><br><span class="line">git <span class="built_in">clone</span> https://github.com/Zxilly/UA2F package/UA2F</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">git</span> clone https://github.com/CHN-beta/rkp-ipid package/rkp-ipid
+<span class="token function">git</span> clone https://github.com/Zxilly/UA2F package/UA2F<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <h2 id="配置编译目标"><a href="#配置编译目标" class="headerlink" title="配置编译目标"></a>配置编译目标</h2><p>一切准备就绪，接下来就是设定编译目标了，执行以下命令：</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">make menuconfig</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">make</span> menuconfig<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 <p>然后会出现一个命令行 UI，首先需要重点设定好<code>Target System</code>,<code>Subtarget</code>,<code>Target Profile</code>，将这几个项目设定为你的路由器。 然后就可以选择你需要编译的包啦，使用空格可以选择要编译的包，设定为 &lt;*&gt; 的包将会内置到固件里，刷好就能直接用，设定为 <M> 的包将会编译成 ipk 文件，需要上传到路由器，然后使用<code>opkg install package_name.ipk</code>进行安装。</p>
 <p>设定好了之后，将配置文件保存为<code>.config</code>即可，如果有一些包需要对内核做一些自定义，也可以直接使用文本编辑器编辑保存下来的<code>.config</code>文件，例如<code>UA2F</code>就需要添加<code>CONFIG_NETFILTER_NETLINK_GLUE_CT=y</code>。</p>
 <h2 id="开始编译"><a href="#开始编译" class="headerlink" title="开始编译"></a>开始编译</h2><p>一切准备完毕，接下来开始编译！</p>
-<div class="code-container" data-rel="Sh"><figure class="iseeu highlight sh"><table><tr><td class="code"><pre><span class="line">make download -j8</span><br><span class="line">make V=s -j8</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">make</span> download <span class="token parameter variable">-j8</span>
+<span class="token function">make</span> <span class="token assign-left variable">V</span><span class="token operator">=</span>s <span class="token parameter variable">-j8</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 <p>其中<code>V=s</code>表示输出<code>stdout</code>和<code>stderr</code>，方便在编译失败的时候根据输出信息确定是哪里的错误，<code>-jn</code>的<code>n</code>表示使用<code>n</code>个线程同时编译，对于核心数较多的机器可以将该数值设置得大一些，加快编译过程。</p>
 <p>编译完成之后，在<code>./bin/targets</code>下就可以找到固件以及相应的<code>ipk</code>包了。</p>
 <h2 id="UA2F-的注意事项"><a href="#UA2F-的注意事项" class="headerlink" title="UA2F 的注意事项"></a>UA2F 的注意事项</h2><p>要使 UA2F 正常工作需要关闭 “网络”——“Turbo ACC 网络加速设置” 下的所有选项，否则 UA2F 无法正常工作，具体表现为：重启路由器防火墙之后，第一次 HTTP 请求的 User-Agent 成功修改，但后续 HTTP 请求的 User-Agent 没有被修改。</p>
@@ -610,10 +710,11 @@ make4.1+ perl python3.7+ rsync subversion unzip which
 <h3 id="2-教程"><a href="#2-教程" class="headerlink" title="2. 教程:"></a>2. 教程:</h3><h4 id="2-1-固件下载"><a href="#2-1-固件下载" class="headerlink" title="2.1 固件下载"></a>2.1 固件下载</h4><p>我们选择 x86 64 位 (MBR dos) 或 x86 64 位 (UEFI gpt) 的固件进行部署。您可以从以下链接下载所需的文件：</p>
 <p><a class="link"   href="https://downloads.x-wrt.com/rom/" >https://downloads.x-wrt.com/rom/<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 <p>刷机所需的文件如下：</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">x-wrt-x86-64-generic-initramfs-kernel.bin</span><br><span class="line">x-wrt-x86-64-generic-ext4-combined.img.gz</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">x-wrt-x86-64-generic-initramfs-kernel.bin
+x-wrt-x86-64-generic-ext4-combined.img.gz<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p>如果您的系统是 EFI 系统，则还需要下载以下文件：</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">x-wrt-x86-64-generic-ext4-combined-efi.img.gz</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">x-wrt-x86-64-generic-ext4-combined-efi.img.gz<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <h4 id="2-2-VPS系统部署"><a href="#2-2-VPS系统部署" class="headerlink" title="2.2 VPS系统部署"></a>2.2 VPS系统部署</h4><p>本教程所涉及的 VPS 系统要求比较宽松，可以是 Ubuntu、CentOS、Debian 或其他类 Unix 系统。</p>
 <h4 id="2-3-VPS系统的网络配置识别"><a href="#2-3-VPS系统的网络配置识别" class="headerlink" title="2.3 VPS系统的网络配置识别"></a>2.3 VPS系统的网络配置识别</h4><p>在开始部署之前，我们需要了解 VPS 的 IP 地址是如何分配的。有些 VPS 是通过 DHCP 自动获取 IP 地址，有些是静态配置的，还有一些是双网卡或多网卡的。</p>
@@ -622,20 +723,50 @@ make4.1+ perl python3.7+ rsync subversion unzip which
 <h4 id="2-4-确定磁盘的路径和分区类型"><a href="#2-4-确定磁盘的路径和分区类型" class="headerlink" title="2.4 确定磁盘的路径和分区类型"></a>2.4 确定磁盘的路径和分区类型</h4><p>使用 <code>df</code> 和 <code>mount</code> 命令可以查看 VPS 的磁盘信息，确定磁盘的第一个分区挂载路径，例如 <code>/dev/sda1</code>、<code>/dev/vda1</code>、<code>/dev/xvda1</code> 等等。需要注意的是，此分区的挂载路径以及可用空间大小，通常情况下此分区挂载在 <code>/</code> 或者 <code>/boot</code> 下，而我们在刷机过程中需要将固件等文件保存在此路径下。</p>
 <p>使用 <code>fdisk -l</code> 命令可以查看分区类型，以确定分区是否为 GPT。如果分区为 GPT，则需要刷写 EFI 固件。但通常情况下分区不是 GPT 类型。</p>
 <h4 id="2-5-开始刷机"><a href="#2-5-开始刷机" class="headerlink" title="2.5 开始刷机"></a>2.5 开始刷机</h4><p>以下是刷机所需的文件，您可以使用 wget 命令进行下载：</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">x-wrt-x86-64-generic-initramfs-kernel.bin</span><br><span class="line">x-wrt-x86-64-generic-ext4-combined.img.gz 或者 x-wrt-x86-64-generic-ext4-combined-efi.img.gz</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">x-wrt-x86-64-generic-initramfs-kernel.bin
+x-wrt-x86-64-generic-ext4-combined.img.gz 或者 x-wrt-x86-64-generic-ext4-combined-efi.img.gz<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p>在刷机之前，需要确定当前系统运行的内核路径。一般来说，这个路径是 <code>/boot/vmlinuz*</code>。您可以使用 <code>uname -r</code> 命令查看内核版本。比如，如果路径是 <code>/boot/vmlinuz-4.15.0-111-generic</code>，那么我们需要把 <code>x-wrt-x86-64-generic-initramfs-kernel.bin</code> 替换为这个内核：</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">cp x-wrt-x86-64-generic-initramfs-kernel.bin /boot/vmlinuz-4.15.0-111-generic</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">cp x-wrt-x86-64-generic-initramfs-kernel.bin &#x2F;boot&#x2F;vmlinuz-4.15.0-111-generic<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>然后我们需要确定第一个分区的路径，假如第一个分区是 <code>/</code> 我们把固件拷贝到 <code>/</code> 保存好，注意保存的名字是 <code>x-wrt.img.gz</code></p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">cp x-wrt-x86-64-generic-ext4-combined.img.gz /x-wrt.img.gz</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">cp x-wrt-x86-64-generic-ext4-combined.img.gz &#x2F;x-wrt.img.gz<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>同时我们还需要一个安装脚本，脚本路径和固件保存的目录相同，这个例子是<code>/</code> ，脚本名字是 <code>x-wrt-install-vps.sh</code> 脚本的代码参考如下：（根据情况修改）</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line"></span><br><span class="line"># install to sda</span><br><span class="line">BDEV=sda</span><br><span class="line"></span><br><span class="line"># x-wrt.img.gz in disk part sda1</span><br><span class="line">DDEV=sda1</span><br><span class="line"></span><br><span class="line"># static ip</span><br><span class="line">#network=172.21.170.245,255.255.240.0,172.21.175.253,8.8.8.8</span><br><span class="line"></span><br><span class="line"># static ip swap eth0 eth1</span><br><span class="line">#network=&quot;117.18.13.159,255.255.255.0,117.18.13.1,8.8.8.8,initscript=dWNpIHNldCBuZXR3b3JrLmxhbi5pZm5hbWU9ZXRoMQp1Y2kgc2V0IG5ldHdvcmsud2FuLmlmbmFtZT1ldGgwCnVjaSBjb21taXQgbmV0d29yawo=&quot;</span><br><span class="line"></span><br><span class="line"># dhcp ip</span><br><span class="line">network=dhcp</span><br><span class="line"></span><br><span class="line">vmroot=/tmp/block</span><br><span class="line">mkdir -p $vmroot</span><br><span class="line">mount /dev/$&#123;DDEV&#125; $vmroot || exit 0</span><br><span class="line">cp $vmroot/x-wrt.img.gz /tmp/x-wrt.img.gz &amp;&amp; &#123;</span><br><span class="line">	cd /</span><br><span class="line">	umount $vmroot</span><br><span class="line">	sync</span><br><span class="line">	(zcat /tmp/x-wrt.img.gz;</span><br><span class="line">	 echo open=443,network=$network;</span><br><span class="line">	) &gt;/dev/$BDEV &amp;&amp; reboot</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">#!&#x2F;bin&#x2F;sh
+
+# install to sda
+BDEV&#x3D;sda
+
+# x-wrt.img.gz in disk part sda1
+DDEV&#x3D;sda1
+
+# static ip
+#network&#x3D;172.21.170.245,255.255.240.0,172.21.175.253,8.8.8.8
+
+# static ip swap eth0 eth1
+#network&#x3D;&quot;117.18.13.159,255.255.255.0,117.18.13.1,8.8.8.8,initscript&#x3D;dWNpIHNldCBuZXR3b3JrLmxhbi5pZm5hbWU9ZXRoMQp1Y2kgc2V0IG5ldHdvcmsud2FuLmlmbmFtZT1ldGgwCnVjaSBjb21taXQgbmV0d29yawo&#x3D;&quot;
+
+# dhcp ip
+network&#x3D;dhcp
+
+vmroot&#x3D;&#x2F;tmp&#x2F;block
+mkdir -p $vmroot
+mount &#x2F;dev&#x2F;$&#123;DDEV&#125; $vmroot || exit 0
+cp $vmroot&#x2F;x-wrt.img.gz &#x2F;tmp&#x2F;x-wrt.img.gz &amp;&amp; &#123;
+	cd &#x2F;
+	umount $vmroot
+	sync
+	(zcat &#x2F;tmp&#x2F;x-wrt.img.gz;
+	 echo open&#x3D;443,network&#x3D;$network;
+	) &gt;&#x2F;dev&#x2F;$BDEV &amp;&amp; reboot
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>这个脚本准备刷机的磁盘是sda，第一个分区是sda1，它是DHCP动态获取IP的。你需要根据情况修改刷机脚本，脚本会在重启后启动initramfs内核并且执行。</p>
 <p>如果磁盘是vda，就修改BDEV的值，注意，如果是静态IP，就注释掉<code>network=dhcp</code>，启用静态IP那一行的<code>network=&lt;ip&gt;,&lt;mask&gt;,&lt;gateway&gt;,&lt;dns&gt;</code>，如果VPS有多个网卡，比如有2个<code>eth0 eth1</code>，我们需要附加一个<code>initscript=&lt;script base64 codes&gt;</code>来做交换网口，这个<code>&lt;script base64 codes&gt;</code>其实是如下脚本的base64编码，你要根据情况修改。</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">uci set network.lan.ifname=eth1</span><br><span class="line">uci set network.wan.ifname=eth0</span><br><span class="line">uci commit network</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">uci set network.lan.ifname&#x3D;eth1
+uci set network.wan.ifname&#x3D;eth0
+uci commit network<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 <p>如果以上操作正确无误，就执行<code>reboot</code>重启系统。由于我们使用initramfs-kernel替换了原有内核，重启后系统会进入initramfs-kernel环境。然后，该环境会查找 x-wrt-install-vps.sh 脚本并执行刷机操作。这个脚本执行的内容很简单：挂载第一个分区、将固件拷贝到 &#x2F;tmp 目录中，然后执行刷机并重启。这个过程大概需要5分钟，看情况了。</p>
 <h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结:"></a>3. 总结:</h3><p>整个刷机过程，大概就三个步骤:</p>
@@ -686,10 +817,12 @@ make4.1+ perl python3.7+ rsync subversion unzip which
 <p>访问AP的地址: <code>http://&#123;mac&#125;.ap.fakemesh/</code> 或者 <code>http://N.ap.fakemesh/</code></p>
 <p>其中<code>&#123;mac&#125;</code>是AP的MAC地址，比如<code>&#123;mac&#125;=1122334455AB</code>，<code>N</code>是AP的自动编号，比如 N&#x3D;1, N&#x3D;2, N&#x3D;3, …</p>
 <p>例子:</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">http://1.ap.fakemesh/</span><br><span class="line">http://1122334455AB.ap.fakemesh/</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">http:&#x2F;&#x2F;1.ap.fakemesh&#x2F;
+http:&#x2F;&#x2F;1122334455AB.ap.fakemesh&#x2F;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <h3 id="故障处理"><a href="#故障处理" class="headerlink" title="故障处理:"></a>故障处理:</h3><p>AP离线3分钟左右进入故障模式，这个模式开启默认SSID，可以提供接入管理重新配置。<br>故障模式的默认SSID和密码是:</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">SSID: X-WRT_XXXX</span><br><span class="line">PASSWD: 88888888</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">SSID: X-WRT_XXXX
+PASSWD: 88888888<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p>故障模式下AP的管理IP地址是DHCP的网关地址，比如电脑获取到<code>192.168.16.x</code>的IP，那么AP的管理IP就是<code>192.168.16.1</code></p>
 <h2 id="fakemesh-基本组成"><a href="#fakemesh-基本组成" class="headerlink" title="fakemesh 基本组成"></a>fakemesh 基本组成</h2><p>组网由一个<code>控制器(controller)</code>和一个或者多个<code>AP</code>组成</p>

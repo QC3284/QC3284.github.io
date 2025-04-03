@@ -634,7 +634,7 @@
     
     
         <span class="article-wordcount article-meta-item">
-            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>1.6k 字</span>
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>1.7k 字</span>
         </span>
     
     
@@ -665,10 +665,11 @@
 <h3 id="2-教程"><a href="#2-教程" class="headerlink" title="2. 教程:"></a>2. 教程:</h3><h4 id="2-1-固件下载"><a href="#2-1-固件下载" class="headerlink" title="2.1 固件下载"></a>2.1 固件下载</h4><p>我们选择 x86 64 位 (MBR dos) 或 x86 64 位 (UEFI gpt) 的固件进行部署。您可以从以下链接下载所需的文件：</p>
 <p><a class="link"   target="_blank" rel="noopener" href="https://downloads.x-wrt.com/rom/" >https://downloads.x-wrt.com/rom/<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 <p>刷机所需的文件如下：</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x-wrt-x86-64-generic-initramfs-kernel.bin</span><br><span class="line">x-wrt-x86-64-generic-ext4-combined.img.gz</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">x-wrt-x86-64-generic-initramfs-kernel.bin
+x-wrt-x86-64-generic-ext4-combined.img.gz<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p>如果您的系统是 EFI 系统，则还需要下载以下文件：</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x-wrt-x86-64-generic-ext4-combined-efi.img.gz</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">x-wrt-x86-64-generic-ext4-combined-efi.img.gz<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <h4 id="2-2-VPS系统部署"><a href="#2-2-VPS系统部署" class="headerlink" title="2.2 VPS系统部署"></a>2.2 VPS系统部署</h4><p>本教程所涉及的 VPS 系统要求比较宽松，可以是 Ubuntu、CentOS、Debian 或其他类 Unix 系统。</p>
 <h4 id="2-3-VPS系统的网络配置识别"><a href="#2-3-VPS系统的网络配置识别" class="headerlink" title="2.3 VPS系统的网络配置识别"></a>2.3 VPS系统的网络配置识别</h4><p>在开始部署之前，我们需要了解 VPS 的 IP 地址是如何分配的。有些 VPS 是通过 DHCP 自动获取 IP 地址，有些是静态配置的，还有一些是双网卡或多网卡的。</p>
@@ -677,20 +678,50 @@
 <h4 id="2-4-确定磁盘的路径和分区类型"><a href="#2-4-确定磁盘的路径和分区类型" class="headerlink" title="2.4 确定磁盘的路径和分区类型"></a>2.4 确定磁盘的路径和分区类型</h4><p>使用 <code>df</code> 和 <code>mount</code> 命令可以查看 VPS 的磁盘信息，确定磁盘的第一个分区挂载路径，例如 <code>/dev/sda1</code>、<code>/dev/vda1</code>、<code>/dev/xvda1</code> 等等。需要注意的是，此分区的挂载路径以及可用空间大小，通常情况下此分区挂载在 <code>/</code> 或者 <code>/boot</code> 下，而我们在刷机过程中需要将固件等文件保存在此路径下。</p>
 <p>使用 <code>fdisk -l</code> 命令可以查看分区类型，以确定分区是否为 GPT。如果分区为 GPT，则需要刷写 EFI 固件。但通常情况下分区不是 GPT 类型。</p>
 <h4 id="2-5-开始刷机"><a href="#2-5-开始刷机" class="headerlink" title="2.5 开始刷机"></a>2.5 开始刷机</h4><p>以下是刷机所需的文件，您可以使用 wget 命令进行下载：</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">x-wrt-x86-64-generic-initramfs-kernel.bin</span><br><span class="line">x-wrt-x86-64-generic-ext4-combined.img.gz 或者 x-wrt-x86-64-generic-ext4-combined-efi.img.gz</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">x-wrt-x86-64-generic-initramfs-kernel.bin
+x-wrt-x86-64-generic-ext4-combined.img.gz 或者 x-wrt-x86-64-generic-ext4-combined-efi.img.gz<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p>在刷机之前，需要确定当前系统运行的内核路径。一般来说，这个路径是 <code>/boot/vmlinuz*</code>。您可以使用 <code>uname -r</code> 命令查看内核版本。比如，如果路径是 <code>/boot/vmlinuz-4.15.0-111-generic</code>，那么我们需要把 <code>x-wrt-x86-64-generic-initramfs-kernel.bin</code> 替换为这个内核：</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp x-wrt-x86-64-generic-initramfs-kernel.bin /boot/vmlinuz-4.15.0-111-generic</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">cp x-wrt-x86-64-generic-initramfs-kernel.bin &#x2F;boot&#x2F;vmlinuz-4.15.0-111-generic<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>然后我们需要确定第一个分区的路径，假如第一个分区是 <code>/</code> 我们把固件拷贝到 <code>/</code> 保存好，注意保存的名字是 <code>x-wrt.img.gz</code></p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cp x-wrt-x86-64-generic-ext4-combined.img.gz /x-wrt.img.gz</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">cp x-wrt-x86-64-generic-ext4-combined.img.gz &#x2F;x-wrt.img.gz<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>同时我们还需要一个安装脚本，脚本路径和固件保存的目录相同，这个例子是<code>/</code> ，脚本名字是 <code>x-wrt-install-vps.sh</code> 脚本的代码参考如下：（根据情况修改）</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line"></span><br><span class="line"># install to sda</span><br><span class="line">BDEV=sda</span><br><span class="line"></span><br><span class="line"># x-wrt.img.gz in disk part sda1</span><br><span class="line">DDEV=sda1</span><br><span class="line"></span><br><span class="line"># static ip</span><br><span class="line">#network=172.21.170.245,255.255.240.0,172.21.175.253,8.8.8.8</span><br><span class="line"></span><br><span class="line"># static ip swap eth0 eth1</span><br><span class="line">#network=&quot;117.18.13.159,255.255.255.0,117.18.13.1,8.8.8.8,initscript=dWNpIHNldCBuZXR3b3JrLmxhbi5pZm5hbWU9ZXRoMQp1Y2kgc2V0IG5ldHdvcmsud2FuLmlmbmFtZT1ldGgwCnVjaSBjb21taXQgbmV0d29yawo=&quot;</span><br><span class="line"></span><br><span class="line"># dhcp ip</span><br><span class="line">network=dhcp</span><br><span class="line"></span><br><span class="line">vmroot=/tmp/block</span><br><span class="line">mkdir -p $vmroot</span><br><span class="line">mount /dev/$&#123;DDEV&#125; $vmroot || exit 0</span><br><span class="line">cp $vmroot/x-wrt.img.gz /tmp/x-wrt.img.gz &amp;&amp; &#123;</span><br><span class="line">	cd /</span><br><span class="line">	umount $vmroot</span><br><span class="line">	sync</span><br><span class="line">	(zcat /tmp/x-wrt.img.gz;</span><br><span class="line">	 echo open=443,network=$network;</span><br><span class="line">	) &gt;/dev/$BDEV &amp;&amp; reboot</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">#!&#x2F;bin&#x2F;sh
+
+# install to sda
+BDEV&#x3D;sda
+
+# x-wrt.img.gz in disk part sda1
+DDEV&#x3D;sda1
+
+# static ip
+#network&#x3D;172.21.170.245,255.255.240.0,172.21.175.253,8.8.8.8
+
+# static ip swap eth0 eth1
+#network&#x3D;&quot;117.18.13.159,255.255.255.0,117.18.13.1,8.8.8.8,initscript&#x3D;dWNpIHNldCBuZXR3b3JrLmxhbi5pZm5hbWU9ZXRoMQp1Y2kgc2V0IG5ldHdvcmsud2FuLmlmbmFtZT1ldGgwCnVjaSBjb21taXQgbmV0d29yawo&#x3D;&quot;
+
+# dhcp ip
+network&#x3D;dhcp
+
+vmroot&#x3D;&#x2F;tmp&#x2F;block
+mkdir -p $vmroot
+mount &#x2F;dev&#x2F;$&#123;DDEV&#125; $vmroot || exit 0
+cp $vmroot&#x2F;x-wrt.img.gz &#x2F;tmp&#x2F;x-wrt.img.gz &amp;&amp; &#123;
+	cd &#x2F;
+	umount $vmroot
+	sync
+	(zcat &#x2F;tmp&#x2F;x-wrt.img.gz;
+	 echo open&#x3D;443,network&#x3D;$network;
+	) &gt;&#x2F;dev&#x2F;$BDEV &amp;&amp; reboot
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>这个脚本准备刷机的磁盘是sda，第一个分区是sda1，它是DHCP动态获取IP的。你需要根据情况修改刷机脚本，脚本会在重启后启动initramfs内核并且执行。</p>
 <p>如果磁盘是vda，就修改BDEV的值，注意，如果是静态IP，就注释掉<code>network=dhcp</code>，启用静态IP那一行的<code>network=&lt;ip&gt;,&lt;mask&gt;,&lt;gateway&gt;,&lt;dns&gt;</code>，如果VPS有多个网卡，比如有2个<code>eth0 eth1</code>，我们需要附加一个<code>initscript=&lt;script base64 codes&gt;</code>来做交换网口，这个<code>&lt;script base64 codes&gt;</code>其实是如下脚本的base64编码，你要根据情况修改。</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">uci set network.lan.ifname=eth1</span><br><span class="line">uci set network.wan.ifname=eth0</span><br><span class="line">uci commit network</span><br></pre></td></tr></table></figure></div>
+<pre class="line-numbers language-none"><code class="language-none">uci set network.lan.ifname&#x3D;eth1
+uci set network.wan.ifname&#x3D;eth0
+uci commit network<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 <p>如果以上操作正确无误，就执行<code>reboot</code>重启系统。由于我们使用initramfs-kernel替换了原有内核，重启后系统会进入initramfs-kernel环境。然后，该环境会查找 x-wrt-install-vps.sh 脚本并执行刷机操作。这个脚本执行的内容很简单：挂载第一个分区、将固件拷贝到 &#x2F;tmp 目录中，然后执行刷机并重启。这个过程大概需要5分钟，看情况了。</p>
 <h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3. 总结:"></a>3. 总结:</h3><p>整个刷机过程，大概就三个步骤:</p>
@@ -886,7 +917,7 @@
                     </span>
                     
                         <span>
-                            共 10.8k 字
+                            共 11k 字
                         </span>
                     
                 </p>
