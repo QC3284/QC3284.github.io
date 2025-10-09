@@ -115,7 +115,7 @@ function onBuildReset() {
               prepend-icon="mdi-folder-open"
               class="mr-3"
             >
-              Folder
+              {{ i18n.t('device-link-folder', '文件夹') }}
             </v-btn>
             
             <v-btn
@@ -126,7 +126,7 @@ function onBuildReset() {
               prepend-icon="mdi-information"
               class="mr-3"
             >
-              Info
+              {{ i18n.t('device-link-info', '信息') }}
             </v-btn>
             
             <v-btn
@@ -135,7 +135,7 @@ function onBuildReset() {
               size="small"
               prepend-icon="mdi-link"
             >
-              Link
+              {{ i18n.t('device-link-direct', '链接') }}
             </v-btn>
           </div>
         </v-col>

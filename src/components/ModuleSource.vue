@@ -1,8 +1,29 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useModuleStore } from '@/stores/module'
+import { useI18nStore } from '@/stores/i18n'
 
 const moduleStore = useModuleStore()
+const i18n = useI18nStore()
+
+function translate(key: string, fallback: string, replacements?: Record<string, string>) {
+  let text = i18n.t(key, fallback)
+  if (replacements) {
+    for (const [token, value] of Object.entries(replacements)) {
+      text = text.replace(new RegExp(`{${token}}`, 'g'), value)
+    }
+  }
+  return text
+}
+
+function getLocale(): string {
+  const lang = (i18n.currentLanguage || 'en').replace(/_/g, '-')
+  const [language, region] = lang.split('-')
+  if (!region) {
+    return language
+  }
+  return `${language}-${region.toUpperCase()}`
+}
 
 // Add source dialog
 const showAddDialog = ref(false)
@@ -12,19 +33,19 @@ const newSourceRef = ref('main')
 
 // Form validation
 const urlRules = [
-  (v: string) => !!v || 'URL is required',
+  (v: string) => !!v || i18n.t('module-source-url-required', 'URL is required'),
   (v: string) => {
     const githubPattern = /^https?:\/\/github\.com\/[^\/]+\/[^\/]+/
-    return githubPattern.test(v) || 'Must be a valid GitHub repository URL'
+    return githubPattern.test(v) || i18n.t('module-source-url-invalid', 'Must be a valid GitHub repository URL')
   }
 ]
 
 const nameRules = [
-  (v: string) => !!v || 'Name is required'
+  (v: string) => !!v || i18n.t('module-source-name-required', 'Name is required')
 ]
 
 const refRules = [
-  (v: string) => !!v || 'Reference is required'
+  (v: string) => !!v || i18n.t('module-source-ref-required', 'Reference is required')
 ]
 
 // Form state
@@ -74,8 +95,8 @@ function removeSource(sourceId: string) {
 }
 
 function formatDate(date: Date | undefined): string {
-  if (!date) return 'Never'
-  return new Intl.DateTimeFormat('en-US', {
+  if (!date) return i18n.t('module-source-never', 'Never')
+  return new Intl.DateTimeFormat(getLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -90,14 +111,14 @@ function formatDate(date: Date | undefined): string {
   <v-card>
     <v-card-title class="d-flex align-center">
       <v-icon icon="mdi-source-repository" class="mr-2" />
-      模块源管理
+      {{ i18n.t('module-source-title', '模块源管理') }}
       <v-spacer />
       <v-btn
         color="primary"
         prepend-icon="mdi-plus"
         @click="showAddDialog = true"
       >
-        添加模块源
+        {{ i18n.t('module-source-add', '添加模块源') }}
       </v-btn>
     </v-card-title>
 
@@ -116,8 +137,8 @@ function formatDate(date: Date | undefined): string {
       <!-- Module Sources List -->
       <div v-if="moduleStore.sources.length === 0" class="text-center py-8">
         <v-icon icon="mdi-source-repository-multiple" size="64" color="grey-lighten-1" />
-        <p class="text-h6 mt-4 text-grey">尚未添加任何模块源</p>
-        <p class="text-grey">点击"添加模块源"按钮开始添加</p>
+        <p class="text-h6 mt-4 text-grey">{{ i18n.t('module-source-empty', '尚未添加任何模块源') }}</p>
+        <p class="text-grey">{{ i18n.t('module-source-empty-hint', '点击“添加模块源”按钮开始添加') }}</p>
       </div>
 
       <v-row v-else>
@@ -146,13 +167,13 @@ function formatDate(date: Date | undefined): string {
                     <template #prepend>
                       <v-icon icon="mdi-refresh" />
                     </template>
-                    <v-list-item-title>刷新</v-list-item-title>
+                    <v-list-item-title>{{ i18n.t('common-refresh', '刷新') }}</v-list-item-title>
                   </v-list-item>
                   <v-list-item @click="removeSource(source.id)" class="text-error">
                     <template #prepend>
                       <v-icon icon="mdi-delete" />
                     </template>
-                    <v-list-item-title>删除</v-list-item-title>
+                    <v-list-item-title>{{ i18n.t('common-delete', '删除') }}</v-list-item-title>
                   </v-list-item>
                 </v-list>
               </v-menu>
@@ -160,16 +181,16 @@ function formatDate(date: Date | undefined): string {
 
             <v-card-text>
               <div class="text-body-2 mb-2">
-                <strong>仓库:</strong> {{ source.url }}
+                <strong>{{ i18n.t('module-source-repo-label', '仓库') }}:</strong> {{ source.url }}
               </div>
               <div class="text-body-2 mb-2">
-                <strong>引用:</strong> {{ source.ref }}
+                <strong>{{ i18n.t('module-source-ref-label', '引用') }}:</strong> {{ source.ref }}
               </div>
               <div class="text-body-2 mb-2">
-                <strong>模块数量:</strong> {{ source.modules.length }}
+                <strong>{{ i18n.t('module-source-count-label', '模块数量') }}:</strong> {{ source.modules.length }}
               </div>
               <div class="text-body-2">
-                <strong>最后更新:</strong> {{ formatDate(source.lastUpdated) }}
+                <strong>{{ i18n.t('module-source-updated-label', '最后更新') }}:</strong> {{ formatDate(source.lastUpdated) }}
               </div>
             </v-card-text>
 
@@ -188,7 +209,7 @@ function formatDate(date: Date | undefined): string {
                   size="small"
                   variant="outlined"
                 >
-                  +{{ source.modules.length - 3 }} 更多
+                  {{ translate('module-source-more', '+{count} 更多', { count: String(source.modules.length - 3) }) }}
                 </v-chip>
               </v-chip-group>
             </v-card-actions>
@@ -200,13 +221,13 @@ function formatDate(date: Date | undefined): string {
     <!-- Add Source Dialog -->
     <v-dialog v-model="showAddDialog" max-width="600px">
       <v-card>
-        <v-card-title>添加模块源</v-card-title>
+        <v-card-title>{{ i18n.t('module-source-add', '添加模块源') }}</v-card-title>
         
         <v-card-text>
           <v-form>
             <v-text-field
               v-model="newSourceUrl"
-              label="GitHub 仓库 URL"
+              :label="i18n.t('module-source-url-label', 'GitHub 仓库 URL')"
               placeholder="https://github.com/username/repository"
               :rules="urlRules"
               required
@@ -215,8 +236,8 @@ function formatDate(date: Date | undefined): string {
             
             <v-text-field
               v-model="newSourceName"
-              label="模块源名称"
-              placeholder="My Module Source"
+              :label="i18n.t('module-source-name-label', '模块源名称')"
+              :placeholder="i18n.t('module-source-name-placeholder', 'My Module Source')"
               :rules="nameRules"
               required
               prepend-icon="mdi-tag"
@@ -224,7 +245,7 @@ function formatDate(date: Date | undefined): string {
             
             <v-text-field
               v-model="newSourceRef"
-              label="分支/标签/提交"
+              :label="i18n.t('module-source-ref-input-label', '分支/标签/提交')"
               placeholder="main, v1.0.0, commit-sha"
               :rules="refRules"
               required
@@ -233,13 +254,13 @@ function formatDate(date: Date | undefined): string {
 
             <v-alert type="info" variant="tonal" class="mt-4">
               <div class="text-body-2">
-                <p><strong>支持的引用格式:</strong></p>
+                <p><strong>{{ i18n.t('module-source-ref-info-title', '支持的引用格式:') }}</strong></p>
                 <ul>
-                  <li>分支名: main, develop, feature/xxx</li>
-                  <li>标签名: v1.0.0, release-2024.1</li>
-                  <li>提交: 提交的 SHA 值</li>
+                  <li>{{ i18n.t('module-source-ref-branch', '分支名: main, develop, feature/xxx') }}</li>
+                  <li>{{ i18n.t('module-source-ref-tag', '标签名: v1.0.0, release-2024.1') }}</li>
+                  <li>{{ i18n.t('module-source-ref-commit', '提交: 提交的 SHA 值') }}</li>
                 </ul>
-                <p class="mt-2">保持用户指定的引用格式，构建时由后端解析。</p>
+                <p class="mt-2">{{ i18n.t('module-source-ref-note', '保持用户指定的引用格式，构建时由后端解析。') }}</p>
               </div>
             </v-alert>
           </v-form>
@@ -247,14 +268,14 @@ function formatDate(date: Date | undefined): string {
 
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="closeAddDialog">取消</v-btn>
+          <v-btn @click="closeAddDialog">{{ i18n.t('common-cancel', '取消') }}</v-btn>
           <v-btn
             color="primary"
             :disabled="!isFormValid || moduleStore.isLoading"
             :loading="moduleStore.isLoading"
             @click="addSource"
           >
-            添加
+            {{ i18n.t('common-add', '添加') }}
           </v-btn>
         </v-card-actions>
       </v-card>

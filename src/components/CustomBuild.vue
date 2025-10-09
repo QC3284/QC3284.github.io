@@ -29,6 +29,16 @@ const packageStore = usePackageStore()
 const customBuildStore = useCustomBuildStore()
 const asuService = new AsuService()
 
+function translate(key: string, fallback: string, replacements?: Record<string, string>) {
+  let text = i18n.t(key, fallback)
+  if (replacements) {
+    for (const [token, value] of Object.entries(replacements)) {
+      text = text.replace(new RegExp(`{${token}}`, 'g'), value)
+    }
+  }
+  return text
+}
+
 // Form data managed via store
 const uciDefaultsContent = computed<string>({
   get: () => customBuildStore.uciDefaults,
@@ -125,7 +135,7 @@ const statusMessage = computed(() => {
     building: i18n.t('tr-building-image', '正在生成固件映像'),
     success: i18n.t('tr-build-successful', '构建成功'),
     failure: i18n.t('tr-build-failed', '构建失败'),
-    no_sysupgrade: '设备不支持 sysupgrade'
+    no_sysupgrade: translate('custom-no-sysupgrade', '设备不支持 sysupgrade')
   }
 
   return statusMessages[buildStatus.value.status] || buildStatus.value.status
@@ -198,7 +208,10 @@ function getModuleDisplayName(moduleKey: string): string {
   const module = source?.modules.find(m => m.id === moduleId)
   
   if (module && source) {
-    return `${module.definition.name} (来源: ${source.name})`
+    return translate('custom-module-label', '{name} (来源: {source})', {
+      name: module.definition.name,
+      source: source.name
+    })
   }
   
   return moduleKey
@@ -334,7 +347,9 @@ async function requestBuild() {
     }
     
   } catch (error) {
-    const errorMsg = `构建请求失败: ${error}`
+    const errorMsg = translate('custom-build-request-failed', '构建请求失败: {error}', {
+      error: String(error)
+    })
     buildError.value = errorMsg
     emit('build-error', errorMsg)
   } finally {
@@ -367,12 +382,12 @@ function startPolling(requestHash: string) {
       } else if (status.httpStatus >= 400) {
         // Build failed
         stopPolling()
-        emit('build-error', status.detail || `构建失败 (HTTP ${status.httpStatus})`)
+        emit('build-error', status.detail || translate('custom-build-failed-http', '构建失败 (HTTP {status})', { status: String(status.httpStatus) }))
       }
     } catch (error) {
       console.error('Failed to poll build status:', error)
       stopPolling()
-      emit('build-error', `构建状态检查失败: ${error}`)
+      emit('build-error', translate('custom-build-status-failed', '构建状态检查失败: {error}', { error: String(error) }))
     }
   }, 5000)
 }
@@ -437,7 +452,7 @@ async function loadRepositoryIndex(index: number) {
     packageStore.addCustomFeedPackages((current?.name || repo.name || 'custom'), packages)
   } catch (error) {
     customBuildStore.updateRepository(index, {
-      error: error instanceof Error ? error.message : '加载失败',
+      error: error instanceof Error ? error.message : translate('custom-repo-load-error', '加载失败'),
       loading: false
     })
     console.error('Failed to load repository index:', error)
@@ -528,15 +543,15 @@ onUnmounted(() => {
                 variant="outlined"
                 @click="loadTemplate"
               >
-                加载模板
+                {{ i18n.t('custom-load-template', '加载模板') }}
               </v-btn>
             </div>
             <v-textarea
               v-model="uciDefaultsContent"
               rows="10"
               variant="outlined"
-              placeholder="输入首次启动脚本内容"
-              hint="这个脚本将在设备首次启动时执行一次"
+              :placeholder="i18n.t('custom-defaults-placeholder', '输入首次启动脚本内容')"
+              :hint="i18n.t('custom-defaults-hint', '这个脚本将在设备首次启动时执行一次')"
               persistent-hint
             />
           </v-col>
@@ -547,18 +562,18 @@ onUnmounted(() => {
         <!-- Advanced Configuration -->
         <v-row>
           <v-col cols="12">
-            <h4 class="text-h6 mb-3">高级配置</h4>
+            <h4 class="text-h6 mb-3">{{ i18n.t('custom-advanced-settings', '高级配置') }}</h4>
           </v-col>
 
           <!-- Root Filesystem Size -->
           <v-col cols="12" md="6">
             <v-text-field
               v-model.number="rootfsSizeMb"
-              label="根文件系统大小 (MiB)"
+              :label="i18n.t('custom-rootfs-label', '根文件系统大小 (MiB)')"
               placeholder="256"
               type="number"
               variant="outlined"
-              hint="设置根文件系统的大小，单位为 MiB (可选)"
+              :hint="i18n.t('custom-rootfs-hint', '设置根文件系统的大小，单位为 MiB (可选)')"
               persistent-hint
               :min="1"
               :max="2048"
@@ -569,25 +584,25 @@ onUnmounted(() => {
           <!-- Repositories -->
           <v-col cols="12">
             <div class="d-flex align-center mb-3">
-              <h5 class="text-subtitle1">自定义软件源</h5>
+              <h5 class="text-subtitle1">{{ i18n.t('custom-repo-title', '自定义软件源') }}</h5>
               <v-spacer />
               <v-btn
                 size="small"
                 prepend-icon="mdi-plus"
                 @click="addRepository"
               >
-                添加软件源
+                {{ i18n.t('custom-repo-add', '添加软件源') }}
               </v-btn>
             </div>
             
             <div v-if="repositories.length === 0" class="text-grey text-body-2 mb-4">
-              暂无自定义软件源
+              {{ i18n.t('custom-repo-empty', '暂无自定义软件源') }}
             </div>
 
             <v-card v-for="(repo, index) in repositories" :key="index" variant="outlined" class="mb-3">
               <v-card-title class="d-flex align-center pa-3">
                 <v-icon icon="mdi-package-variant" class="mr-2" />
-                软件源 {{ index + 1 }}
+                {{ translate('custom-repo-item', '软件源 {index}', { index: String(index + 1) }) }}
                 <v-spacer />
                 <v-btn
                   icon="mdi-delete"
@@ -603,7 +618,7 @@ onUnmounted(() => {
                   <v-col cols="12" md="4">
                     <v-text-field
                       v-model="repo.name"
-                      label="源名称"
+                      :label="i18n.t('custom-repo-name-label', '源名称')"
                       variant="outlined"
                       density="compact"
                       placeholder="my-repo"
@@ -612,7 +627,7 @@ onUnmounted(() => {
                   <v-col cols="12" md="8">
                     <v-text-field
                       v-model="repo.url"
-                      label="源地址"
+                      :label="i18n.t('custom-repo-url-label', '源地址')"
                       variant="outlined"
                       density="compact"
                       placeholder="https://downloads.example.com/packages/Packages"
@@ -621,7 +636,7 @@ onUnmounted(() => {
                       :error-messages="repo.error"
                     />
                     <div v-if="repo.packages" class="text-caption text-success mt-1">
-                      ✓ 已加载 {{ repo.packages.length }} 个软件包
+                      {{ translate('custom-repo-loaded', '✓ 已加载 {count} 个软件包', { count: String(repo.packages.length) }) }}
                     </div>
                   </v-col>
                 </v-row>
@@ -632,25 +647,25 @@ onUnmounted(() => {
           <!-- Repository Keys -->
           <v-col cols="12">
             <div class="d-flex align-center mb-3">
-              <h5 class="text-subtitle1">软件源签名密钥</h5>
+              <h5 class="text-subtitle1">{{ i18n.t('custom-keys-title', '软件源签名密钥') }}</h5>
               <v-spacer />
               <v-btn
                 size="small"
                 prepend-icon="mdi-plus"
                 @click="addRepositoryKey"
               >
-                添加密钥
+                {{ i18n.t('custom-keys-add', '添加密钥') }}
               </v-btn>
             </div>
             
             <div v-if="repositoryKeys.length === 0" class="text-grey text-body-2 mb-4">
-              暂无签名密钥
+              {{ i18n.t('custom-keys-empty', '暂无签名密钥') }}
             </div>
 
             <v-card v-for="(key, index) in repositoryKeys" :key="index" variant="outlined" class="mb-3">
               <v-card-title class="d-flex align-center pa-3">
                 <v-icon icon="mdi-key-variant" class="mr-2" />
-                签名密钥 {{ index + 1 }}
+                {{ translate('custom-keys-item', '签名密钥 {index}', { index: String(index + 1) }) }}
                 <v-spacer />
                 <v-btn
                   icon="mdi-delete"
@@ -664,12 +679,12 @@ onUnmounted(() => {
               <v-card-text class="pt-0">
                 <v-textarea
                   v-model="repositoryKeys[index]"
-                  label="usign 公钥"
+                  :label="i18n.t('custom-keys-label', 'usign 公钥')"
                   variant="outlined"
                   rows="3"
                   density="compact"
                   placeholder="untrusted comment: OpenWrt usign key&#10;RWQKvaZaSStIhx4t06ISyV42CIpK7niKfR+Yro/WHiKLa122SEh2j3Z4"
-                  hint="用于验证自定义软件源的 usign 公钥"
+                  :hint="i18n.t('custom-keys-hint', '用于验证自定义软件源的 usign 公钥')"
                   persistent-hint
                 />
               </v-card-text>
@@ -680,7 +695,7 @@ onUnmounted(() => {
         <!-- Package Summary -->
         <v-card v-if="finalPackages.length > 0" variant="elevated" class="mt-4 mb-4">
           <v-card-title class="text-subtitle1">
-            软件包摘要 ({{ finalPackages.length }} 个)
+            {{ translate('custom-package-summary-title', '软件包摘要 ({count} 个)', { count: String(finalPackages.length) }) }}
           </v-card-title>
           <v-card-text>
             <div class="d-flex flex-wrap">
@@ -739,7 +754,7 @@ onUnmounted(() => {
               <div>
                 <div>{{ statusMessage }}</div>
                 <div v-if="buildStatus.queue_position" class="text-caption">
-                  队列位置: {{ buildStatus.queue_position }}
+                  {{ translate('custom-queue-position', '队列位置: {position}', { position: String(buildStatus.queue_position) }) }}
                 </div>
               </div>
             </div>
@@ -782,7 +797,7 @@ onUnmounted(() => {
           <v-divider class="mb-4" />
           <div class="d-flex align-center mb-2">
             <v-icon icon="mdi-text-box-outline" size="small" class="mr-2" />
-            <span class="text-subtitle2">构建日志</span>
+            <span class="text-subtitle2">{{ i18n.t('custom-build-log', '构建日志') }}</span>
           </div>
           <v-expansion-panels
             v-model="expandedLogPanels"
@@ -817,14 +832,14 @@ onUnmounted(() => {
     <v-card>
       <v-card-title class="d-flex align-center">
         <v-icon icon="mdi-alert-circle" color="error" class="mr-2" />
-        模块参数验证失败
+        {{ i18n.t('custom-validation-title', '模块参数验证失败') }}
       </v-card-title>
 
       <v-divider />
 
       <v-card-text class="pt-4">
         <v-alert type="error" variant="tonal" class="mb-4">
-          <strong>无法开始构建，以下模块存在参数错误：</strong>
+          <strong>{{ i18n.t('custom-validation-intro', '无法开始构建，以下模块存在参数错误：') }}</strong>
         </v-alert>
 
         <div v-for="(errors, moduleKey) in validationErrors" :key="moduleKey" class="mb-4">
@@ -849,12 +864,12 @@ onUnmounted(() => {
 
         <v-alert type="info" variant="tonal" class="mt-4">
           <div class="text-body-2">
-            <strong>解决方法：</strong>
+            <strong>{{ i18n.t('custom-validation-solutions-title', '解决方法：') }}</strong>
             <ul class="mt-2">
-              <li>检查标红的必填参数是否已填写</li>
-              <li>确保参数格式符合要求（如IP地址、URL等）</li>
-              <li>为用户自定义下载提供有效的URL</li>
-              <li>点击模块的"配置参数"按钮进行修正</li>
+              <li>{{ i18n.t('custom-validation-solution-required', '检查标红的必填参数是否已填写') }}</li>
+              <li>{{ i18n.t('custom-validation-solution-format', '确保参数格式符合要求（如IP地址、URL等）') }}</li>
+              <li>{{ i18n.t('custom-validation-solution-url', '为用户自定义下载提供有效的URL') }}</li>
+              <li>{{ i18n.t('custom-validation-solution-config', '点击模块的\"配置参数\"按钮进行修正') }}</li>
             </ul>
           </div>
         </v-alert>
@@ -862,13 +877,13 @@ onUnmounted(() => {
 
       <v-card-actions>
         <v-spacer />
-        <v-btn @click="closeValidationErrorDialog">关闭</v-btn>
+        <v-btn @click="closeValidationErrorDialog">{{ i18n.t('common-close', '关闭') }}</v-btn>
         <v-btn 
           color="primary" 
           variant="outlined"
           @click="closeValidationErrorDialog"
         >
-          去修正参数
+          {{ i18n.t('custom-validation-fix', '去修正参数') }}
         </v-btn>
       </v-card-actions>
     </v-card>

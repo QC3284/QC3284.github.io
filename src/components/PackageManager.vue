@@ -5,9 +5,21 @@ import { useFirmwareStore } from '@/stores/firmware'
 import { packageManager } from '@/services/packageManager'
 import type { OpenWrtPackage } from '@/types/package'
 import PackageDetailDialog from './PackageDetailDialog.vue'
+import { useI18nStore } from '@/stores/i18n'
 
 const packageStore = usePackageStore()
 const firmwareStore = useFirmwareStore()
+const i18n = useI18nStore()
+
+function translate(key: string, fallback: string, replacements?: Record<string, string>) {
+  let text = i18n.t(key, fallback)
+  if (replacements) {
+    for (const [token, value] of Object.entries(replacements)) {
+      text = text.replace(new RegExp(`{${token}}`, 'g'), value)
+    }
+  }
+  return text
+}
 
 // Component state
 const searchInput = ref('')
@@ -205,7 +217,7 @@ function getPackageBackgroundClass(packageName: string): string {
   <v-card>
     <v-card-title class="d-flex align-center">
       <v-icon icon="mdi-package-variant" class="mr-2" />
-      软件包管理
+      {{ i18n.t('package-manager-title', '软件包管理') }}
       <v-spacer />
       <v-btn
         color="primary"
@@ -213,7 +225,7 @@ function getPackageBackgroundClass(packageName: string): string {
         @click="openAddDialog"
         :disabled="!firmwareStore.selectedDevice"
       >
-        添加软件包
+        {{ i18n.t('package-manager-add', '添加软件包') }}
       </v-btn>
     </v-card-title>
 
@@ -221,8 +233,8 @@ function getPackageBackgroundClass(packageName: string): string {
       <!-- Selected packages list -->
       <div v-if="packageStore.selectedPackagesList.length === 0 && packageStore.removedPackagesList.length === 0" class="text-center py-4">
         <v-icon icon="mdi-package-variant-closed" size="48" color="grey-lighten-1" />
-        <p class="text-body-1 mt-2 text-grey">暂未选择任何软件包</p>
-        <p class="text-caption text-grey">点击"添加软件包"开始选择</p>
+        <p class="text-body-1 mt-2 text-grey">{{ i18n.t('package-manager-empty', '暂未选择任何软件包') }}</p>
+        <p class="text-caption text-grey">{{ i18n.t('package-manager-empty-hint', '点击“添加软件包”开始选择') }}</p>
       </div>
 
       <div v-else>
@@ -230,7 +242,7 @@ function getPackageBackgroundClass(packageName: string): string {
         <div class="mb-4">
           <div class="d-flex align-center justify-space-between mb-3">
             <div class="text-subtitle-2 text-medium-emphasis">
-              软件包摘要
+              {{ i18n.t('package-manager-summary-title', '软件包摘要') }}
             </div>
             <v-btn
               size="small"
@@ -238,7 +250,7 @@ function getPackageBackgroundClass(packageName: string): string {
               color="error"
               @click="clearAllPackages"
             >
-              清空全部
+              {{ i18n.t('package-manager-clear-all', '清空全部') }}
             </v-btn>
           </div>
           
@@ -246,22 +258,22 @@ function getPackageBackgroundClass(packageName: string): string {
           <v-row dense>
             <v-col cols="6" sm="3">
               <v-chip color="primary" variant="tonal" size="small" class="w-100 justify-center">
-                已选择 {{ packageStore.selectedPackagesList.length }} 个
+                {{ translate('package-manager-selected-count', '已选择 {count} 个', { count: String(packageStore.selectedPackagesList.length) }) }}
               </v-chip>
             </v-col>
             <v-col cols="6" sm="3" v-if="packageStore.removedPackagesList.length > 0">
               <v-chip color="error" variant="tonal" size="small" class="w-100 justify-center">
-                移除 {{ packageStore.removedPackagesList.length }} 个
+                {{ translate('package-manager-removed-count', '移除 {count} 个', { count: String(packageStore.removedPackagesList.length) }) }}
               </v-chip>
             </v-col>
             <v-col cols="6" sm="3">
               <v-chip color="info" variant="tonal" size="small" class="w-100 justify-center">
-                下载: {{ formatSize(totalSize.downloadSize) }}
+                {{ translate('package-manager-download-size', '下载: {size}', { size: formatSize(totalSize.downloadSize) }) }}
               </v-chip>
             </v-col>
             <v-col cols="6" sm="3">
               <v-chip color="warning" variant="tonal" size="small" class="w-100 justify-center">
-                安装: {{ formatSize(totalSize.installedSize) }}
+                {{ translate('package-manager-install-size', '安装: {size}', { size: formatSize(totalSize.installedSize) }) }}
               </v-chip>
             </v-col>
           </v-row>
@@ -281,7 +293,7 @@ function getPackageBackgroundClass(packageName: string): string {
                 <span v-if="packageStore.getPackageInfo(packageName)">
                   {{ packageStore.getPackageInfo(packageName)!.description }}
                 </span>
-                <span v-else class="text-medium-emphasis">加载中...</span>
+                <span v-else class="text-medium-emphasis">{{ i18n.t('package-manager-loading', '加载中...') }}</span>
               </v-list-item-subtitle>
 
               <template #append>
@@ -298,7 +310,9 @@ function getPackageBackgroundClass(packageName: string): string {
                     variant="text"
                     size="small"
                     color="error"
-                    :title="packageStore.isPackageInDefaults(packageName) ? '从默认包列表中排除' : '取消选择'"
+                    :title="packageStore.isPackageInDefaults(packageName)
+                      ? i18n.t('package-manager-action-exclude-default', '从默认包列表中排除')
+                      : i18n.t('package-manager-action-deselect', '取消选择')"
                     @click="removePackage(packageName)"
                   />
                 </div>
@@ -323,7 +337,7 @@ function getPackageBackgroundClass(packageName: string): string {
                 <span v-if="packageStore.getPackageInfo(packageName)">
                   {{ packageStore.getPackageInfo(packageName)!.description }}
                 </span>
-                <span v-else class="text-medium-emphasis">此软件包将在构建时移除</span>
+                <span v-else class="text-medium-emphasis">{{ i18n.t('package-manager-will-remove', '此软件包将在构建时移除') }}</span>
               </v-list-item-subtitle>
 
               <template #append>
@@ -335,12 +349,12 @@ function getPackageBackgroundClass(packageName: string): string {
                     @click="showPackageDetails(packageStore.getPackageInfo(packageName) || null)"
                     v-if="packageStore.getPackageInfo(packageName)"
                   />
-                  <v-btn
+                    <v-btn
                     icon="mdi-restore"
                     variant="text"
                     size="small"
                     color="success"
-                    title="恢复到默认状态"
+                    :title="i18n.t('package-manager-action-restore-default', '恢复到默认状态')"
                     @click="packageStore.removeRemovedPackage(packageName)"
                   />
                 </div>
@@ -356,7 +370,7 @@ function getPackageBackgroundClass(packageName: string): string {
       <v-card>
         <v-card-title class="d-flex align-center">
           <v-icon icon="mdi-package-variant-plus" class="mr-2" />
-          添加软件包
+          {{ i18n.t('package-manager-add', '添加软件包') }}
           <v-spacer />
           <v-btn
             icon="mdi-close"
@@ -370,8 +384,8 @@ function getPackageBackgroundClass(packageName: string): string {
           <!-- Loading state -->
           <div v-if="packageStore.isLoading" class="text-center py-8">
             <v-progress-circular indeterminate color="primary" size="48" />
-            <p class="text-body-1 mt-4">正在加载软件包列表...</p>
-            <p class="text-caption text-medium-emphasis">首次加载需要一些时间</p>
+            <p class="text-body-1 mt-4">{{ i18n.t('package-manager-loading-list', '正在加载软件包列表...') }}</p>
+            <p class="text-caption text-medium-emphasis">{{ i18n.t('package-manager-loading-hint', '首次加载需要一些时间') }}</p>
           </div>
 
           <!-- Error state -->
@@ -397,11 +411,11 @@ function getPackageBackgroundClass(packageName: string): string {
               <div class="d-flex align-center">
                 <v-icon icon="mdi-information" size="small" class="mr-2" />
                 <span class="text-body-2">
-                  共加载 <strong>{{ packageStore.totalPackages }}</strong> 个软件包
+                  {{ translate('package-manager-loaded-count', '共加载 {count} 个软件包', { count: String(packageStore.totalPackages) }) }}
                 </span>
                 <v-spacer />
                 <v-chip size="small" variant="text" color="info">
-                  来自 {{ packageStore.packageSources.length }} 个软件源
+                  {{ translate('package-manager-source-count', '来自 {count} 个软件源', { count: String(packageStore.packageSources.length) }) }}
                 </v-chip>
               </div>
             </v-alert>
@@ -412,8 +426,8 @@ function getPackageBackgroundClass(packageName: string): string {
               <v-col cols="12" md="6">
                 <v-text-field
                   v-model="searchInput"
-                  label="搜索软件包"
-                  placeholder="输入软件包名称或描述..."
+                  :label="i18n.t('package-manager-search-label', '搜索软件包')"
+                  :placeholder="i18n.t('package-manager-search-placeholder', '输入软件包名称或描述...')"
                   prepend-inner-icon="mdi-magnify"
                   variant="outlined"
                   density="compact"
@@ -425,8 +439,8 @@ function getPackageBackgroundClass(packageName: string): string {
               <v-col cols="6" md="3">
                 <v-select
                   v-model="packageStore.selectedSection"
-                  :items="[{ title: '全部分类', value: '' }, ...packageStore.packageSections.map(s => ({ title: getSectionName(s), value: s }))]"
-                  label="分类"
+                  :items="[{ title: i18n.t('package-manager-all-sections', '全部分类'), value: '' }, ...packageStore.packageSections.map(s => ({ title: getSectionName(s), value: s }))]"
+                  :label="i18n.t('package-manager-section-label', '分类')"
                   variant="outlined"
                   density="compact"
                 />
@@ -435,8 +449,8 @@ function getPackageBackgroundClass(packageName: string): string {
               <v-col cols="6" md="3">
                 <v-select
                   v-model="packageStore.selectedSource"
-                  :items="[{ title: '全部来源', value: '' }, ...packageStore.packageSources.map(s => ({ title: getFeedName(s), value: s }))]"
-                  label="来源"
+                  :items="[{ title: i18n.t('package-manager-all-sources', '全部来源'), value: '' }, ...packageStore.packageSources.map(s => ({ title: getFeedName(s), value: s }))]"
+                  :label="i18n.t('package-manager-source-label', '来源')"
                   variant="outlined"
                   density="compact"
                 />
@@ -446,7 +460,7 @@ function getPackageBackgroundClass(packageName: string): string {
             <!-- Results info -->
             <div class="d-flex align-center mb-3">
               <span class="text-body-2 text-medium-emphasis">
-                显示前50个结果，共找到 {{ packageStore.filteredPackages.length }} 个软件包
+                {{ translate('package-manager-results-info', '显示前50个结果，共找到 {count} 个软件包', { count: String(packageStore.filteredPackages.length) }) }}
               </span>
               <v-spacer />
               <v-btn
@@ -455,7 +469,7 @@ function getPackageBackgroundClass(packageName: string): string {
                 @click="packageStore.clearFilters"
                 v-if="searchInput || packageStore.selectedSection || packageStore.selectedSource"
               >
-                清除筛选
+                {{ i18n.t('package-manager-clear-filters', '清除筛选') }}
               </v-btn>
             </div>
 
@@ -476,7 +490,7 @@ function getPackageBackgroundClass(packageName: string): string {
                 <v-list-item-title class="font-weight-medium">
                   {{ pkg.name }}
                   <v-chip v-if="packageStore.isPackageInDefaults(pkg.name)" size="x-small" color="secondary" variant="tonal" class="ml-2">
-                    默认
+                    {{ i18n.t('package-manager-default-tag', '默认') }}
                   </v-chip>
                 </v-list-item-title>
                 <v-list-item-subtitle>
@@ -511,7 +525,7 @@ function getPackageBackgroundClass(packageName: string): string {
                         variant="text"
                         size="small"
                         color="primary"
-                        title="添加"
+                        :title="i18n.t('package-manager-action-add', '添加')"
                         @click="packageStore.togglePackage(pkg.name)"
                       />
                       <v-btn
@@ -520,7 +534,7 @@ function getPackageBackgroundClass(packageName: string): string {
                         variant="text"
                         size="small"
                         color="error"
-                        title="取消添加"
+                        :title="i18n.t('package-manager-action-remove', '取消添加')"
                         @click="packageStore.togglePackage(pkg.name)"
                       />
                     </template>
@@ -533,7 +547,7 @@ function getPackageBackgroundClass(packageName: string): string {
                         variant="text"
                         size="small"
                         color="error"
-                        title="排除"
+                        :title="i18n.t('package-manager-action-exclude', '排除')"
                         @click="packageStore.togglePackage(pkg.name)"
                       />
                       <v-btn
@@ -542,7 +556,7 @@ function getPackageBackgroundClass(packageName: string): string {
                         variant="text"
                         size="small"
                         color="success"
-                        title="取消排除"
+                        :title="i18n.t('package-manager-action-undo-exclude', '取消排除')"
                         @click="packageStore.togglePackage(pkg.name)"
                       />
                     </template>

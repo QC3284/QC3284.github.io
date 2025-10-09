@@ -3,8 +3,10 @@ import { ref, defineAsyncComponent } from 'vue'
 import { packageManager } from '@/services/packageManager'
 import { usePackageStore } from '@/stores/package'
 import type { OpenWrtPackage } from '@/types/package'
+import { useI18nStore } from '@/stores/i18n'
 
 const packageStore = usePackageStore()
+const i18n = useI18nStore()
 
 // Async component to avoid circular dependency
 const AsyncPackageDetailDialog = defineAsyncComponent(() => import('./PackageDetailDialog.vue'))
@@ -72,7 +74,7 @@ function closeDependencyDetail() {
 
       <v-card-text>
         <div class="mb-4">
-          <h4 class="text-subtitle-1 mb-2">描述</h4>
+          <h4 class="text-subtitle-1 mb-2">{{ i18n.t('package-detail-description', '描述') }}</h4>
           <p class="text-body-2">{{ packageDetail.description }}</p>
         </div>
 
@@ -80,7 +82,7 @@ function closeDependencyDetail() {
         <v-row>
           <v-col cols="6">
             <div class="mb-3">
-              <h4 class="text-subtitle-2 mb-1">版本</h4>
+              <h4 class="text-subtitle-2 mb-1">{{ i18n.t('package-detail-version', '版本') }}</h4>
               <v-chip size="small" color="primary" variant="tonal">
                 v{{ packageDetail.version }}
               </v-chip>
@@ -88,8 +90,8 @@ function closeDependencyDetail() {
           </v-col>
           <v-col cols="6">
             <div class="mb-3">
-              <h4 class="text-subtitle-2 mb-1">许可证</h4>
-              <span class="text-body-2">{{ packageDetail.license || '未知' }}</span>
+              <h4 class="text-subtitle-2 mb-1">{{ i18n.t('package-detail-license', '许可证') }}</h4>
+              <span class="text-body-2">{{ packageDetail.license || i18n.t('package-detail-unknown', '未知') }}</span>
             </div>
           </v-col>
         </v-row>
@@ -98,7 +100,7 @@ function closeDependencyDetail() {
         <v-row>
           <v-col cols="6">
             <div class="mb-3">
-              <h4 class="text-subtitle-2 mb-1">分类</h4>
+              <h4 class="text-subtitle-2 mb-1">{{ i18n.t('package-detail-section', '分类') }}</h4>
               <v-chip size="small" color="secondary" variant="tonal">
                 {{ getSectionName(packageDetail.section) }}
               </v-chip>
@@ -106,7 +108,7 @@ function closeDependencyDetail() {
           </v-col>
           <v-col cols="6">
             <div class="mb-3">
-              <h4 class="text-subtitle-2 mb-1">来源</h4>
+              <h4 class="text-subtitle-2 mb-1">{{ i18n.t('package-detail-source', '来源') }}</h4>
               <v-chip size="small" color="info" variant="tonal">
                 {{ getFeedName(packageDetail.source || '') }}
               </v-chip>
@@ -118,13 +120,13 @@ function closeDependencyDetail() {
         <v-row>
           <v-col cols="6">
             <div class="mb-3">
-              <h4 class="text-subtitle-2 mb-1">下载大小</h4>
+              <h4 class="text-subtitle-2 mb-1">{{ i18n.t('package-detail-download-size', '下载大小') }}</h4>
               <span class="text-body-2">{{ formatSize(packageDetail.size) }}</span>
             </div>
           </v-col>
           <v-col cols="6">
             <div class="mb-3">
-              <h4 class="text-subtitle-2 mb-1">安装大小</h4>
+              <h4 class="text-subtitle-2 mb-1">{{ i18n.t('package-detail-install-size', '安装大小') }}</h4>
               <span class="text-body-2">{{ formatSize(packageDetail.installedSize || 0) }}</span>
             </div>
           </v-col>
@@ -132,7 +134,7 @@ function closeDependencyDetail() {
 
         <!-- 主页链接 -->
         <div v-if="packageDetail.url" class="mb-3">
-          <h4 class="text-subtitle-2 mb-1">主页</h4>
+          <h4 class="text-subtitle-2 mb-1">{{ i18n.t('package-detail-homepage', '主页') }}</h4>
           <a :href="packageDetail.url" target="_blank" class="text-primary">
             {{ packageDetail.url }}
           </a>
@@ -140,7 +142,7 @@ function closeDependencyDetail() {
 
         <!-- 最后一行：依赖 -->
         <div v-if="packageDetail.depends?.length" class="mb-3">
-          <h4 class="text-subtitle-2 mb-2">依赖</h4>
+          <h4 class="text-subtitle-2 mb-2">{{ i18n.t('package-detail-dependencies', '依赖') }}</h4>
           <div class="d-flex flex-wrap">
             <v-chip
               v-for="dep in packageDetail.depends"

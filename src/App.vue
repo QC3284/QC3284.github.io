@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useI18nStore } from '@/stores/i18n'
 import { useFirmwareStore } from '@/stores/firmware'
 import { useConfigStore } from '@/stores/config'
@@ -22,10 +22,16 @@ if (initialSharedConfigParam) {
 // Configuration Manager state
 const showConfigManager = ref(false)
 
+function updateDocumentTitle() {
+  const title = i18nStore.t('tr-title', 'OpenWrt Firmware Selector')
+  document.title = title.replace('OpenWrt', config.brand_name)
+}
+
 onMounted(async () => {
   // Initialize translation
   const lang = i18nStore.detectLanguage()
   await i18nStore.loadTranslation(lang)
+  updateDocumentTitle()
   
   // Initialize firmware data
   await firmwareStore.loadVersions()
@@ -40,6 +46,10 @@ onMounted(async () => {
       await configStore.autoLoadLastConfig(true)
     }
   }
+})
+
+watch(() => i18nStore.currentLanguage, () => {
+  updateDocumentTitle()
 })
 </script>
 
@@ -157,14 +167,14 @@ onMounted(async () => {
           <template #prepend>
             <v-icon icon="mdi-information" />
           </template>
-          当前配置: <strong>{{ configStore.currentConfigName }}</strong>
+          {{ i18nStore.t('config-current', '当前配置') }}: <strong>{{ configStore.currentConfigName }}</strong>
           <template #append>
             <v-btn
               size="small"
               variant="text"
               @click="configStore.newConfiguration"
             >
-              新建配置
+              {{ i18nStore.t('config-new', '新建配置') }}
             </v-btn>
           </template>
         </v-alert>
