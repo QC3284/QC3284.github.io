@@ -155,7 +155,11 @@ function onBuildReset() {
 
   <!-- Download Section -->
   <DownloadSection 
-    v-if="firmware.selectedProfile && !isBuilding && !customBuildStore.hasCustomData" 
+    v-if="
+      firmware.selectedProfile && 
+      !isBuilding && 
+      (!customBuildStore.hasCustomData || buildResult)
+    " 
     :build-result="buildResult"
     class="mt-8"
   />
