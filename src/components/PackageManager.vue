@@ -24,8 +24,14 @@ function translate(key: string, fallback: string, replacements?: Record<string, 
 // Component state
 const searchInput = ref('')
 const showAddDialog = ref(false)
+const showBulkAddDialog = ref(false)
 const selectedPackageDetail = ref<OpenWrtPackage | null>(null)
 const showPackageDetail = ref(false)
+const bulkInput = ref('')
+const bulkValidationResult = ref<{ found: string[]; missing: string[] } | null>(null)
+const bulkValidationError = ref('')
+const bulkRequiresConfirmation = ref(false)
+const bulkConfirmationSignature = ref('')
 
 // Debounced search
 const searchDebounce = ref<NodeJS.Timeout>()
@@ -88,6 +94,13 @@ watch(() => packageStore.removedPackagesList, (newRemoved, oldRemoved) => {
   }
 })
 
+watch(bulkInput, () => {
+  bulkValidationResult.value = null
+  bulkValidationError.value = ''
+  bulkRequiresConfirmation.value = false
+  bulkConfirmationSignature.value = ''
+})
+
 const totalSize = computed(() => {
   return packageStore.getTotalSize()
 })
@@ -105,6 +118,27 @@ function closeAddDialog() {
   showAddDialog.value = false
   packageStore.clearFilters()
   searchInput.value = ''
+}
+
+function openBulkAddDialog() {
+  if (packageStore.totalPackages === 0 && firmwareStore.selectedDevice) {
+    loadPackagesForCurrentDevice()
+  }
+  showBulkAddDialog.value = true
+  bulkInput.value = ''
+  bulkValidationResult.value = null
+  bulkValidationError.value = ''
+  bulkRequiresConfirmation.value = false
+  bulkConfirmationSignature.value = ''
+}
+
+function closeBulkAddDialog() {
+  showBulkAddDialog.value = false
+  bulkInput.value = ''
+  bulkValidationResult.value = null
+  bulkValidationError.value = ''
+  bulkRequiresConfirmation.value = false
+  bulkConfirmationSignature.value = ''
 }
 
 async function loadPackagesForCurrentDevice() {
@@ -153,6 +187,73 @@ function showPackageDetails(pkg: OpenWrtPackage | null) {
 function closePackageDetail() {
   showPackageDetail.value = false
   selectedPackageDetail.value = null
+}
+
+function validateBulkPackages(): { found: string[]; missing: string[] } | null {
+  bulkValidationError.value = ''
+  const names = bulkInput.value
+    .split(/\s+/)
+    .map(name => name.trim())
+    .filter(Boolean)
+
+  if (names.length === 0) {
+    bulkValidationResult.value = null
+    bulkValidationError.value = translate('package-manager-bulk-empty', 'Please enter at least one package name')
+    bulkConfirmationSignature.value = ''
+    bulkRequiresConfirmation.value = false
+    return null
+  }
+
+  const uniqueNames = Array.from(new Set(names))
+  const availablePackages = new Set(packageStore.allPackages.map(pkg => pkg.name))
+  const signature = uniqueNames.join('|')
+
+  if (signature !== bulkConfirmationSignature.value) {
+    bulkRequiresConfirmation.value = false
+  }
+  bulkConfirmationSignature.value = signature
+
+  const found = uniqueNames.filter(name => availablePackages.has(name))
+  const missing = uniqueNames.filter(name => !availablePackages.has(name))
+
+  bulkValidationResult.value = { found, missing }
+
+  if (found.length === 0) {
+    bulkValidationError.value = translate('package-manager-bulk-none-valid', 'None of the entered packages exist in the current feed list')
+    return null
+  }
+
+  return { found, missing }
+}
+
+function applyBulkAdd(packages: string[]) {
+  packages.forEach(pkgName => {
+    if (packageStore.isPackageInDefaults(pkgName)) {
+      packageStore.removeRemovedPackage(pkgName)
+    } else {
+      packageStore.addPackage(pkgName)
+    }
+  })
+  closeBulkAddDialog()
+}
+
+function submitBulkAdd() {
+  const result = validateBulkPackages()
+
+  if (!result) {
+    return
+  }
+
+  const { found, missing } = result
+
+  if (missing.length > 0 && !bulkRequiresConfirmation.value) {
+    bulkRequiresConfirmation.value = true
+    return
+  }
+
+  applyBulkAdd(found)
+  bulkRequiresConfirmation.value = false
+  bulkConfirmationSignature.value = ''
 }
 
 
@@ -219,6 +320,16 @@ function getPackageBackgroundClass(packageName: string): string {
       <v-icon icon="mdi-package-variant" class="mr-2" />
       {{ i18n.t('package-manager-title', 'Package Manager') }}
       <v-spacer />
+      <v-btn
+        color="primary"
+        variant="tonal"
+        prepend-icon="mdi-playlist-plus"
+        class="mr-2"
+        @click="openBulkAddDialog"
+        :disabled="!firmwareStore.selectedDevice"
+      >
+        {{ i18n.t('package-manager-bulk-open', 'Batch Add Packages') }}
+      </v-btn>
       <v-btn
         color="primary"
         prepend-icon="mdi-plus"
@@ -569,6 +680,116 @@ function getPackageBackgroundClass(packageName: string): string {
 
       </v-card>
     </v-dialog>
+
+    <!-- Bulk Add Dialog -->
+    <v-dialog v-model="showBulkAddDialog" max-width="1000px" scrollable>
+      <v-card>
+        <v-card-title class="d-flex align-center">
+          <v-icon icon="mdi-playlist-plus" class="mr-2" />
+          {{ i18n.t('package-manager-bulk-title', 'Batch Add Packages') }}
+          <v-spacer />
+          <v-btn
+            icon="mdi-close"
+            variant="text"
+            size="small"
+            @click="closeBulkAddDialog"
+          />
+        </v-card-title>
+
+        <v-card-text>
+          <v-alert
+            variant="tonal"
+            color="info"
+            class="mb-4"
+            :icon="false"
+          >
+            <div class="d-flex align-center">
+              <v-icon icon="mdi-information-outline" size="small" class="mr-2" />
+              <span class="text-body-2">
+                {{ i18n.t('package-manager-bulk-hint', 'Enter package names separated by spaces to add them all at once') }}
+              </span>
+            </div>
+          </v-alert>
+
+          <v-textarea
+            v-model="bulkInput"
+            :label="i18n.t('package-manager-bulk-input-label', 'Package names')"
+            :placeholder="i18n.t('package-manager-bulk-input-placeholder', 'e.g. luci nano openssh-sftp-server')"
+            auto-grow
+            rows="3"
+            variant="outlined"
+            clearable
+            class="mb-4"
+          />
+
+          <v-alert
+            v-if="bulkValidationError"
+            type="error"
+            class="mb-4"
+          >
+            {{ bulkValidationError }}
+          </v-alert>
+
+          <div v-if="bulkValidationResult">
+            <div class="d-flex align-center mb-3">
+              <v-chip
+                color="primary"
+                variant="tonal"
+                size="small"
+                class="mr-2"
+              >
+                {{ translate('package-manager-bulk-found-count', 'Existing: {count}', { count: String(bulkValidationResult.found.length) }) }}
+              </v-chip>
+              <v-chip
+                v-if="bulkValidationResult.missing.length"
+                color="error"
+                variant="tonal"
+                size="small"
+              >
+                {{ translate('package-manager-bulk-missing-count', 'Missing: {count}', { count: String(bulkValidationResult.missing.length) }) }}
+              </v-chip>
+            </div>
+
+            <v-alert
+              v-if="bulkValidationResult.found.length"
+              type="success"
+              class="mb-4"
+              :title="i18n.t('package-manager-bulk-found-title', 'Available packages')"
+            >
+              {{ bulkValidationResult.found.join(', ') }}
+            </v-alert>
+
+          <v-alert
+            v-if="bulkValidationResult.missing.length"
+            type="warning"
+            class="mb-4"
+            :title="i18n.t('package-manager-bulk-missing-title', 'Unavailable packages')"
+          >
+            {{ bulkValidationResult.missing.join(', ') }}
+            <div
+              v-if="bulkRequiresConfirmation"
+              class="mt-2 text-body-2"
+            >
+              {{ i18n.t('package-manager-bulk-missing-notice', 'Click "Add" again to continue. Missing packages will be ignored.') }}
+            </div>
+          </v-alert>
+        </div>
+      </v-card-text>
+
+      <v-card-actions class="justify-end">
+        <v-btn variant="text" @click="closeBulkAddDialog">
+          {{ i18n.t('common-cancel', 'Cancel') }}
+        </v-btn>
+        <v-btn
+          color="primary"
+          @click="submitBulkAdd"
+          :disabled="!bulkInput.trim()"
+        >
+          {{ i18n.t('package-manager-bulk-add', 'Add') }}
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 
     <!-- Package Detail Dialog -->
     <PackageDetailDialog 
