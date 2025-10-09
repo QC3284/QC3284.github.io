@@ -2,12 +2,14 @@
 import { ref, computed } from 'vue'
 import { useI18nStore } from '@/stores/i18n'
 import { useFirmwareStore } from '@/stores/firmware'
+import { useCustomBuildStore } from '@/stores/customBuild'
 import DownloadSection from './DownloadSection.vue'
 import CustomBuild from './CustomBuild.vue'
 import type { AsuBuildResponse } from '@/services/asu'
 
 const i18n = useI18nStore()
 const firmware = useFirmwareStore()
+const customBuildStore = useCustomBuildStore()
 
 // Build state management
 const isBuilding = ref(false)
@@ -153,7 +155,7 @@ function onBuildReset() {
 
   <!-- Download Section -->
   <DownloadSection 
-    v-if="firmware.selectedProfile && !isBuilding" 
+    v-if="firmware.selectedProfile && !isBuilding && !customBuildStore.hasCustomData" 
     :build-result="buildResult"
     class="mt-8"
   />

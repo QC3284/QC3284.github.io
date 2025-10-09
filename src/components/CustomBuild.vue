@@ -50,6 +50,14 @@ const repositoryKeys = computed<string[]>({
   set: (value) => customBuildStore.setRepositoryKeys(value)
 })
 
+const expandedPanels = ref<number[]>([])
+
+watch(() => customBuildStore.hasCustomData, (hasData, previous) => {
+  if (hasData && expandedPanels.value.length === 0 && !previous) {
+    expandedPanels.value = [0]
+  }
+}, { immediate: true })
+
 // Build state
 const buildStatus = ref<AsuBuildResponse | null>(null)
 const isBuilding = ref(false)
@@ -486,7 +494,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <v-expansion-panels v-if="isAsuAvailable">
+  <v-expansion-panels v-if="isAsuAvailable" v-model="expandedPanels">
     <v-expansion-panel>
       <v-expansion-panel-title>
         <div class="d-flex align-center">

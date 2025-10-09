@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { usePackageStore } from './package'
 import type { OpenWrtPackage } from '@/types/package'
 
@@ -131,11 +131,24 @@ export const useCustomBuildStore = defineStore('customBuild', () => {
     repositoryKeys.value = [...normalized.repositoryKeys]
   }
 
+  const hasCustomData = computed(() => {
+    const snapshot = getSnapshot()
+    return Boolean(
+      snapshot.uciDefaults && snapshot.uciDefaults.length > 0 ||
+      snapshot.rootfsSizeMb !== undefined ||
+      snapshot.repositories.length > 0 ||
+      snapshot.repositoryKeys.length > 0 ||
+      snapshot.packageConfiguration.addedPackages.length > 0 ||
+      snapshot.packageConfiguration.removedPackages.length > 0
+    )
+  })
+
   return {
     uciDefaults,
     rootfsSizeMb,
     repositories,
     repositoryKeys,
+    hasCustomData,
     setUciDefaults,
     setRootfsSize,
     setRepositories,
