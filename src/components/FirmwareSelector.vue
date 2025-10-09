@@ -138,9 +138,10 @@ const sortedVersions = computed(() => {
       <v-col cols="12" class="text-center">
         <div class="text-body-2 text-medium-emphasis">
           <a 
-            href="https://downloads.openwrt.org" 
+            :href="config.image_url"
             class="text-decoration-none"
             target="_blank"
+            rel="noopener"
           >
             {{ i18n.t('tr-server-link', '所有文件') }}
           </a>
