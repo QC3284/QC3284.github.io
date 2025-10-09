@@ -316,28 +316,30 @@ function getPackageBackgroundClass(packageName: string): string {
 
 <template>
   <v-card>
-    <v-card-title class="d-flex align-center">
+    <v-card-title class="package-manager-title d-flex align-center flex-wrap">
       <v-icon icon="mdi-package-variant" class="mr-2" />
       {{ i18n.t('package-manager-title', 'Package Manager') }}
-      <v-spacer />
-      <v-btn
-        color="primary"
-        variant="tonal"
-        prepend-icon="mdi-playlist-plus"
-        class="mr-2"
-        @click="openBulkAddDialog"
-        :disabled="!firmwareStore.selectedDevice"
-      >
-        {{ i18n.t('package-manager-bulk-open', 'Batch Add Packages') }}
-      </v-btn>
-      <v-btn
-        color="primary"
-        prepend-icon="mdi-plus"
-        @click="openAddDialog"
-        :disabled="!firmwareStore.selectedDevice"
-      >
-        {{ i18n.t('package-manager-add', 'Add Packages') }}
-      </v-btn>
+      <div class="package-manager-actions d-flex">
+        <v-btn
+          color="primary"
+          variant="tonal"
+          prepend-icon="mdi-playlist-plus"
+          class="package-action-btn"
+          @click="openBulkAddDialog"
+          :disabled="!firmwareStore.selectedDevice"
+        >
+          {{ i18n.t('package-manager-bulk-open', 'Batch Add Packages') }}
+        </v-btn>
+        <v-btn
+          color="primary"
+          prepend-icon="mdi-plus"
+          class="package-action-btn"
+          @click="openAddDialog"
+          :disabled="!firmwareStore.selectedDevice"
+        >
+          {{ i18n.t('package-manager-add', 'Add Packages') }}
+        </v-btn>
+      </div>
     </v-card-title>
 
     <v-card-text>
@@ -800,6 +802,40 @@ function getPackageBackgroundClass(packageName: string): string {
 </template>
 
 <style scoped>
+.package-manager-title {
+  gap: 8px;
+}
+
+.package-manager-actions {
+  margin-left: auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+
+.package-manager-actions .package-action-btn {
+  flex: 0 0 auto;
+  min-width: 0;
+  min-height: 44px;
+}
+
+@media (max-width: 600px) {
+  .package-manager-actions {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 8px;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .package-manager-actions .package-action-btn {
+    flex: 1 1 100%;
+  }
+}
+
 .bg-primary-container {
   background-color: rgba(var(--v-theme-primary), 0.1);
 }
