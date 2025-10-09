@@ -88,7 +88,7 @@ const sortedVersions = computed(() => {
           {{ i18n.t('tr-load', 'Download OpenWrt firmware for your device').replace('OpenWrt', config.brand_name) }}
         </h1>
         <p class="text-body-1 text-medium-emphasis">
-          {{ i18n.t('tr-message', '输入设备的名称或型号，然后选择一个稳定或快照版本。') }}
+          {{ i18n.t('tr-message', 'Type the name or model of your device, then select a stable build or the nightly "snapshot" build.') }}
         </p>
       </v-col>
     </v-row>
@@ -102,17 +102,17 @@ const sortedVersions = computed(() => {
         <v-select
           v-model="firmware.currentVersion"
           :items="sortedVersions"
-          :label="i18n.t('tr-version', '版本')"
+          :label="i18n.t('tr-version', 'Version')"
           variant="outlined"
           density="comfortable"
           :loading="firmware.isLoadingVersions"
         >
           <template #item="{ item, props }">
-            <v-list-item v-bind="props" :title="item.raw === 'latest' ? i18n.t('tr-latest-releases', '最新') : item.raw">
+            <v-list-item v-bind="props" :title="item.raw === 'latest' ? i18n.t('tr-latest-releases', 'Latest') : item.raw">
             </v-list-item>
           </template>
           <template #selection="{ item }">
-            {{ item.raw === 'latest' ? i18n.t('tr-latest-releases', '最新') : item.raw }}
+            {{ item.raw === 'latest' ? i18n.t('tr-latest-releases', 'Latest') : item.raw }}
           </template>
         </v-select>
       </v-col>
@@ -125,7 +125,7 @@ const sortedVersions = computed(() => {
       variant="tonal"
       class="mb-6"
     >
-      {{ i18n.t('tr-not-found', '未找到型号！') }}
+      {{ i18n.t('tr-not-found', 'No model found!') }}
     </v-alert>
 
     <!-- Device Details -->
@@ -143,7 +143,7 @@ const sortedVersions = computed(() => {
             target="_blank"
             rel="noopener"
           >
-            {{ i18n.t('tr-server-link', '所有文件') }}
+            {{ i18n.t('tr-server-link', 'All Downloads') }}
           </a>
           |
           <a 
@@ -151,7 +151,7 @@ const sortedVersions = computed(() => {
             class="text-decoration-none"
             target="_blank"
           >
-            {{ i18n.t('tr-feedback-link', '反馈') }}
+            {{ i18n.t('tr-feedback-link', 'Feedback') }}
           </a>
           |
           <a 

@@ -1,6 +1,7 @@
 // Configuration management service for import/export
 
 import * as YAML from 'js-yaml'
+import { useI18nStore } from '@/stores/i18n'
 import type { 
   SavedConfiguration, 
   ConfigurationSummary, 
@@ -8,10 +9,32 @@ import type {
   ExportOptions 
 } from '@/types/config'
 
+function translate(key: string, fallback: string, replacements?: Record<string, string>): string {
+  try {
+    const store = useI18nStore()
+    let text = store?.t(key, fallback) ?? fallback
+    if (replacements) {
+      for (const [token, value] of Object.entries(replacements)) {
+        text = text.replace(new RegExp(`{${token}}`, 'g'), value)
+      }
+    }
+    return text
+  } catch {
+    return fallback
+  }
+}
+
 export class ConfigurationManager {
   private readonly STORAGE_KEY = 'openwrt-configs'
   private readonly LAST_CONFIG_KEY = 'openwrt-last-config'
   private readonly CURRENT_VERSION = '1.0.0'
+
+  private formatUnknownError(error: unknown): string {
+    if (error instanceof Error && error.message) {
+      return error.message
+    }
+    return translate('config-manager-error-unknown', 'Unknown error')
+  }
 
   /**
    * Save configuration to localStorage
@@ -60,7 +83,7 @@ export class ConfigurationManager {
     try {
       const configs = this.getAllConfigurations()
       return configs
-        .filter(config => config.customBuild.packageConfiguration) // 忽略旧格式配置
+        .filter(config => config.customBuild.packageConfiguration) // Ignore legacy configuration format
         .map(config => ({
           id: config.id,
           name: config.name,
@@ -191,7 +214,11 @@ export class ConfigurationManager {
       if (!validation.isValid) {
         return {
           success: false,
-          message: `配置文件格式错误: ${validation.errors.join(', ')}`
+          message: translate(
+            'config-manager-parse-invalid',
+            'Configuration format error: {details}',
+            { details: validation.errors.join(', ') }
+          )
         }
       }
 
@@ -207,19 +234,29 @@ export class ConfigurationManager {
       // Check for compatibility issues
       const warnings: string[] = []
       if (data.version && data.version !== this.CURRENT_VERSION) {
-        warnings.push(`配置版本 ${data.version} 可能与当前系统不完全兼容`)
+        warnings.push(
+          translate(
+            'config-manager-version-warning',
+            'Configuration version {version} may not be fully compatible with this system',
+            { version: String(data.version) }
+          )
+        )
       }
 
       return {
         success: true,
-        message: '配置导入成功',
+        message: translate('config-manager-import-success', 'Configuration imported successfully'),
         config,
         warnings: warnings.length > 0 ? warnings : undefined
       }
     } catch (error) {
       return {
         success: false,
-        message: `配置解析失败: ${error instanceof Error ? error.message : '未知错误'}`
+        message: translate(
+          'config-manager-parse-failed',
+          'Failed to parse configuration: {message}',
+          { message: this.formatUnknownError(error) }
+        )
       }
     }
   }
@@ -282,53 +319,57 @@ export class ConfigurationManager {
     const errors: string[] = []
 
     if (!data || typeof data !== 'object') {
-      errors.push('无效的配置文件格式')
+      errors.push(translate('config-manager-error-invalid-format', 'Invalid configuration file format'))
       return { isValid: false, errors }
     }
 
     // Check required fields
     if (!data.name || typeof data.name !== 'string') {
-      errors.push('缺少配置名称')
+      errors.push(translate('config-manager-error-missing-name', 'Missing configuration name'))
     }
 
     if (!data.device || typeof data.device !== 'object') {
-      errors.push('缺少设备配置')
+      errors.push(translate('config-manager-error-missing-device', 'Missing device configuration'))
     } else {
       // Profile is derived from target + model; do not require it here
       const required = ['model', 'target', 'version']
       for (const field of required) {
         if (!data.device[field]) {
-          errors.push(`缺少设备配置字段: ${field}`)
+          errors.push(
+            translate('config-manager-error-missing-device-field', 'Missing device configuration field: {field}', {
+              field
+            })
+          )
         }
       }
     }
 
     if (!data.customBuild || typeof data.customBuild !== 'object') {
-      errors.push('缺少自定义构建配置')
+      errors.push(translate('config-manager-error-missing-custom-build', 'Missing custom build configuration'))
     } else {
       // Expect new packageConfiguration shape with added/removed arrays
       const pc = data.customBuild.packageConfiguration
       if (!pc || typeof pc !== 'object' || !Array.isArray(pc.addedPackages) || !Array.isArray(pc.removedPackages)) {
-        errors.push('软件包配置格式错误')
+        errors.push(translate('config-manager-error-packages-format', 'Invalid package configuration format'))
       }
       if (!Array.isArray(data.customBuild.repositories)) {
-        errors.push('仓库配置格式错误')
+        errors.push(translate('config-manager-error-repos-format', 'Invalid repository configuration format'))
       }
       if (!Array.isArray(data.customBuild.repositoryKeys)) {
-        errors.push('仓库密钥配置格式错误')
+        errors.push(translate('config-manager-error-keys-format', 'Invalid repository keys configuration format'))
       }
     }
 
     // Modules are optional; validate only if provided
     if (data.modules !== undefined) {
       if (!data.modules || typeof data.modules !== 'object') {
-        errors.push('模块配置格式错误')
+        errors.push(translate('config-manager-error-modules-format', 'Invalid module configuration format'))
       } else {
         if (!Array.isArray(data.modules.sources)) {
-          errors.push('模块源配置格式错误')
+          errors.push(translate('config-manager-error-module-sources-format', 'Invalid module source configuration format'))
         }
         if (!Array.isArray(data.modules.selections)) {
-          errors.push('模块选择配置格式错误')
+          errors.push(translate('config-manager-error-module-selection-format', 'Invalid module selection configuration format'))
         }
       }
     }

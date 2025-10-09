@@ -76,7 +76,7 @@ export const useConfigStore = defineStore('config', () => {
     try {
       savedConfigurations.value = configManager.getConfigurationSummaries()
     } catch (err) {
-      error.value = translate('config-error-load-list', '加载配置列表失败')
+      error.value = translate('config-error-load-list', 'Failed to load configuration list')
       console.error(err)
     }
   }
@@ -99,7 +99,7 @@ export const useConfigStore = defineStore('config', () => {
     options?: { forShare?: boolean }
   ): SavedConfiguration {
     if (!firmwareStore.selectedDevice || !firmwareStore.selectedProfile) {
-      throw new Error(translate('config-error-select-device', '请先选择设备'))
+      throw new Error(translate('config-error-select-device', 'Please select a device first'))
     }
 
     const useExistingId = !options?.forShare && currentConfigId.value
@@ -151,7 +151,7 @@ export const useConfigStore = defineStore('config', () => {
 
   async function saveCurrentConfiguration(name: string, description?: string): Promise<boolean> {
     if (!firmwareStore.selectedDevice || !firmwareStore.selectedProfile) {
-      error.value = translate('config-error-select-device', '请先选择设备')
+      error.value = translate('config-error-select-device', 'Please select a device first')
       return false
     }
 
@@ -168,11 +168,11 @@ export const useConfigStore = defineStore('config', () => {
         loadSavedConfigurations()
         return true
       } else {
-        error.value = translate('config-error-save', '保存配置失败')
+        error.value = translate('config-error-save', 'Failed to save configuration')
         return false
       }
     } catch (err) {
-      error.value = translate('config-error-save-generic', '保存配置时出错')
+      error.value = translate('config-error-save-generic', 'An error occurred while saving the configuration')
       console.error(err)
       return false
     } finally {
@@ -192,13 +192,13 @@ export const useConfigStore = defineStore('config', () => {
     )
 
     if (!devicesLoaded) {
-      error.value = translate('config-error-device-list', '设备列表加载失败，请重试')
+      error.value = translate('config-error-device-list', 'Failed to load device list, please try again')
       return false
     }
 
     const device = firmwareStore.devices[savedConfig.device.model]
     if (!device) {
-      error.value = translate('config-error-device-missing', '未找到设备: {model}，可能版本不匹配或设备已下线', {
+      error.value = translate('config-error-device-missing', 'Device not found: {model}. It may be incompatible or offline', {
         model: savedConfig.device.model
       })
       return false
@@ -265,7 +265,7 @@ export const useConfigStore = defineStore('config', () => {
 
     if (options?.markAsShared) {
       currentConfigId.value = ''
-      currentConfigName.value = savedConfig.name || translate('config-shared', '共享配置')
+      currentConfigName.value = savedConfig.name || translate('config-shared', 'Shared Configuration')
     } else {
       currentConfigId.value = savedConfig.id
       currentConfigName.value = savedConfig.name
@@ -282,13 +282,13 @@ export const useConfigStore = defineStore('config', () => {
     try {
       const savedConfig = configManager.loadConfiguration(id)
       if (!savedConfig) {
-        error.value = translate('config-error-missing', '配置不存在')
+        error.value = translate('config-error-missing', 'Configuration not found')
         return false
       }
       const success = await applyConfigurationState(savedConfig)
       return success
     } catch (err) {
-      error.value = translate('config-error-load', '加载配置失败')
+      error.value = translate('config-error-load', 'Failed to load configuration')
       console.error(err)
       return false
     } finally {
@@ -303,14 +303,14 @@ export const useConfigStore = defineStore('config', () => {
     try {
       const sharedConfig = decodeConfigurationFromUrl(encoded)
       if (!sharedConfig) {
-        error.value = translate('config-error-shared-invalid', '链接中的配置无效或已过期')
+        error.value = translate('config-error-shared-invalid', 'The configuration in the link is invalid or has expired')
         return false
       }
 
       const success = await applyConfigurationState(sharedConfig, { markAsShared: true })
       return success
     } catch (err) {
-      error.value = translate('config-error-load-shared', '加载共享配置失败')
+      error.value = translate('config-error-load-shared', 'Failed to load shared configuration')
       console.error(err)
       return false
     } finally {
@@ -322,13 +322,13 @@ export const useConfigStore = defineStore('config', () => {
     try {
       const name = currentConfigName.value
         || firmwareStore.selectedDevice?.title
-        || translate('config-shared', '共享配置')
+        || translate('config-shared', 'Shared Configuration')
 
       const snapshot = buildConfigurationData(name, undefined, { forShare: true })
       const encoded = encodeConfigurationForUrl(snapshot)
       return { success: true as const, value: encoded }
     } catch (err) {
-      const message = err instanceof Error ? err.message : translate('config-error-share-generate', '生成共享配置失败')
+      const message = err instanceof Error ? err.message : translate('config-error-share-generate', 'Failed to generate shared configuration')
       error.value = message
       return { success: false as const, message }
     }
@@ -353,7 +353,7 @@ export const useConfigStore = defineStore('config', () => {
       }
       return success
     } catch (err) {
-      error.value = translate('config-error-delete', '删除配置失败')
+      error.value = translate('config-error-delete', 'Failed to delete configuration')
       console.error(err)
       return false
     }
@@ -365,10 +365,10 @@ export const useConfigStore = defineStore('config', () => {
       if (config) {
         configManager.downloadConfiguration(config, options)
       } else {
-        error.value = translate('config-error-missing', '配置不存在')
+        error.value = translate('config-error-missing', 'Configuration not found')
       }
     } catch (err) {
-      error.value = translate('config-error-export', '导出配置失败')
+      error.value = translate('config-error-export', 'Failed to export configuration')
       console.error(err)
     }
   }
@@ -385,7 +385,7 @@ export const useConfigStore = defineStore('config', () => {
     } catch {
       return {
         success: false,
-        message: translate('config-error-import', '导入配置失败')
+        message: translate('config-error-import', 'Failed to import configuration')
       }
     }
   }

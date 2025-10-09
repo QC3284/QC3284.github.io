@@ -6,6 +6,16 @@ import type { ModuleSource, ModuleSelection, Module } from '@/types/module'
 import { githubService } from '@/services/github'
 import { moduleParserService } from '@/services/moduleParser'
 import { moduleValidationService } from '@/services/moduleValidation'
+import { useI18nStore } from '@/stores/i18n'
+
+function translate(key: string, fallback: string): string {
+  try {
+    const store = useI18nStore()
+    return store?.t(key, fallback) ?? fallback
+  } catch {
+    return fallback
+  }
+}
 
 export const useModuleStore = defineStore('module', () => {
   // State
@@ -200,7 +210,10 @@ export const useModuleStore = defineStore('module', () => {
     const module = source?.modules.find(m => m.id === moduleId)
     
     if (!selection || !module) {
-      return { isValid: false, errors: ['模块选择不存在'] }
+      return {
+        isValid: false,
+        errors: [translate('module-selection-missing', 'Module selection does not exist')]
+      }
     }
 
     const errors: string[] = []

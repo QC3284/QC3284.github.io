@@ -235,7 +235,7 @@ onBeforeUnmount(() => {
     <v-text-field
       ref="inputRef"
       v-model="searchInput"
-      :label="i18n.t('tr-model', '型号')"
+      :label="i18n.t('tr-model', 'Model')"
       variant="outlined"
       density="comfortable"
       :loading="firmware.isLoadingDevices"

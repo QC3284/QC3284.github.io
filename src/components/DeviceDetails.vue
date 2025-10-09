@@ -71,28 +71,28 @@ function onBuildReset() {
 <template>
   <v-card v-if="firmware.selectedProfile" class="mb-6">
     <v-card-title class="bg-primary text-white">
-      {{ i18n.t('tr-version-build', '关于此构建') }}
+      {{ i18n.t('tr-version-build', 'About this build') }}
     </v-card-title>
     
     <v-card-text class="pa-6">
       <v-row dense>
         <v-col cols="12" sm="6" md="4">
           <div class="text-subtitle2 text-medium-emphasis mb-1">
-            {{ i18n.t('tr-model', '型号') }}
+            {{ i18n.t('tr-model', 'Model') }}
           </div>
           <div class="text-body-1">{{ deviceTitles }}</div>
         </v-col>
         
         <v-col cols="12" sm="6" md="4">
           <div class="text-subtitle2 text-medium-emphasis mb-1">
-            {{ i18n.t('tr-target', '平台') }}
+            {{ i18n.t('tr-target', 'Platform') }}
           </div>
           <div class="text-body-1">{{ firmware.selectedDevice?.target }}</div>
         </v-col>
         
         <v-col cols="12" sm="6" md="4">
           <div class="text-subtitle2 text-medium-emphasis mb-1">
-            {{ i18n.t('tr-version', '版本') }}
+            {{ i18n.t('tr-version', 'Version') }}
           </div>
           <div class="text-body-1">
             {{ firmware.selectedProfile.version_number }} 
@@ -104,7 +104,7 @@ function onBuildReset() {
       <v-row class="mt-4" dense>
         <v-col cols="12">
           <div class="text-subtitle2 text-medium-emphasis mb-2">
-            {{ i18n.t('tr-links', '链接') }}
+            {{ i18n.t('tr-links', 'Links') }}
           </div>
           <div class="d-flex flex-wrap">
             <v-btn
@@ -115,7 +115,7 @@ function onBuildReset() {
               prepend-icon="mdi-folder-open"
               class="mr-3"
             >
-              {{ i18n.t('device-link-folder', '文件夹') }}
+              {{ i18n.t('device-link-folder', 'Folder') }}
             </v-btn>
             
             <v-btn
@@ -126,7 +126,7 @@ function onBuildReset() {
               prepend-icon="mdi-information"
               class="mr-3"
             >
-              {{ i18n.t('device-link-info', '信息') }}
+              {{ i18n.t('device-link-info', 'Info') }}
             </v-btn>
             
             <v-btn
@@ -135,7 +135,7 @@ function onBuildReset() {
               size="small"
               prepend-icon="mdi-link"
             >
-              {{ i18n.t('device-link-direct', '链接') }}
+              {{ i18n.t('device-link-direct', 'Link') }}
             </v-btn>
           </div>
         </v-col>

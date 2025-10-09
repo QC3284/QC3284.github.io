@@ -4,10 +4,34 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { packageManager } from '@/services/packageManager'
 import { useFirmwareStore } from '@/stores/firmware'
+import { useI18nStore } from '@/stores/i18n'
 import type { OpenWrtPackage, PackageFeed, PackageSearchFilter } from '@/types/package'
+
+function translate(key: string, fallback: string, replacements?: Record<string, string>): string {
+  try {
+    const store = useI18nStore()
+    let text = store?.t(key, fallback) ?? fallback
+    if (replacements) {
+      for (const [token, value] of Object.entries(replacements)) {
+        text = text.replace(new RegExp(`{${token}}`, 'g'), value)
+      }
+    }
+    return text
+  } catch {
+    return fallback
+  }
+}
 
 export const usePackageStore = defineStore('package', () => {
   const firmwareStore = useFirmwareStore()
+  const UNKNOWN_ERROR = () => translate('package-error-unknown', 'Unknown error')
+
+  function formatError(err: unknown): string {
+    if (err instanceof Error && err.message) {
+      return err.message
+    }
+    return UNKNOWN_ERROR()
+  }
   // State
   const feeds = ref<PackageFeed[]>([])
   const selectedPackages = ref<Set<string>>(new Set())
@@ -120,14 +144,20 @@ export const usePackageStore = defineStore('package', () => {
           feed.isLoading = false
         } catch (err) {
           console.error(`Failed to load ${feed.name} feed:`, err)
-          feed.error = `加载失败: ${err instanceof Error ? err.message : '未知错误'}`
+          const message = formatError(err)
+          feed.error = translate('package-error-feed', 'Failed to load feed: {message}', {
+            message
+          })
           feed.isLoading = false
         }
       })
 
       await Promise.all(loadPromises)
     } catch (err) {
-      error.value = `加载软件包列表失败: ${err instanceof Error ? err.message : '未知错误'}`
+      const message = formatError(err)
+      error.value = translate('package-error-list', 'Failed to load package list: {message}', {
+        message
+      })
     } finally {
       isLoading.value = false
     }
@@ -246,22 +276,22 @@ export const usePackageStore = defineStore('package', () => {
   function setSelectedPackages(packages: string[]): void {
     const defaultPackages = firmwareStore.selectedProfile?.default_packages || []
     
-    // 只将非默认包添加到 selectedPackages
+    // Only include non-default packages in selectedPackages
     selectedPackages.value = new Set(packages.filter(pkg => 
       !pkg.startsWith('-') && !defaultPackages.includes(pkg)
     ))
     
-    // 处理被移除的默认包
+    // Handle default packages that were removed
     removedPackages.value = new Set(packages.filter(pkg => pkg.startsWith('-')).map(pkg => pkg.substring(1)))
   }
 
-  // 新增：设置用户包配置（更清晰的API）
+  // Added: set user package configuration (clearer API)
   function setPackageConfiguration(config: { addedPackages: string[]; removedPackages: string[] }): void {
     selectedPackages.value = new Set(config.addedPackages)
     removedPackages.value = new Set(config.removedPackages)
   }
 
-  // 新增：获取用户包配置（用于导出）
+  // Added: get user package configuration (used for export)
   function getPackageConfiguration(): { addedPackages: string[]; removedPackages: string[] } {
     return {
       addedPackages: Array.from(selectedPackages.value),

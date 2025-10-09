@@ -167,14 +167,14 @@ watch(() => i18nStore.currentLanguage, () => {
           <template #prepend>
             <v-icon icon="mdi-information" />
           </template>
-          {{ i18nStore.t('config-current', '当前配置') }}: <strong>{{ configStore.currentConfigName }}</strong>
+          {{ i18nStore.t('config-current', 'Current configuration') }}: <strong>{{ configStore.currentConfigName }}</strong>
           <template #append>
             <v-btn
               size="small"
               variant="text"
               @click="configStore.newConfiguration"
             >
-              {{ i18nStore.t('config-new', '新建配置') }}
+              {{ i18nStore.t('config-new', 'New configuration') }}
             </v-btn>
           </template>
         </v-alert>

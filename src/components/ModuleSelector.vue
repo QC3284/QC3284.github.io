@@ -123,14 +123,14 @@ function getCategoryIcon(category: string): string {
 
 function getCategoryName(category: string): string {
   const names: { [key: string]: string } = {
-    network: '网络',
-    system: '系统',
-    applications: '应用',
-    security: '安全',
-    storage: '存储',
-    multimedia: '多媒体',
-    development: '开发',
-    uncategorized: '未分类'
+    network: 'Network',
+    system: 'System',
+    applications: 'Applications',
+    security: 'Security',
+    storage: 'Storage',
+    multimedia: 'Multimedia',
+    development: 'Development',
+    uncategorized: 'Uncategorized'
   }
   const fallback = names[category] || category
   return i18n.t(`module-category-${category}`, fallback)
@@ -174,18 +174,18 @@ function getModuleNameByKey(moduleKey: string): string {
   <v-card>
     <v-card-title class="d-flex align-center">
       <v-icon icon="mdi-puzzle" class="mr-2" />
-      {{ i18n.t('module-selector-title', '模块选择') }}
+      {{ i18n.t('module-selector-title', 'Module Selection') }}
       <v-spacer />
       <div v-if="selectedCount > 0" class="d-flex align-center gap-2">
         <v-chip color="primary">
-          {{ translate('module-selector-selected', '已选择 {count} 个模块', { count: String(selectedCount) }) }}
+          {{ translate('module-selector-selected', 'Selected {count} modules', { count: String(selectedCount) }) }}
         </v-chip>
         <v-chip 
           v-if="!validationSummary.isValid" 
           color="error" 
           variant="outlined"
         >
-          {{ translate('module-selector-validation-errors', '{count} 个验证错误', { count: String(validationSummary.errorCount) }) }}
+          {{ translate('module-selector-validation-errors', '{count} validation errors', { count: String(validationSummary.errorCount) }) }}
         </v-chip>
         <v-chip 
           v-if="validationSummary.isValid && selectedCount > 0" 
@@ -193,7 +193,7 @@ function getModuleNameByKey(moduleKey: string): string {
           variant="outlined"
           prepend-icon="mdi-check"
         >
-          {{ i18n.t('module-selector-validation-passed', '参数验证通过') }}
+          {{ i18n.t('module-selector-validation-passed', 'Parameters validated') }}
         </v-chip>
       </div>
     </v-card-title>
@@ -210,7 +210,7 @@ function getModuleNameByKey(moduleKey: string): string {
         <template #title>
           <div class="d-flex align-center">
             <v-icon icon="mdi-alert-circle" class="mr-2" />
-            {{ translate('module-selector-validation-summary', '发现 {count} 个参数验证错误', { count: String(validationSummary.errorCount) }) }}
+            {{ translate('module-selector-validation-summary', 'Found {count} parameter validation errors', { count: String(validationSummary.errorCount) }) }}
           </div>
         </template>
         
@@ -222,15 +222,15 @@ function getModuleNameByKey(moduleKey: string): string {
             </ul>
           </div>
           <div class="text-body-2 text-medium-emphasis mt-3">
-            {{ i18n.t('module-selector-validation-hint', '点击对应模块的“配置参数”按钮进行修正') }}
+            {{ i18n.t('module-selector-validation-hint', 'Use the "Configure Parameters" button on the module to fix issues') }}
           </div>
         </div>
       </v-alert>
 
       <div v-if="moduleStore.totalModules === 0" class="text-center py-8">
         <v-icon icon="mdi-puzzle-outline" size="64" color="grey-lighten-1" />
-        <p class="text-h6 mt-4 text-grey">{{ i18n.t('module-selector-empty', '暂无可用模块') }}</p>
-        <p class="text-grey">{{ i18n.t('module-selector-empty-hint', '请先添加模块源') }}</p>
+        <p class="text-h6 mt-4 text-grey">{{ i18n.t('module-selector-empty', 'No modules available') }}</p>
+        <p class="text-grey">{{ i18n.t('module-selector-empty-hint', 'Add a module source first') }}</p>
       </div>
 
       <v-expansion-panels v-else v-model="expandedPanels" multiple>
@@ -279,7 +279,7 @@ function getModuleNameByKey(moduleKey: string): string {
                       color="error" 
                       class="mr-2"
                     >
-                      {{ i18n.t('module-selector-parameter-error', '参数错误') }}
+                      {{ i18n.t('module-selector-parameter-error', 'Parameter Error') }}
                     </v-chip>
                     <v-chip size="x-small" color="secondary">
                       v{{ module.definition.version }}
@@ -293,23 +293,23 @@ function getModuleNameByKey(moduleKey: string): string {
                       </p>
 
                       <div class="text-caption text-grey mb-2">
-                        <strong>{{ i18n.t('module-selector-author', '作者') }}:</strong> {{ getAuthorInfo(module) }}
+                        <strong>{{ i18n.t('module-selector-author', 'Author') }}:</strong> {{ getAuthorInfo(module) }}
                       </div>
 
                       <div class="text-caption text-grey mb-2">
-                        <strong>{{ i18n.t('module-selector-source', '模块源') }}:</strong> {{ source.name }}
+                        <strong>{{ i18n.t('module-selector-source', 'Module Source') }}:</strong> {{ source.name }}
                       </div>
 
                       <div class="text-caption text-grey mb-2">
-                        <strong>{{ i18n.t('module-selector-license', '许可证') }}:</strong> {{ module.definition.license }}
+                        <strong>{{ i18n.t('module-selector-license', 'License') }}:</strong> {{ module.definition.license }}
                       </div>
 
                       <div v-if="module.definition.tags?.length" class="text-caption text-grey mb-2">
-                        <strong>{{ i18n.t('module-selector-tags', '标签') }}:</strong> {{ formatTags(module.definition.tags) }}
+                        <strong>{{ i18n.t('module-selector-tags', 'Tags') }}:</strong> {{ formatTags(module.definition.tags) }}
                       </div>
 
                       <div v-if="module.definition.packages?.length" class="text-caption text-grey mb-2">
-                        <strong>{{ i18n.t('module-selector-packages', '软件包') }}:</strong> {{ module.definition.packages.join(', ') }}
+                        <strong>{{ i18n.t('module-selector-packages', 'Packages') }}:</strong> {{ module.definition.packages.join(', ') }}
                       </div>
                     </div>
 
@@ -320,7 +320,7 @@ function getModuleNameByKey(moduleKey: string): string {
                         prepend-icon="mdi-cog"
                         @click="openParameterDialog(module, source)"
                       >
-                        {{ i18n.t('module-selector-configure', '配置参数') }}
+                        {{ i18n.t('module-selector-configure', 'Configure Parameters') }}
                       </v-btn>
                     </div>
                   </v-card-text>
@@ -337,12 +337,12 @@ function getModuleNameByKey(moduleKey: string): string {
       <v-card v-if="currentModule">
         <v-card-title>
           <v-icon icon="mdi-cog" class="mr-2" />
-          {{ translate('module-selector-configure-module', '配置模块: {name}', { name: currentModule.module.definition.name }) }}
+          {{ translate('module-selector-configure-module', 'Configure Module: {name}', { name: currentModule.module.definition.name }) }}
         </v-card-title>
 
         <v-card-text>
           <div v-if="currentModule.module.definition.parameterized_files?.length">
-            <h3 class="text-h6 mb-4">{{ i18n.t('module-selector-parameter-files', '参数化文件配置') }}</h3>
+            <h3 class="text-h6 mb-4">{{ i18n.t('module-selector-parameter-files', 'Parameterized File Settings') }}</h3>
             
             <v-expansion-panels class="mb-6">
               <v-expansion-panel
@@ -388,7 +388,7 @@ function getModuleNameByKey(moduleKey: string): string {
           </div>
 
           <div v-if="currentModule.module.definition.downloads?.some(d => !d.url)">
-            <h3 class="text-h6 mb-4">{{ i18n.t('module-selector-custom-downloads', '用户自定义下载') }}</h3>
+            <h3 class="text-h6 mb-4">{{ i18n.t('module-selector-custom-downloads', 'User-defined Downloads') }}</h3>
             
             <div
               v-for="download in currentModule.module.definition.downloads.filter(d => !d.url)"
@@ -404,14 +404,14 @@ function getModuleNameByKey(moduleKey: string): string {
                   $event
                 )"
                 :label="translate('module-selector-download-label', '{name} URL', { name: download.name })"
-                :hint="translate('module-selector-download-hint', '文件将下载到: {path}', { path: download.path })"
+                :hint="translate('module-selector-download-hint', 'File will be saved to: {path}', { path: download.path })"
                 placeholder="https://example.com/file"
                 persistent-hint
                 :rules="getDownloadRules()"
               />
               
               <div v-if="download.headers?.length" class="text-caption text-grey mt-1">
-                <strong>{{ i18n.t('module-selector-request-headers', '请求头') }}:</strong> {{ download.headers.join(', ') }}
+                <strong>{{ i18n.t('module-selector-request-headers', 'Request Headers') }}:</strong> {{ download.headers.join(', ') }}
               </div>
             </div>
           </div>
@@ -419,7 +419,7 @@ function getModuleNameByKey(moduleKey: string): string {
 
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="closeParameterDialog">{{ i18n.t('common-close', '关闭') }}</v-btn>
+          <v-btn @click="closeParameterDialog">{{ i18n.t('common-close', 'Close') }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

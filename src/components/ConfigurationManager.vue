@@ -73,7 +73,7 @@ async function copyShareLink() {
   const result = configStore.getShareConfigParam()
   if (!result.success) {
     shareSnackbarColor.value = 'error'
-    shareSnackbarMessage.value = result.message || translate('config-share-generate-error', '生成共享配置失败')
+    shareSnackbarMessage.value = result.message || translate('config-share-generate-error', 'Failed to generate shared configuration')
     shareSnackbar.value = true
     return
   }
@@ -99,11 +99,11 @@ async function copyShareLink() {
       document.body.removeChild(textarea)
     }
     shareSnackbarColor.value = 'success'
-    shareSnackbarMessage.value = translate('config-share-success', '链接已复制，可以分享当前配置。')
+    shareSnackbarMessage.value = translate('config-share-success', 'Link copied. You can now share this configuration.')
   } catch (error) {
     console.error('Failed to copy share link', error)
     shareSnackbarColor.value = 'error'
-    shareSnackbarMessage.value = translate('config-share-copy-failed', '复制链接失败，请重试。')
+    shareSnackbarMessage.value = translate('config-share-copy-failed', 'Failed to copy link. Please try again.')
   } finally {
     shareSnackbar.value = true
     isCopyingShareLink.value = false
@@ -115,7 +115,7 @@ function openSaveDialog() {
     saveForm.value.name = configStore.currentConfigName
   } else {
     const date = new Intl.DateTimeFormat(getLocale()).format(new Date())
-    saveForm.value.name = translate('config-default-name', '配置 {date}', { date })
+    saveForm.value.name = translate('config-default-name', 'Configuration {date}', { date })
   }
   saveForm.value.description = ''
   showSaveDialog.value = true
@@ -160,7 +160,7 @@ async function loadConfiguration(config: ConfigurationSummary) {
 
 function deleteConfiguration(config: ConfigurationSummary, event: Event) {
   event.stopPropagation()
-  const message = translate('config-delete-confirm', '确定要删除配置"{name}"吗？', { name: config.name })
+  const message = translate('config-delete-confirm', 'Are you sure you want to delete configuration "{name}"?', { name: config.name })
   if (confirm(message)) {
     configStore.deleteConfiguration(config.id)
   }
@@ -206,7 +206,7 @@ function importConfiguration() {
     closeImportDialog()
     if (result.warnings?.length) {
       const warningText = result.warnings.join('\n')
-      alert(translate('config-import-warning', '导入成功，但有以下警告：\n{warnings}', { warnings: warningText }))
+    alert(translate('config-import-warning', 'Imported successfully, but with warnings:\n{warnings}', { warnings: warningText }))
     }
   } else {
     alert(result.message)
@@ -253,7 +253,7 @@ function formatDate(date: Date): string {
     <v-card class="mb-4">
       <v-card-title class="d-flex align-center">
         <v-icon icon="mdi-cog-box" class="mr-2" />
-        {{ i18n.t('config-manager-title', '配置管理') }}
+        {{ i18n.t('config-manager-title', 'Configuration Manager') }}
         <v-spacer />
         
         <!-- Desktop buttons -->
@@ -264,7 +264,7 @@ function formatDate(date: Date): string {
             @click="openSaveDialog"
             class="mr-3"
           >
-            {{ i18n.t('config-save', '保存配置') }}
+            {{ i18n.t('config-save', 'Save Configuration') }}
           </v-btn>
           <v-btn
             variant="outlined"
@@ -272,7 +272,7 @@ function formatDate(date: Date): string {
             @click="openLoadDialog"
             class="mr-3"
           >
-            {{ i18n.t('config-load', '加载配置') }}
+            {{ i18n.t('config-load', 'Load Configuration') }}
           </v-btn>
           <v-btn
             variant="outlined"
@@ -281,14 +281,14 @@ function formatDate(date: Date): string {
             @click="copyShareLink"
             class="mr-3"
           >
-            {{ i18n.t('config-copy-link', '复制分享链接') }}
+            {{ i18n.t('config-copy-link', 'Copy Share Link') }}
           </v-btn>
           <v-btn
             variant="outlined"
             prepend-icon="mdi-import"
             @click="openImportDialog"
           >
-            {{ i18n.t('config-import', '导入配置') }}
+            {{ i18n.t('config-import', 'Import Configuration') }}
           </v-btn>
         </div>
         
@@ -337,18 +337,18 @@ function formatDate(date: Date): string {
     <!-- Save Dialog -->
     <v-dialog v-model="showSaveDialog" max-width="500px">
       <v-card>
-        <v-card-title>{{ i18n.t('config-save', '保存配置') }}</v-card-title>
+        <v-card-title>{{ i18n.t('config-save', 'Save Configuration') }}</v-card-title>
         <v-card-text>
           <v-form>
             <v-text-field
               v-model="saveForm.name"
-              :label="i18n.t('config-name-label', '配置名称')"
+              :label="i18n.t('config-name-label', 'Configuration name')"
               required
               variant="outlined"
             />
             <v-textarea
               v-model="saveForm.description"
-              :label="i18n.t('config-description-label', '描述（可选）')"
+              :label="i18n.t('config-description-label', 'Description (optional)')"
               variant="outlined"
               rows="3"
             />
@@ -356,14 +356,14 @@ function formatDate(date: Date): string {
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="closeSaveDialog">{{ i18n.t('common-cancel', '取消') }}</v-btn>
+          <v-btn @click="closeSaveDialog">{{ i18n.t('common-cancel', 'Cancel') }}</v-btn>
           <v-btn
             color="primary"
             :loading="configStore.isLoading"
             :disabled="!saveForm.name"
             @click="saveConfiguration"
           >
-            {{ i18n.t('common-save', '保存') }}
+            {{ i18n.t('common-save', 'Save') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -372,11 +372,11 @@ function formatDate(date: Date): string {
     <!-- Load Dialog -->
     <v-dialog v-model="showLoadDialog" max-width="800px" scrollable>
       <v-card>
-        <v-card-title>{{ i18n.t('config-load', '加载配置') }}</v-card-title>
+        <v-card-title>{{ i18n.t('config-load', 'Load Configuration') }}</v-card-title>
         <v-card-text>
           <div v-if="sortedConfigurations.length === 0" class="text-center py-8">
             <v-icon icon="mdi-folder-open-outline" size="64" color="grey-lighten-1" />
-            <p class="text-h6 mt-4 text-grey">{{ i18n.t('config-none-saved', '暂无保存的配置') }}</p>
+            <p class="text-h6 mt-4 text-grey">{{ i18n.t('config-none-saved', 'No saved configurations') }}</p>
           </div>
 
           <v-list v-else lines="three">
@@ -395,15 +395,15 @@ function formatDate(date: Date): string {
 
               <v-list-item-title>{{ config.name }}</v-list-item-title>
               <v-list-item-subtitle>
-                <div>{{ config.description || i18n.t('config-no-description', '无描述') }}</div>
+                <div>{{ config.description || i18n.t('config-no-description', 'No description') }}</div>
                 <div class="text-caption">
-                  <strong>{{ i18n.t('config-device-label', '设备') }}:</strong> {{ config.deviceModel }} | 
-                  <strong>{{ i18n.t('config-version-label', '版本') }}:</strong> {{ config.version }} | 
-                  <strong>{{ i18n.t('config-module-label', '模块') }}:</strong> {{ config.moduleCount }} | 
-                  <strong>{{ i18n.t('config-package-label', '软件包') }}:</strong> {{ config.packageCount }}
+                  <strong>{{ i18n.t('config-device-label', 'Device') }}:</strong> {{ config.deviceModel }} | 
+                  <strong>{{ i18n.t('config-version-label', 'Version') }}:</strong> {{ config.version }} | 
+                  <strong>{{ i18n.t('config-module-label', 'Modules') }}:</strong> {{ config.moduleCount }} | 
+                  <strong>{{ i18n.t('config-package-label', 'Packages') }}:</strong> {{ config.packageCount }}
                 </div>
                 <div class="text-caption text-medium-emphasis">
-                  {{ i18n.t('config-updated-label', '更新时间') }}: {{ formatDate(config.updatedAt) }}
+                  {{ i18n.t('config-updated-label', 'Updated') }}: {{ formatDate(config.updatedAt) }}
                 </div>
               </v-list-item-subtitle>
 
@@ -436,14 +436,14 @@ function formatDate(date: Date): string {
         
         <v-card-actions>
           <div v-if="configStore.isLoading" class="text-body-2 text-medium-emphasis">
-            {{ i18n.t('config-loading', '正在加载配置，请稍候...') }}
+            {{ i18n.t('config-loading', 'Loading configuration, please wait...') }}
           </div>
           <v-spacer />
           <v-btn 
             @click="closeLoadDialog"
             :disabled="configStore.isLoading"
           >
-            {{ i18n.t('common-close', '关闭') }}
+            {{ i18n.t('common-close', 'Close') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -452,7 +452,7 @@ function formatDate(date: Date): string {
     <!-- Import Dialog -->
     <v-dialog v-model="showImportDialog" max-width="600px" scrollable>
       <v-card>
-        <v-card-title>{{ i18n.t('config-import', '导入配置') }}</v-card-title>
+        <v-card-title>{{ i18n.t('config-import', 'Import Configuration') }}</v-card-title>
         <v-card-text>
           <div class="mb-4">
             <v-btn
@@ -461,7 +461,7 @@ function formatDate(date: Date): string {
               @click="importFromFile"
               class="mr-2"
             >
-              {{ i18n.t('config-import-choose-file', '选择文件') }}
+              {{ i18n.t('config-import-choose-file', 'Choose File') }}
             </v-btn>
             <v-select
               v-model="importForm.format"
@@ -469,7 +469,7 @@ function formatDate(date: Date): string {
                 { title: 'JSON', value: 'json' },
                 { title: 'YAML', value: 'yaml' }
               ]"
-              :label="i18n.t('config-import-format', '格式')"
+              :label="i18n.t('config-import-format', 'Format')"
               variant="outlined"
               density="compact"
               style="max-width: 150px; display: inline-block;"
@@ -478,10 +478,10 @@ function formatDate(date: Date): string {
 
           <v-textarea
             v-model="importForm.content"
-            :label="i18n.t('config-import-content', '配置内容')"
+            :label="i18n.t('config-import-content', 'Configuration content')"
             variant="outlined"
             rows="10"
-            :placeholder="i18n.t('config-import-placeholder', '粘贴配置内容或选择文件...')"
+            :placeholder="i18n.t('config-import-placeholder', 'Paste configuration content or choose a file...')"
           />
 
           <input
@@ -494,13 +494,13 @@ function formatDate(date: Date): string {
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="closeImportDialog">{{ i18n.t('common-cancel', '取消') }}</v-btn>
+          <v-btn @click="closeImportDialog">{{ i18n.t('common-cancel', 'Cancel') }}</v-btn>
           <v-btn
             color="primary"
             :disabled="!importForm.content"
             @click="importConfiguration"
           >
-            {{ i18n.t('common-import', '导入') }}
+            {{ i18n.t('common-import', 'Import') }}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -509,7 +509,7 @@ function formatDate(date: Date): string {
     <!-- Export Dialog -->
     <v-dialog v-model="showExportDialog" max-width="500px">
       <v-card>
-        <v-card-title>{{ i18n.t('config-export', '导出配置') }}</v-card-title>
+        <v-card-title>{{ i18n.t('config-export', 'Export Configuration') }}</v-card-title>
         <v-card-text>
           <v-form>
             <v-select
@@ -518,25 +518,25 @@ function formatDate(date: Date): string {
                 { title: 'JSON', value: 'json' },
                 { title: 'YAML', value: 'yaml' }
               ]"
-              :label="i18n.t('config-export-format', '导出格式')"
+              :label="i18n.t('config-export-format', 'Export format')"
               variant="outlined"
             />
 
             <div class="mt-4">
-              <p class="text-subtitle-2 mb-2">{{ i18n.t('config-export-content', '导出内容') }}:</p>
+              <p class="text-subtitle-2 mb-2">{{ i18n.t('config-export-content', 'Export content') }}:</p>
               <v-checkbox
                 v-model="exportForm.options.includeModuleSources"
-                :label="i18n.t('config-export-include-modules', '包含模块源')"
+                :label="i18n.t('config-export-include-modules', 'Include module sources')"
                 density="compact"
               />
               <v-checkbox
                 v-model="exportForm.options.includePackages"
-                :label="i18n.t('config-export-include-packages', '包含软件包列表')"
+                :label="i18n.t('config-export-include-packages', 'Include package list')"
                 density="compact"
               />
               <v-checkbox
                 v-model="exportForm.options.includeUciDefaults"
-                :label="i18n.t('config-export-include-uci', '包含UCI默认配置')"
+                :label="i18n.t('config-export-include-uci', 'Include UCI defaults')"
                 density="compact"
               />
             </div>
@@ -544,12 +544,12 @@ function formatDate(date: Date): string {
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn @click="closeExportDialog">{{ i18n.t('common-cancel', '取消') }}</v-btn>
+          <v-btn @click="closeExportDialog">{{ i18n.t('common-cancel', 'Cancel') }}</v-btn>
           <v-btn
             color="primary"
             @click="exportConfiguration"
           >
-            {{ i18n.t('common-export', '导出') }}
+            {{ i18n.t('common-export', 'Export') }}
           </v-btn>
         </v-card-actions>
       </v-card>
