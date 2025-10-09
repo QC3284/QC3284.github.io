@@ -6,11 +6,6 @@ import DownloadSection from './DownloadSection.vue'
 import CustomBuild from './CustomBuild.vue'
 import type { AsuBuildResponse } from '@/services/asu'
 
-// Props
-const props = defineProps<{
-  customBuildRef?: any
-}>()
-
 const i18n = useI18nStore()
 const firmware = useFirmwareStore()
 
@@ -149,7 +144,6 @@ function onBuildReset() {
   <!-- Custom Build Section -->
   <CustomBuild 
     v-if="firmware.selectedProfile" 
-    :ref="props.customBuildRef"
     class="mb-8"
     @build-start="onBuildStart"
     @build-success="onBuildSuccess"

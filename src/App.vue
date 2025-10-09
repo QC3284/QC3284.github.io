@@ -3,16 +3,13 @@ import { onMounted, ref } from 'vue'
 import { useI18nStore } from '@/stores/i18n'
 import { useFirmwareStore } from '@/stores/firmware'
 import { useConfigStore } from '@/stores/config'
-import { usePackageStore } from '@/stores/package'
 import { config } from '@/config'
 import FirmwareSelector from '@/components/FirmwareSelector.vue'
 import ConfigurationManager from '@/components/ConfigurationManager.vue'
-import type { SavedConfiguration } from '@/types/config'
 
 const i18nStore = useI18nStore()
 const firmwareStore = useFirmwareStore()
 const configStore = useConfigStore()
-const packageStore = usePackageStore()
 
 const initialSharedConfigParam = typeof window !== 'undefined'
   ? new URL(window.location.href).searchParams.get('config')
@@ -25,55 +22,7 @@ if (initialSharedConfigParam) {
 // Configuration Manager state
 const showConfigManager = ref(false)
 
-// Store reference to CustomBuild component for accessing form data  
-const customBuildRef = ref<{
-  getCurrentCustomBuildConfig?: () => {
-    packageConfiguration: { addedPackages: string[]; removedPackages: string[] };
-    repositories: Array<{ name: string; url: string; }>;
-    repositoryKeys: string[];
-  };
-  applyCustomBuildConfig?: (config: {
-    packageConfiguration: { addedPackages: string[]; removedPackages: string[] };
-    repositories: Array<{ name: string; url: string; }>;
-    repositoryKeys: string[];
-  }) => void;
-} | null>(null)
-
-// Global app state management for configuration system
-function getAllAppState() {
-  // Get current CustomBuild form data if available
-  const customBuildData = customBuildRef.value?.getCurrentCustomBuildConfig?.() || {
-    // 使用新的配置结构，只保存用户的增量操作
-    packageConfiguration: packageStore.getPackageConfiguration(),
-    repositories: [],
-    repositoryKeys: []
-  }
-
-  return {
-    customBuild: customBuildData
-  }
-}
-
-function applyAppState(config: SavedConfiguration) {
-  // Apply custom build configuration directly via stores
-  if (config.customBuild) {
-    // 使用新的配置结构
-    if (config.customBuild.packageConfiguration) {
-      packageStore.setPackageConfiguration(config.customBuild.packageConfiguration)
-    }
-    
-    // If CustomBuild component is available, also apply other settings
-    if (customBuildRef.value?.applyCustomBuildConfig) {
-      customBuildRef.value.applyCustomBuildConfig(config.customBuild)
-    }
-  }
-}
-
 onMounted(async () => {
-  // Register global app state handlers for configuration system
-  configStore.setAppStateGetter(getAllAppState)
-  configStore.setAppStateApplier(applyAppState)
-
   // Initialize translation
   const lang = i18nStore.detectLanguage()
   await i18nStore.loadTranslation(lang)
@@ -220,7 +169,7 @@ onMounted(async () => {
           </template>
         </v-alert>
 
-        <FirmwareSelector :custom-build-ref="customBuildRef" />
+        <FirmwareSelector />
       </v-container>
     </v-main>
   </v-app>

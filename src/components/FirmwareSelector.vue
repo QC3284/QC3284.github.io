@@ -7,11 +7,6 @@ import { config } from '@/config'
 import DeviceSelector from './DeviceSelector.vue'
 import DeviceDetails from './DeviceDetails.vue'
 
-// Props
-const props = defineProps<{
-  customBuildRef?: any
-}>()
-
 const i18n = useI18nStore()
 const firmware = useFirmwareStore()
 const packageStore = usePackageStore()
@@ -135,8 +130,7 @@ const sortedVersions = computed(() => {
 
     <!-- Device Details -->
     <DeviceDetails 
-      v-if="firmware.selectedDevice && firmware.selectedProfile" 
-      :custom-build-ref="props.customBuildRef"
+      v-if="firmware.selectedDevice && firmware.selectedProfile"
     />
 
     <!-- Footer -->

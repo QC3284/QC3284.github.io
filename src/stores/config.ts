@@ -5,6 +5,7 @@ import { ref, computed } from 'vue'
 import { useFirmwareStore } from './firmware'
 import { useModuleStore } from './module'
 import { usePackageStore } from './package'
+import { useCustomBuildStore } from './customBuild'
 import { configManager } from '@/services/configManager'
 import { config } from '@/config'
 import { encodeConfigurationForUrl, decodeConfigurationFromUrl } from '@/services/urlConfig'
@@ -50,6 +51,7 @@ export const useConfigStore = defineStore('config', () => {
   const firmwareStore = useFirmwareStore()
   const moduleStore = useModuleStore()
   const packageStore = usePackageStore()
+  const customBuildStore = useCustomBuildStore()
 
   // Computed
   const hasCurrentConfig = computed(() => !!currentConfigId.value)
@@ -65,13 +67,6 @@ export const useConfigStore = defineStore('config', () => {
       error.value = '加载配置列表失败'
       console.error(err)
     }
-  }
-
-  // Global reference to get all current application state for configuration
-  let getAllAppState: (() => { customBuild: unknown }) | null = null
-  
-  function setAppStateGetter(getter: () => { customBuild: unknown }) {
-    getAllAppState = getter
   }
 
   function disableAutoLoad() {
@@ -100,19 +95,7 @@ export const useConfigStore = defineStore('config', () => {
     const createdAt = useExistingId
       ? currentConfigSummary.value?.createdAt || new Date()
       : new Date()
-    const customBuildData = getAllAppState
-      ? getAllAppState().customBuild as {
-          packageConfiguration: { addedPackages: string[]; removedPackages: string[] }
-          uciDefaults?: string
-          rootfsSizeMb?: number
-          repositories: { name: string; url: string }[]
-          repositoryKeys: string[]
-        }
-      : {
-          packageConfiguration: { addedPackages: [], removedPackages: [] },
-          repositories: [],
-          repositoryKeys: []
-        }
+    const customBuildData = customBuildStore.getSnapshot()
 
     const baseConfig: SavedConfiguration = {
       id,
@@ -183,13 +166,6 @@ export const useConfigStore = defineStore('config', () => {
     } finally {
       isLoading.value = false
     }
-  }
-
-  // Function to apply configuration to application
-  let applyAppState: ((config: SavedConfiguration) => void) | null = null
-  
-  function setAppStateApplier(applier: (config: SavedConfiguration) => void) {
-    applyAppState = applier
   }
 
   async function applyConfigurationState(
@@ -271,14 +247,7 @@ export const useConfigStore = defineStore('config', () => {
       }
     }
 
-    if (applyAppState) {
-      await waitForCondition(
-        () => !packageStore.isLoading && packageStore.totalPackages > 0,
-        10000
-      )
-
-      applyAppState(savedConfig)
-    }
+    customBuildStore.applySnapshot(savedConfig.customBuild)
 
     if (options?.markAsShared) {
       currentConfigId.value = ''
@@ -417,6 +386,7 @@ export const useConfigStore = defineStore('config', () => {
     
     // Clear package selections
     packageStore.clearAllPackages()
+    customBuildStore.reset()
     
     // Clear module selections (only if module management is enabled)
     if (config.enable_module_management) {
@@ -478,8 +448,6 @@ export const useConfigStore = defineStore('config', () => {
     newConfiguration,
     clearError,
     getShareConfigParam,
-    setAppStateGetter,
-    setAppStateApplier,
     autoLoadLastConfig,
     disableAutoLoad,
     enableAutoLoad

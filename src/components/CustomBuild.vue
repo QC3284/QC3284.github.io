@@ -4,6 +4,7 @@ import { useI18nStore } from '@/stores/i18n'
 import { useFirmwareStore } from '@/stores/firmware'
 import { useModuleStore } from '@/stores/module'
 import { usePackageStore } from '@/stores/package'
+import { useCustomBuildStore, type CustomBuildSnapshot, type CustomRepository } from '@/stores/customBuild'
 import { AsuService, type AsuBuildRequest, type AsuBuildResponse } from '@/services/asu'
 import { config } from '@/config'
 import { packageManager } from '@/services/packageManager'
@@ -25,13 +26,29 @@ const i18n = useI18nStore()
 const firmware = useFirmwareStore()
 const moduleStore = useModuleStore()
 const packageStore = usePackageStore()
+const customBuildStore = useCustomBuildStore()
 const asuService = new AsuService()
 
-// Form data
-const uciDefaultsContent = ref('')
-const rootfsSizeMb = ref<number | null>(null)
-const repositories = ref<Array<{ name: string; url: string; loading?: boolean; packages?: OpenWrtPackage[]; error?: string }>>([])
-const repositoryKeys = ref<string[]>([])
+// Form data managed via store
+const uciDefaultsContent = computed<string>({
+  get: () => customBuildStore.uciDefaults,
+  set: (value) => customBuildStore.setUciDefaults(value)
+})
+
+const rootfsSizeMb = computed<number | null>({
+  get: () => customBuildStore.rootfsSizeMb,
+  set: (value) => customBuildStore.setRootfsSize(value ?? null)
+})
+
+const repositories = computed<CustomRepository[]>({
+  get: () => customBuildStore.repositories,
+  set: (value) => customBuildStore.setRepositories(value)
+})
+
+const repositoryKeys = computed<string[]>({
+  get: () => customBuildStore.repositoryKeys,
+  set: (value) => customBuildStore.setRepositoryKeys(value)
+})
 
 // Build state
 const buildStatus = ref<AsuBuildResponse | null>(null)
@@ -194,12 +211,8 @@ function resetCustomConfiguration() {
   showPackageDetail.value = false
   selectedPackageDetail.value = null
 
-  uciDefaultsContent.value = ''
-  rootfsSizeMb.value = null
-  repositories.value = []
-  repositoryKeys.value = []
+  customBuildStore.reset()
 
-  packageStore.clearAllPackages()
   if (config.enable_module_management) {
     moduleStore.resetAll()
   }
@@ -207,32 +220,12 @@ function resetCustomConfiguration() {
 
 // Get current custom build configuration for saving
 function getCurrentCustomBuildConfig() {
-  return {
-    packageConfiguration: packageStore.getPackageConfiguration(),
-    uciDefaults: uciDefaultsContent.value,
-    rootfsSizeMb: rootfsSizeMb.value,
-    repositories: repositories.value.filter(repo => repo.name && repo.url),
-    repositoryKeys: repositoryKeys.value.filter(key => key.trim())
-  }
+  return customBuildStore.getSnapshot()
 }
 
 // Apply custom build configuration from loaded config
 function applyCustomBuildConfig(customBuild: Record<string, unknown>) {
-  if (customBuild.packageConfiguration && typeof customBuild.packageConfiguration === 'object' && customBuild.packageConfiguration !== null) {
-    packageStore.setPackageConfiguration(customBuild.packageConfiguration as { addedPackages: string[]; removedPackages: string[] })
-  }
-  if (customBuild.uciDefaults && typeof customBuild.uciDefaults === 'string') {
-    uciDefaultsContent.value = customBuild.uciDefaults
-  }
-  if (customBuild.rootfsSizeMb && typeof customBuild.rootfsSizeMb === 'number') {
-    rootfsSizeMb.value = customBuild.rootfsSizeMb
-  }
-  if (customBuild.repositories && Array.isArray(customBuild.repositories)) {
-    repositories.value = [...customBuild.repositories]
-  }
-  if (customBuild.repositoryKeys && Array.isArray(customBuild.repositoryKeys)) {
-    repositoryKeys.value = [...customBuild.repositoryKeys]
-  }
+  customBuildStore.applySnapshot(customBuild as Partial<CustomBuildSnapshot>)
 }
 
 // Note: Configuration management is now handled at the App level
@@ -408,14 +401,14 @@ uci commit
 
 // Repository management methods
 function addRepository() {
-  repositories.value.push({ name: '', url: '' })
+  customBuildStore.addRepository()
 }
 
-async function loadRepositoryIndex(repo: { name: string; url: string; loading?: boolean; packages?: OpenWrtPackage[]; error?: string }) {
-  if (!repo.url) return
-  
-  repo.loading = true
-  repo.error = undefined
+async function loadRepositoryIndex(index: number) {
+  const repo = repositories.value[index]
+  if (!repo || !repo.url) return
+
+  customBuildStore.updateRepository(index, { loading: true, error: undefined })
   
   try {
     // Ensure the URL ends with '/Packages' for the feed URL
@@ -429,15 +422,17 @@ async function loadRepositoryIndex(repo: { name: string; url: string; loading?: 
     }
     
     const packages = await packageManager.fetchFeedPackages(feedUrl, repo.name || 'custom')
-    repo.packages = packages
-    
+    customBuildStore.updateRepository(index, { packages, loading: false })
+
     // Add these packages to the main package store for browsing
-    packageStore.addCustomFeedPackages(repo.name || 'custom', packages)
+    const current = repositories.value[index]
+    packageStore.addCustomFeedPackages((current?.name || repo.name || 'custom'), packages)
   } catch (error) {
-    repo.error = error instanceof Error ? error.message : '加载失败'
+    customBuildStore.updateRepository(index, {
+      error: error instanceof Error ? error.message : '加载失败',
+      loading: false
+    })
     console.error('Failed to load repository index:', error)
-  } finally {
-    repo.loading = false
   }
 }
 
@@ -447,20 +442,10 @@ watch(repositories, async (newRepos, oldRepos) => {
     const newRepo = newRepos[i]
     const oldRepo = oldRepos?.[i]
     
-    console.log('Repository watch triggered:', {
-      index: i,
-      name: newRepo.name,
-      url: newRepo.url,
-      loading: newRepo.loading,
-      hasPackages: !!newRepo.packages,
-      urlChanged: !oldRepo || oldRepo.url !== newRepo.url
-    })
-    
     // Auto-load when both name and url are filled
-    if (newRepo.name.trim() && newRepo.url.trim() && 
+    if (newRepo.name.trim() && newRepo.url.trim() &&
         !newRepo.loading && !newRepo.packages) {
-      console.log('Loading repository index for:', newRepo.name)
-      await loadRepositoryIndex(newRepo)
+      await loadRepositoryIndex(i)
     }
   }
 }, { deep: true })
@@ -473,16 +458,16 @@ function removeRepository(index: number) {
     packageStore.removeCustomFeedPackages(repo.name)
   }
   
-  repositories.value.splice(index, 1)
+  customBuildStore.removeRepository(index)
 }
 
 // Repository keys management methods
 function addRepositoryKey() {
-  repositoryKeys.value.push('')
+  customBuildStore.addRepositoryKey()
 }
 
 function removeRepositoryKey(index: number) {
-  repositoryKeys.value.splice(index, 1)
+  customBuildStore.removeRepositoryKey(index)
 }
 
 // Package detail methods
