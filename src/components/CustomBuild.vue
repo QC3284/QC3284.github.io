@@ -546,11 +546,11 @@ onUnmounted(() => {
           <v-col cols="12" md="6">
             <v-text-field
               v-model.number="rootfsSizeMb"
-              label="根文件系统大小 (MB)"
+              label="根文件系统大小 (MiB)"
               placeholder="256"
               type="number"
               variant="outlined"
-              hint="设置根文件系统的大小，单位为MB (可选)"
+              hint="设置根文件系统的大小，单位为 MiB (可选)"
               persistent-hint
               :min="1"
               :max="2048"

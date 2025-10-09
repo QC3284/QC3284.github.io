@@ -184,7 +184,7 @@ export class AsuService {
   }
 
   formatBuildSize(sizeBytes: number): string {
-    const units = ['B', 'KB', 'MB', 'GB']
+    const units = ['B', 'KiB', 'MiB', 'GiB']
     let size = sizeBytes
     let unitIndex = 0
     
