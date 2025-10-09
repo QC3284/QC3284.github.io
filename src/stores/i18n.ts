@@ -9,6 +9,29 @@ export const useI18nStore = defineStore('i18n', () => {
   const currentLanguage = ref('zh-cn')
   const currentTranslation = ref<Translation>({})
   const isLoading = ref(false)
+  const STORAGE_KEY = 'ofs-language'
+  
+  function isBrowser(): boolean {
+    return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+  }
+  
+  function getSavedLanguage(): string | null {
+    if (!isBrowser()) return null
+    try {
+      return window.localStorage.getItem(STORAGE_KEY)
+    } catch {
+      return null
+    }
+  }
+  
+  function saveLanguage(lang: string) {
+    if (!isBrowser()) return
+    try {
+      window.localStorage.setItem(STORAGE_KEY, lang)
+    } catch {
+      // Ignore storage errors (e.g., private mode)
+    }
+  }
   
   const supportedLanguages = [
     { code: 'ar', name: 'العربية (Arabic)' },
@@ -76,6 +99,7 @@ export const useI18nStore = defineStore('i18n', () => {
         const translation = await response.json()
         currentTranslation.value = translation
         currentLanguage.value = lang
+        saveLanguage(lang)
       } else {
         throw new Error(`Failed to fetch translation for ${lang}`)
       }
@@ -100,6 +124,11 @@ export const useI18nStore = defineStore('i18n', () => {
 
   // Auto-detect language
   function detectLanguage() {
+    const saved = getSavedLanguage()
+    if (saved && supportedLanguages.find(l => l.code === saved)) {
+      return saved
+    }
+    
     const long = (navigator.language || (navigator as any).userLanguage || 'en').toLowerCase()
     const short = long.split('-')[0]
     
