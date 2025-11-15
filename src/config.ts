@@ -60,7 +60,7 @@ export const config: Config = {
   info_url: "https://openwrt.org/start?do=search&id=toh&q={title} @toh",
 
   // Attended Sysupgrade Server support (optional)
-  asu_url: "https://asu-2.kyarucloud.moe",
+  asu_url: "https://sysupgrade.kyarucloud.moe",
   asu_extra_packages: ["luci"],
 
   // Enable/disable module management feature (optional)
