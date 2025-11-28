@@ -4,6 +4,7 @@ import { useI18nStore } from '@/stores/i18n'
 import { useFirmwareStore } from '@/stores/firmware'
 import { useModuleStore } from '@/stores/module'
 import { usePackageStore } from '@/stores/package'
+import { useCustomBuildStore, type CustomBuildSnapshot, type CustomRepository } from '@/stores/customBuild'
 import { AsuService, type AsuBuildRequest, type AsuBuildResponse } from '@/services/asu'
 import { config } from '@/config'
 import { packageManager } from '@/services/packageManager'
@@ -25,13 +26,47 @@ const i18n = useI18nStore()
 const firmware = useFirmwareStore()
 const moduleStore = useModuleStore()
 const packageStore = usePackageStore()
+const customBuildStore = useCustomBuildStore()
 const asuService = new AsuService()
 
-// Form data
-const uciDefaultsContent = ref('')
-const rootfsSizeMb = ref<number | null>(null)
-const repositories = ref<Array<{ name: string; url: string; loading?: boolean; packages?: OpenWrtPackage[]; error?: string }>>([])
-const repositoryKeys = ref<string[]>([])
+function translate(key: string, fallback: string, replacements?: Record<string, string>) {
+  let text = i18n.t(key, fallback)
+  if (replacements) {
+    for (const [token, value] of Object.entries(replacements)) {
+      text = text.replace(new RegExp(`{${token}}`, 'g'), value)
+    }
+  }
+  return text
+}
+
+// Form data managed via store
+const uciDefaultsContent = computed<string>({
+  get: () => customBuildStore.uciDefaults,
+  set: (value) => customBuildStore.setUciDefaults(value)
+})
+
+const rootfsSizeMb = computed<number | null>({
+  get: () => customBuildStore.rootfsSizeMb,
+  set: (value) => customBuildStore.setRootfsSize(value ?? null)
+})
+
+const repositories = computed<CustomRepository[]>({
+  get: () => customBuildStore.repositories,
+  set: (value) => customBuildStore.setRepositories(value)
+})
+
+const repositoryKeys = computed<string[]>({
+  get: () => customBuildStore.repositoryKeys,
+  set: (value) => customBuildStore.setRepositoryKeys(value)
+})
+
+const expandedPanels = ref<number[]>([])
+
+watch(() => customBuildStore.hasCustomData, (hasData, previous) => {
+  if (hasData && expandedPanels.value.length === 0 && !previous) {
+    expandedPanels.value = [0]
+  }
+}, { immediate: true })
 
 // Build state
 const buildStatus = ref<AsuBuildResponse | null>(null)
@@ -84,23 +119,23 @@ const statusMessage = computed(() => {
 
   const httpStatus = (buildStatus.value as (AsuBuildResponse & { httpStatus?: number })).httpStatus
   if (httpStatus === 202) {
-    return `${i18n.t('tr-building-image', '正在生成固件映像')} · HTTP 202`
+    return `${i18n.t('tr-building-image', 'Generating firmware image')} · HTTP 202`
   }
   if (httpStatus === 200) {
-    return `${i18n.t('tr-build-successful', '构建成功')} · HTTP 200`
+    return `${i18n.t('tr-build-successful', 'Build successful')} · HTTP 200`
   }
   if (httpStatus && httpStatus >= 400) {
     const detail = buildStatus.value.detail
-    const base = detail && detail.length > 0 ? detail : i18n.t('tr-build-failed', '构建失败')
+    const base = detail && detail.length > 0 ? detail : i18n.t('tr-build-failed', 'Build failed')
     return `${base} · HTTP ${httpStatus}`
   }
 
   const statusMessages: Record<string, string> = {
-    requested: i18n.t('tr-init', '已收到构建请求'),
-    building: i18n.t('tr-building-image', '正在生成固件映像'),
-    success: i18n.t('tr-build-successful', '构建成功'),
-    failure: i18n.t('tr-build-failed', '构建失败'),
-    no_sysupgrade: '设备不支持 sysupgrade'
+    requested: i18n.t('tr-init', 'Received build request'),
+    building: i18n.t('tr-building-image', 'Generating firmware image'),
+    success: i18n.t('tr-build-successful', 'Build successful'),
+    failure: i18n.t('tr-build-failed', 'Build failed'),
+    no_sysupgrade: translate('custom-no-sysupgrade', 'Device does not support sysupgrade')
   }
 
   return statusMessages[buildStatus.value.status] || buildStatus.value.status
@@ -173,7 +208,10 @@ function getModuleDisplayName(moduleKey: string): string {
   const module = source?.modules.find(m => m.id === moduleId)
   
   if (module && source) {
-    return `${module.definition.name} (来源: ${source.name})`
+    return translate('custom-module-label', '{name} (Source: {source})', {
+      name: module.definition.name,
+      source: source.name
+    })
   }
   
   return moduleKey
@@ -194,12 +232,8 @@ function resetCustomConfiguration() {
   showPackageDetail.value = false
   selectedPackageDetail.value = null
 
-  uciDefaultsContent.value = ''
-  rootfsSizeMb.value = null
-  repositories.value = []
-  repositoryKeys.value = []
+  customBuildStore.reset()
 
-  packageStore.clearAllPackages()
   if (config.enable_module_management) {
     moduleStore.resetAll()
   }
@@ -207,32 +241,12 @@ function resetCustomConfiguration() {
 
 // Get current custom build configuration for saving
 function getCurrentCustomBuildConfig() {
-  return {
-    packageConfiguration: packageStore.getPackageConfiguration(),
-    uciDefaults: uciDefaultsContent.value,
-    rootfsSizeMb: rootfsSizeMb.value,
-    repositories: repositories.value.filter(repo => repo.name && repo.url),
-    repositoryKeys: repositoryKeys.value.filter(key => key.trim())
-  }
+  return customBuildStore.getSnapshot()
 }
 
 // Apply custom build configuration from loaded config
 function applyCustomBuildConfig(customBuild: Record<string, unknown>) {
-  if (customBuild.packageConfiguration && typeof customBuild.packageConfiguration === 'object' && customBuild.packageConfiguration !== null) {
-    packageStore.setPackageConfiguration(customBuild.packageConfiguration as { addedPackages: string[]; removedPackages: string[] })
-  }
-  if (customBuild.uciDefaults && typeof customBuild.uciDefaults === 'string') {
-    uciDefaultsContent.value = customBuild.uciDefaults
-  }
-  if (customBuild.rootfsSizeMb && typeof customBuild.rootfsSizeMb === 'number') {
-    rootfsSizeMb.value = customBuild.rootfsSizeMb
-  }
-  if (customBuild.repositories && Array.isArray(customBuild.repositories)) {
-    repositories.value = [...customBuild.repositories]
-  }
-  if (customBuild.repositoryKeys && Array.isArray(customBuild.repositoryKeys)) {
-    repositoryKeys.value = [...customBuild.repositoryKeys]
-  }
+  customBuildStore.applySnapshot(customBuild as Partial<CustomBuildSnapshot>)
 }
 
 // Note: Configuration management is now handled at the App level
@@ -333,7 +347,9 @@ async function requestBuild() {
     }
     
   } catch (error) {
-    const errorMsg = `构建请求失败: ${error}`
+    const errorMsg = translate('custom-build-request-failed', 'Build request failed: {error}', {
+      error: String(error)
+    })
     buildError.value = errorMsg
     emit('build-error', errorMsg)
   } finally {
@@ -366,12 +382,12 @@ function startPolling(requestHash: string) {
       } else if (status.httpStatus >= 400) {
         // Build failed
         stopPolling()
-        emit('build-error', status.detail || `构建失败 (HTTP ${status.httpStatus})`)
+        emit('build-error', status.detail || translate('custom-build-failed-http', 'Build failed (HTTP {status})', { status: String(status.httpStatus) }))
       }
     } catch (error) {
       console.error('Failed to poll build status:', error)
       stopPolling()
-      emit('build-error', `构建状态检查失败: ${error}`)
+      emit('build-error', translate('custom-build-status-failed', 'Failed to poll build status: {error}', { error: String(error) }))
     }
   }, 5000)
 }
@@ -408,14 +424,14 @@ uci commit
 
 // Repository management methods
 function addRepository() {
-  repositories.value.push({ name: '', url: '' })
+  customBuildStore.addRepository()
 }
 
-async function loadRepositoryIndex(repo: { name: string; url: string; loading?: boolean; packages?: OpenWrtPackage[]; error?: string }) {
-  if (!repo.url) return
-  
-  repo.loading = true
-  repo.error = undefined
+async function loadRepositoryIndex(index: number) {
+  const repo = repositories.value[index]
+  if (!repo || !repo.url) return
+
+  customBuildStore.updateRepository(index, { loading: true, error: undefined })
   
   try {
     // Ensure the URL ends with '/Packages' for the feed URL
@@ -429,15 +445,17 @@ async function loadRepositoryIndex(repo: { name: string; url: string; loading?: 
     }
     
     const packages = await packageManager.fetchFeedPackages(feedUrl, repo.name || 'custom')
-    repo.packages = packages
-    
+    customBuildStore.updateRepository(index, { packages, loading: false })
+
     // Add these packages to the main package store for browsing
-    packageStore.addCustomFeedPackages(repo.name || 'custom', packages)
+    const current = repositories.value[index]
+    packageStore.addCustomFeedPackages((current?.name || repo.name || 'custom'), packages)
   } catch (error) {
-    repo.error = error instanceof Error ? error.message : '加载失败'
+    customBuildStore.updateRepository(index, {
+      error: error instanceof Error ? error.message : translate('custom-repo-load-error', 'Failed to load'),
+      loading: false
+    })
     console.error('Failed to load repository index:', error)
-  } finally {
-    repo.loading = false
   }
 }
 
@@ -447,20 +465,10 @@ watch(repositories, async (newRepos, oldRepos) => {
     const newRepo = newRepos[i]
     const oldRepo = oldRepos?.[i]
     
-    console.log('Repository watch triggered:', {
-      index: i,
-      name: newRepo.name,
-      url: newRepo.url,
-      loading: newRepo.loading,
-      hasPackages: !!newRepo.packages,
-      urlChanged: !oldRepo || oldRepo.url !== newRepo.url
-    })
-    
     // Auto-load when both name and url are filled
-    if (newRepo.name.trim() && newRepo.url.trim() && 
+    if (newRepo.name.trim() && newRepo.url.trim() &&
         !newRepo.loading && !newRepo.packages) {
-      console.log('Loading repository index for:', newRepo.name)
-      await loadRepositoryIndex(newRepo)
+      await loadRepositoryIndex(i)
     }
   }
 }, { deep: true })
@@ -473,16 +481,16 @@ function removeRepository(index: number) {
     packageStore.removeCustomFeedPackages(repo.name)
   }
   
-  repositories.value.splice(index, 1)
+  customBuildStore.removeRepository(index)
 }
 
 // Repository keys management methods
 function addRepositoryKey() {
-  repositoryKeys.value.push('')
+  customBuildStore.addRepositoryKey()
 }
 
 function removeRepositoryKey(index: number) {
-  repositoryKeys.value.splice(index, 1)
+  customBuildStore.removeRepositoryKey(index)
 }
 
 // Package detail methods
@@ -501,12 +509,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <v-expansion-panels v-if="isAsuAvailable">
+  <v-expansion-panels v-if="isAsuAvailable" v-model="expandedPanels">
     <v-expansion-panel>
       <v-expansion-panel-title>
         <div class="d-flex align-center">
           <v-icon class="mr-3">mdi-cog</v-icon>
-          <span>{{ i18n.t('tr-customize', '自定义软件包管理和首次启动脚本') }}</span>
+          <span>{{ i18n.t('tr-customize', 'Customize installed packages and/or first boot script') }}</span>
         </div>
       </v-expansion-panel-title>
       
@@ -529,21 +537,21 @@ onUnmounted(() => {
           <!-- UCI Defaults Script -->
           <v-col cols="12">
             <div class="d-flex align-center justify-space-between mb-3">
-              <h4 class="text-h6">{{ i18n.t('tr-defaults', '首次启动时运行的脚本（uci-defaults）') }}</h4>
+              <h4 class="text-h6">{{ i18n.t('tr-defaults', 'Script to run on first boot (uci-defaults)') }}</h4>
               <v-btn
                 size="small"
                 variant="outlined"
                 @click="loadTemplate"
               >
-                加载模板
+                {{ i18n.t('custom-load-template', 'Load Template') }}
               </v-btn>
             </div>
             <v-textarea
               v-model="uciDefaultsContent"
               rows="10"
               variant="outlined"
-              placeholder="输入首次启动脚本内容"
-              hint="这个脚本将在设备首次启动时执行一次"
+              :placeholder="i18n.t('custom-defaults-placeholder', 'Enter first boot script content')"
+              :hint="i18n.t('custom-defaults-hint', 'This script runs once on first boot')"
               persistent-hint
             />
           </v-col>
@@ -554,18 +562,18 @@ onUnmounted(() => {
         <!-- Advanced Configuration -->
         <v-row>
           <v-col cols="12">
-            <h4 class="text-h6 mb-3">高级配置</h4>
+            <h4 class="text-h6 mb-3">{{ i18n.t('custom-advanced-settings', 'Advanced Settings') }}</h4>
           </v-col>
 
           <!-- Root Filesystem Size -->
           <v-col cols="12" md="6">
             <v-text-field
               v-model.number="rootfsSizeMb"
-              label="根文件系统大小 (MB)"
+              :label="i18n.t('custom-rootfs-label', 'Root filesystem size (MiB)')"
               placeholder="256"
               type="number"
               variant="outlined"
-              hint="设置根文件系统的大小，单位为MB (可选)"
+              :hint="i18n.t('custom-rootfs-hint', 'Set the root filesystem size in MiB (optional)')"
               persistent-hint
               :min="1"
               :max="2048"
@@ -576,25 +584,25 @@ onUnmounted(() => {
           <!-- Repositories -->
           <v-col cols="12">
             <div class="d-flex align-center mb-3">
-              <h5 class="text-subtitle1">自定义软件源</h5>
+              <h5 class="text-subtitle1">{{ i18n.t('custom-repo-title', 'Custom Feeds') }}</h5>
               <v-spacer />
               <v-btn
                 size="small"
                 prepend-icon="mdi-plus"
                 @click="addRepository"
               >
-                添加软件源
+                {{ i18n.t('custom-repo-add', 'Add Feed') }}
               </v-btn>
             </div>
             
             <div v-if="repositories.length === 0" class="text-grey text-body-2 mb-4">
-              暂无自定义软件源
+              {{ i18n.t('custom-repo-empty', 'No custom feeds yet') }}
             </div>
 
             <v-card v-for="(repo, index) in repositories" :key="index" variant="outlined" class="mb-3">
               <v-card-title class="d-flex align-center pa-3">
                 <v-icon icon="mdi-package-variant" class="mr-2" />
-                软件源 {{ index + 1 }}
+                {{ translate('custom-repo-item', 'Feed {index}', { index: String(index + 1) }) }}
                 <v-spacer />
                 <v-btn
                   icon="mdi-delete"
@@ -610,7 +618,7 @@ onUnmounted(() => {
                   <v-col cols="12" md="4">
                     <v-text-field
                       v-model="repo.name"
-                      label="源名称"
+                      :label="i18n.t('custom-repo-name-label', 'Feed name')"
                       variant="outlined"
                       density="compact"
                       placeholder="my-repo"
@@ -619,7 +627,7 @@ onUnmounted(() => {
                   <v-col cols="12" md="8">
                     <v-text-field
                       v-model="repo.url"
-                      label="源地址"
+                      :label="i18n.t('custom-repo-url-label', 'Feed URL')"
                       variant="outlined"
                       density="compact"
                       placeholder="https://downloads.example.com/packages/Packages"
@@ -628,7 +636,7 @@ onUnmounted(() => {
                       :error-messages="repo.error"
                     />
                     <div v-if="repo.packages" class="text-caption text-success mt-1">
-                      ✓ 已加载 {{ repo.packages.length }} 个软件包
+                      {{ translate('custom-repo-loaded', '✓ Loaded {count} packages', { count: String(repo.packages.length) }) }}
                     </div>
                   </v-col>
                 </v-row>
@@ -639,25 +647,25 @@ onUnmounted(() => {
           <!-- Repository Keys -->
           <v-col cols="12">
             <div class="d-flex align-center mb-3">
-              <h5 class="text-subtitle1">软件源签名密钥</h5>
+              <h5 class="text-subtitle1">{{ i18n.t('custom-keys-title', 'Feed Signing Keys') }}</h5>
               <v-spacer />
               <v-btn
                 size="small"
                 prepend-icon="mdi-plus"
                 @click="addRepositoryKey"
               >
-                添加密钥
+                {{ i18n.t('custom-keys-add', 'Add Key') }}
               </v-btn>
             </div>
             
             <div v-if="repositoryKeys.length === 0" class="text-grey text-body-2 mb-4">
-              暂无签名密钥
+              {{ i18n.t('custom-keys-empty', 'No signing keys yet') }}
             </div>
 
             <v-card v-for="(key, index) in repositoryKeys" :key="index" variant="outlined" class="mb-3">
               <v-card-title class="d-flex align-center pa-3">
                 <v-icon icon="mdi-key-variant" class="mr-2" />
-                签名密钥 {{ index + 1 }}
+                {{ translate('custom-keys-item', 'Signing Key {index}', { index: String(index + 1) }) }}
                 <v-spacer />
                 <v-btn
                   icon="mdi-delete"
@@ -671,12 +679,12 @@ onUnmounted(() => {
               <v-card-text class="pt-0">
                 <v-textarea
                   v-model="repositoryKeys[index]"
-                  label="usign 公钥"
+                  :label="i18n.t('custom-keys-label', 'usign Public Key')"
                   variant="outlined"
                   rows="3"
                   density="compact"
                   placeholder="untrusted comment: OpenWrt usign key&#10;RWQKvaZaSStIhx4t06ISyV42CIpK7niKfR+Yro/WHiKLa122SEh2j3Z4"
-                  hint="用于验证自定义软件源的 usign 公钥"
+                  :hint="i18n.t('custom-keys-hint', 'usign public key used to verify custom feeds')"
                   persistent-hint
                 />
               </v-card-text>
@@ -687,7 +695,7 @@ onUnmounted(() => {
         <!-- Package Summary -->
         <v-card v-if="finalPackages.length > 0" variant="elevated" class="mt-4 mb-4">
           <v-card-title class="text-subtitle1">
-            软件包摘要 ({{ finalPackages.length }} 个)
+            {{ translate('custom-package-summary-title', 'Package Summary ({count})', { count: String(finalPackages.length) }) }}
           </v-card-title>
           <v-card-text>
             <div class="d-flex flex-wrap">
@@ -725,7 +733,7 @@ onUnmounted(() => {
             prepend-icon="mdi-hammer-wrench"
             @click="requestBuild"
           >
-            {{ i18n.t('tr-request-build', '请求构建') }}
+            {{ i18n.t('tr-request-build', 'REQUEST BUILD') }}
           </v-btn>
         </div>
 
@@ -746,7 +754,7 @@ onUnmounted(() => {
               <div>
                 <div>{{ statusMessage }}</div>
                 <div v-if="buildStatus.queue_position" class="text-caption">
-                  队列位置: {{ buildStatus.queue_position }}
+                  {{ translate('custom-queue-position', 'Queue position: {position}', { position: String(buildStatus.queue_position) }) }}
                 </div>
               </div>
             </div>
@@ -754,7 +762,7 @@ onUnmounted(() => {
             <!-- Build Success - Show download links -->
             <div v-if="buildStatus.status === 'success' && buildStatus.images" class="mt-3">
               <v-divider class="mb-3" />
-              <div class="text-subtitle2 mb-2">{{ i18n.t('tr-custom-downloads', '自定义下载') }}</div>
+              <div class="text-subtitle2 mb-2">{{ i18n.t('tr-custom-downloads', 'Custom Downloads') }}</div>
               <div class="d-flex flex-wrap gap-2">
                 <v-btn
                   v-for="image in buildStatus.images"
@@ -789,7 +797,7 @@ onUnmounted(() => {
           <v-divider class="mb-4" />
           <div class="d-flex align-center mb-2">
             <v-icon icon="mdi-text-box-outline" size="small" class="mr-2" />
-            <span class="text-subtitle2">构建日志</span>
+            <span class="text-subtitle2">{{ i18n.t('custom-build-log', 'Build Log') }}</span>
           </div>
           <v-expansion-panels
             v-model="expandedLogPanels"
@@ -824,14 +832,14 @@ onUnmounted(() => {
     <v-card>
       <v-card-title class="d-flex align-center">
         <v-icon icon="mdi-alert-circle" color="error" class="mr-2" />
-        模块参数验证失败
+        {{ i18n.t('custom-validation-title', 'Module Parameter Validation Failed') }}
       </v-card-title>
 
       <v-divider />
 
       <v-card-text class="pt-4">
         <v-alert type="error" variant="tonal" class="mb-4">
-          <strong>无法开始构建，以下模块存在参数错误：</strong>
+          <strong>{{ i18n.t('custom-validation-intro', 'Cannot start build because the following modules have parameter errors:') }}</strong>
         </v-alert>
 
         <div v-for="(errors, moduleKey) in validationErrors" :key="moduleKey" class="mb-4">
@@ -856,12 +864,12 @@ onUnmounted(() => {
 
         <v-alert type="info" variant="tonal" class="mt-4">
           <div class="text-body-2">
-            <strong>解决方法：</strong>
+            <strong>{{ i18n.t('custom-validation-solutions-title', 'How to fix:') }}</strong>
             <ul class="mt-2">
-              <li>检查标红的必填参数是否已填写</li>
-              <li>确保参数格式符合要求（如IP地址、URL等）</li>
-              <li>为用户自定义下载提供有效的URL</li>
-              <li>点击模块的"配置参数"按钮进行修正</li>
+              <li>{{ i18n.t('custom-validation-solution-required', 'Fill in all required parameters highlighted in red') }}</li>
+              <li>{{ i18n.t('custom-validation-solution-format', 'Ensure parameter formats are valid (IP addresses, URLs, etc.)') }}</li>
+              <li>{{ i18n.t('custom-validation-solution-url', 'Provide valid URLs for user-defined downloads') }}</li>
+              <li>{{ i18n.t('custom-validation-solution-config', 'Open the "Configure Parameters" dialog for the module to fix issues') }}</li>
             </ul>
           </div>
         </v-alert>
@@ -869,13 +877,13 @@ onUnmounted(() => {
 
       <v-card-actions>
         <v-spacer />
-        <v-btn @click="closeValidationErrorDialog">关闭</v-btn>
+        <v-btn @click="closeValidationErrorDialog">{{ i18n.t('common-close', 'Close') }}</v-btn>
         <v-btn 
           color="primary" 
           variant="outlined"
           @click="closeValidationErrorDialog"
         >
-          去修正参数
+          {{ i18n.t('custom-validation-fix', 'Fix Parameters') }}
         </v-btn>
       </v-card-actions>
     </v-card>

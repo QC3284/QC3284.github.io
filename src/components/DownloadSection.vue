@@ -127,18 +127,18 @@ function getHelpTextClass(image: DeviceImage): string {
 
 function getHelpText(helpClass: string): string {
   const helpTexts: Record<string, string> = {
-    'tr-sysupgrade-help': i18n.t('tr-sysupgrade-help', '使用 Sysupgrade 映像以更新现有运行 OpenWrt 的设备。该映像可以在 LuCI 界面或终端中使用。').replace('OpenWrt', config.brand_name),
-    'tr-factory-help': i18n.t('tr-factory-help', '首次刷机时，使用 Factory 映像以刷入 OpenWrt。通常您可以在原厂固件的 Web 界面中完成此操作。').replace('OpenWrt', config.brand_name),
-    'tr-initramfs-help': i18n.t('tr-initramfs-help', '集成最小文件系统的 Linux 内核。适用于首次安装或故障恢复。'),
-    'tr-kernel-help': i18n.t('tr-kernel-help', '独立的 Linux 内核映像。'),
-    'tr-rootfs-help': i18n.t('tr-rootfs-help', '独立的 rootfs 映像。'),
-    'tr-sdcard-help': i18n.t('tr-sdcard-help', '适用于安装至 SD 卡的映像文件。'),
-    'tr-tftp-help': i18n.t('tr-tftp-help', '适用于 Bootloader TFTP 模式刷入的映像文件。'),
-    'tr-dtb-help': i18n.t('tr-dtb-help', '预编译设备树。此文件用于在 Linux 内核中定义硬件信息。'),
-    'tr-cpximg-help': i18n.t('tr-cpximg-help', '用于在原厂固件中系统升级或内置的 cpximg 加载器。'),
-    'tr-eva-help': i18n.t('tr-eva-help', '封入固件及引导程序的映像文件。'),
-    'tr-uboot-help': i18n.t('tr-uboot-help', '引导程序映像。用于启动时加载操作系统的底层软件。'),
-    'tr-other-help': i18n.t('tr-other-help', '其他映像类型。')
+    'tr-sysupgrade-help': i18n.t('tr-sysupgrade-help', 'Use a Sysupgrade image to update a router that already runs OpenWrt. The image can be used with the LuCI web interface or the terminal.').replace('OpenWrt', config.brand_name),
+    'tr-factory-help': i18n.t('tr-factory-help', 'Use a Factory image to flash a router with OpenWrt for the first time. You normally do this via the web interface of the original firmware.').replace('OpenWrt', config.brand_name),
+    'tr-initramfs-help': i18n.t('tr-initramfs-help', 'Linux kernel with minimal file system. Useful for first installation or recovery.'),
+    'tr-kernel-help': i18n.t('tr-kernel-help', 'Linux kernel as a separate image.'),
+    'tr-rootfs-help': i18n.t('tr-rootfs-help', 'Root file system as a separate image.'),
+    'tr-sdcard-help': i18n.t('tr-sdcard-help', 'Image that is meant to be flashed onto a SD-Card.'),
+    'tr-tftp-help': i18n.t('tr-tftp-help', 'TFTP images are used to flash a device via the TFTP method of the bootloader.'),
+    'tr-dtb-help': i18n.t('tr-dtb-help', 'Device tree blob. This file configures the Linux Kernel for the hardware.'),
+    'tr-cpximg-help': i18n.t('tr-cpximg-help', 'Use with sysupgrade in the stock firmware or with the built-in cpximg loader.'),
+    'tr-eva-help': i18n.t('tr-eva-help', 'Image with OpenWrt and a boot loader.'),
+    'tr-uboot-help': i18n.t('tr-uboot-help', 'Bootloader image. Low-level software which loads the operating system early on boot.'),
+    'tr-other-help': i18n.t('tr-other-help', 'Other image type.')
   }
 
   return helpTexts[helpClass] || ''
@@ -158,7 +158,7 @@ function getImageIcon(type: string): string {
 <template>
   <v-card>
     <v-card-title class="bg-secondary text-white">
-      {{ props.buildResult ? i18n.t('tr-custom-downloads', '自定义下载') : i18n.t('tr-downloads', '下载映像') }}
+      {{ props.buildResult ? i18n.t('tr-custom-downloads', 'Custom Downloads') : i18n.t('tr-downloads', 'Download an image') }}
     </v-card-title>
 
     <v-card-text class="pa-0">

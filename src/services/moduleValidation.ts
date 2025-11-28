@@ -1,6 +1,7 @@
 // Module parameter validation service
 
 import type { ModuleParameter } from '@/types/module'
+import { useI18nStore } from '@/stores/i18n'
 
 export interface ValidationResult {
   isValid: boolean
@@ -16,6 +17,21 @@ export interface ParameterValidationRules {
   customMessage?: string
 }
 
+function translate(key: string, fallback: string, replacements?: Record<string, string>): string {
+  try {
+    const store = useI18nStore()
+    let text = store?.t(key, fallback) ?? fallback
+    if (replacements) {
+      for (const [token, value] of Object.entries(replacements)) {
+        text = text.replace(new RegExp(`{${token}}`, 'g'), value)
+      }
+    }
+    return text
+  } catch {
+    return fallback
+  }
+}
+
 export class ModuleValidationService {
   /**
    * Validate a single parameter value
@@ -25,7 +41,9 @@ export class ModuleValidationService {
     if (param.required && (!value || value.trim() === '')) {
       return {
         isValid: false,
-        errorMessage: `${param.name} 是必填项`
+        errorMessage: translate('module-validation-required', '{name} is required', {
+          name: param.name
+        })
       }
     }
 
@@ -40,7 +58,10 @@ export class ModuleValidationService {
       if (!patternResult.isValid) {
         return {
           isValid: false,
-          errorMessage: `${param.name} 格式不正确: ${patternResult.errorMessage}`
+          errorMessage: translate('module-validation-invalid-format', '{name} is invalid: {message}', {
+            name: param.name,
+            message: patternResult.errorMessage ?? ''
+          })
         }
       }
     }
@@ -71,64 +92,103 @@ export class ModuleValidationService {
    * Get user-friendly error message for common patterns
    */
   private getPatternErrorMessage(pattern: string): string {
-    const commonPatterns: Record<string, string> = {
+    const commonPatterns: Record<string, { key: string, fallback: string }> = {
       // IP address patterns
-      '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$': '请输入有效的IP地址',
-      '^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$': '请输入有效的IP地址',
+      '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$': {
+        key: 'module-validation-error-ip',
+        fallback: 'Please enter a valid IP address'
+      },
+      '^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$': {
+        key: 'module-validation-error-ip',
+        fallback: 'Please enter a valid IP address'
+      },
       
       // MAC address patterns
-      '^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$': '请输入有效的MAC地址',
-      '^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}$': '请输入有效的MAC地址',
+      '^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$': {
+        key: 'module-validation-error-mac',
+        fallback: 'Please enter a valid MAC address'
+      },
+      '^[0-9a-fA-F]{2}(:[0-9a-fA-F]{2}){5}$': {
+        key: 'module-validation-error-mac',
+        fallback: 'Please enter a valid MAC address'
+      },
       
       // Email patterns
-      '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$': '请输入有效的邮箱地址',
+      '^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$': {
+        key: 'module-validation-error-email',
+        fallback: 'Please enter a valid email address'
+      },
       
       // URL patterns
-      '^https?://.*': '请输入有效的URL地址',
-      '^(https?|ftp)://[^\\s/$.?#].[^\\s]*$': '请输入有效的URL地址',
+      '^https?://.*': {
+        key: 'module-validation-error-url',
+        fallback: 'Please enter a valid URL'
+      },
+      '^(https?|ftp)://[^\\s/$.?#].[^\\s]*$': {
+        key: 'module-validation-error-url',
+        fallback: 'Please enter a valid URL'
+      },
       
       // Hostname patterns
-      '^[a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?$': '请输入有效的主机名',
+      '^[a-zA-Z0-9]([a-zA-Z0-9\\-]{0,61}[a-zA-Z0-9])?$': {
+        key: 'module-validation-error-hostname',
+        fallback: 'Please enter a valid hostname'
+      },
       
       // Port patterns
-      '^(6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}|[1-5][0-9]{4}|[1-9][0-9]{0,3})$': '请输入有效的端口号 (1-65535)',
+      '^(6553[0-5]|655[0-2][0-9]|65[0-4][0-9]{2}|6[0-4][0-9]{3}|[1-5][0-9]{4}|[1-9][0-9]{0,3})$': {
+        key: 'module-validation-error-port',
+        fallback: 'Please enter a valid port (1-65535)'
+      },
       
       // Number patterns
-      '^[0-9]+$': '请输入数字',
-      '^[1-9][0-9]*$': '请输入正整数',
+      '^[0-9]+$': {
+        key: 'module-validation-error-number',
+        fallback: 'Please enter a number'
+      },
+      '^[1-9][0-9]*$': {
+        key: 'module-validation-error-positive-number',
+        fallback: 'Please enter a positive integer'
+      },
       
       // Password patterns
-      '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d@$!%*?&]{8,}$': '密码至少8位，包含大小写字母和数字',
+      '^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d@$!%*?&]{8,}$': {
+        key: 'module-validation-error-password',
+        fallback: 'Password must be at least 8 characters with upper, lower case letters and numbers'
+      },
       
       // SSID patterns
-      '^[\\x20-\\x7E]{1,32}$': '请输入有效的SSID (1-32个字符)',
+      '^[\\x20-\\x7E]{1,32}$': {
+        key: 'module-validation-error-ssid',
+        fallback: 'Please enter a valid SSID (1-32 characters)'
+      },
     }
 
     // Check for exact matches
     for (const [patternKey, message] of Object.entries(commonPatterns)) {
       if (pattern === patternKey) {
-        return message
+        return translate(message.key, message.fallback)
       }
     }
 
     // Check for partial matches
     if (pattern.includes('IP') || pattern.includes('ip')) {
-      return '请输入有效的IP地址'
+      return translate('module-validation-error-ip', 'Please enter a valid IP address')
     }
     if (pattern.includes('MAC') || pattern.includes('mac')) {
-      return '请输入有效的MAC地址'  
+      return translate('module-validation-error-mac', 'Please enter a valid MAC address')
     }
     if (pattern.includes('@')) {
-      return '请输入有效的邮箱地址'
+      return translate('module-validation-error-email', 'Please enter a valid email address')
     }
     if (pattern.includes('http')) {
-      return '请输入有效的URL地址'
+      return translate('module-validation-error-url', 'Please enter a valid URL')
     }
     if (pattern.includes('[0-9]')) {
-      return '请输入数字'
+      return translate('module-validation-error-number', 'Please enter a number')
     }
 
-    return '输入格式不正确'
+    return translate('module-validation-error-generic', 'Input format is invalid')
   }
 
   /**
@@ -165,7 +225,9 @@ export class ModuleValidationService {
     if (param.required) {
       rules.push((value: string) => {
         if (!value || value.trim() === '') {
-          return `${param.name} 是必填项`
+          return translate('module-validation-required', '{name} is required', {
+            name: param.name
+          })
         }
         return true
       })
@@ -194,7 +256,7 @@ export class ModuleValidationService {
     if (!url || url.trim() === '') {
       return {
         isValid: false,
-        errorMessage: '下载URL是必需的'
+        errorMessage: translate('module-validation-download-required', 'Download URL is required')
       }
     }
 
@@ -202,7 +264,7 @@ export class ModuleValidationService {
     if (!urlPattern.test(url)) {
       return {
         isValid: false,
-        errorMessage: '必须是有效的HTTP/HTTPS URL'
+        errorMessage: translate('module-validation-download-invalid', 'A valid HTTP/HTTPS URL is required')
       }
     }
 

@@ -2,6 +2,16 @@
 
 import type { OpenWrtPackage, PackageFeed, PackageSearchFilter } from '@/types/package'
 import { config } from '@/config'
+import { useI18nStore } from '@/stores/i18n'
+
+function translate(key: string, fallback: string): string {
+  try {
+    const store = useI18nStore()
+    return store?.t(key, fallback) ?? fallback
+  } catch {
+    return fallback
+  }
+}
 // Import ADB parser for apk v3 package index
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore - JS module export without types
@@ -317,9 +327,9 @@ export class PackageManagerService {
    */
   formatSize(bytes: number): string {
     if (bytes < 1024) return `${bytes} B`
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-    return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KiB`
+    if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MiB`
+    return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GiB`
   }
 
   /**
@@ -329,43 +339,51 @@ export class PackageManagerService {
    * Get feed display names
    */
   getFeedDisplayName(feedName: string): string {
-    const feedNames: { [key: string]: string } = {
-      'base': '基础系统',
-      'luci': 'LuCI界面',
-      'packages': '扩展软件包',
-      'telephony': '电话通信',
-      'kmods': '内核模块',
-      'target-packages': '目标专用包'
+    const feedNames: { [key: string]: { key: string, fallback: string } } = {
+      'base': { key: 'package-feed-base', fallback: 'Base system' },
+      'luci': { key: 'package-feed-luci', fallback: 'LuCI interface' },
+      'packages': { key: 'package-feed-packages', fallback: 'Additional packages' },
+      'telephony': { key: 'package-feed-telephony', fallback: 'Telephony' },
+      'kmods': { key: 'package-feed-kmods', fallback: 'Kernel modules' },
+      'target-packages': { key: 'package-feed-target', fallback: 'Target specific packages' }
     }
-    return feedNames[feedName] || feedName
+    const entry = feedNames[feedName]
+    if (entry) {
+      return translate(entry.key, entry.fallback)
+    }
+    return feedName
   }
 
   /**
    * Get section display names
    */
   getSectionDisplayName(section: string): string {
-    if (!section) return '无'
-    const sectionNames: { [key: string]: string } = {
-      'admin': '系统管理',
-      'base': '基础系统',
-      'boot': '启动加载',
-      'devel': '开发工具',
-      'firmware': '固件',
-      'kernel': '内核模块',
-      'lang': '编程语言',
-      'libs': '系统库',
-      'luci': 'Web界面',
-      'mail': '邮件服务',
-      'multimedia': '多媒体',
-      'net': '网络',
-      'sound': '音频',
-      'system': '系统工具',
-      'telephony': '电话通信',
-      'text': '文本处理',
-      'utils': '实用工具',
-      'web': 'Web服务'
+    if (!section) return translate('package-section-none', 'None')
+    const sectionNames: { [key: string]: { key: string, fallback: string } } = {
+      'admin': { key: 'package-section-admin', fallback: 'Administration' },
+      'base': { key: 'package-section-base', fallback: 'Base system' },
+      'boot': { key: 'package-section-boot', fallback: 'Boot loaders' },
+      'devel': { key: 'package-section-devel', fallback: 'Development' },
+      'firmware': { key: 'package-section-firmware', fallback: 'Firmware' },
+      'kernel': { key: 'package-section-kernel', fallback: 'Kernel modules' },
+      'lang': { key: 'package-section-lang', fallback: 'Languages' },
+      'libs': { key: 'package-section-libs', fallback: 'Libraries' },
+      'luci': { key: 'package-section-luci', fallback: 'LuCI' },
+      'mail': { key: 'package-section-mail', fallback: 'Mail' },
+      'multimedia': { key: 'package-section-multimedia', fallback: 'Multimedia' },
+      'net': { key: 'package-section-net', fallback: 'Network' },
+      'sound': { key: 'package-section-sound', fallback: 'Sound' },
+      'system': { key: 'package-section-system', fallback: 'System utilities' },
+      'telephony': { key: 'package-section-telephony', fallback: 'Telephony' },
+      'text': { key: 'package-section-text', fallback: 'Text processing' },
+      'utils': { key: 'package-section-utils', fallback: 'Utilities' },
+      'web': { key: 'package-section-web', fallback: 'Web services' }
     }
-    return sectionNames[section] || section
+    const entry = sectionNames[section]
+    if (entry) {
+      return translate(entry.key, entry.fallback)
+    }
+    return section
   }
 }
 
