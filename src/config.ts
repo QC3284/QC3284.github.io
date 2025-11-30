@@ -39,16 +39,16 @@ export const config: Config = {
   brand_name: "ImmortalWrt",
 
   // Homepage URL (for logo link)
-  homepage_url: "https://immortalwrt.org/",
+  homepage_url: "https://downloads.immortalwrt.org/",
 
   // Show help text for images
   show_help: true,
 
   // Versions list (optional if provided by .versions.json)
-  versions: ["24.10.3", "23.05.4", "19.07.10"],
+  versions: ["24.10.4", "23.05.4", "19.07.10"],
 
   // Pre-selected version (optional if provided by .versions.json)
-  default_version: "24.10.3",
+  default_version: "24.10.4",
 
   // Image download URL (e.g. "https://downloads.openwrt.org")
   image_url: "https://downloads.immortalwrt.org",
