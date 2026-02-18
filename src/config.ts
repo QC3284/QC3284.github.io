@@ -45,10 +45,10 @@ export const config: Config = {
   show_help: true,
 
   // Versions list (optional if provided by .versions.json)
-  versions: ["24.10.4", "23.05.4", "19.07.10"],
+  versions: ["24.10.5", "24.10.4", "23.05.4", "19.07.10"],
 
   // Pre-selected version (optional if provided by .versions.json)
-  default_version: "24.10.4",
+  default_version: "24.10.5",
 
   // Image download URL (e.g. "https://downloads.openwrt.org")
   image_url: "https://downloads.immortalwrt.org",
